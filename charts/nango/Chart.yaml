@@ -1,0 +1,28 @@
+apiVersion: v2
+name: nango
+type: application
+version: 0.0.1
+appVersion: 1.227.1
+dependencies:
+  - condition: postgresql.enabled
+    name: postgresql
+    repository: https://charts.bitnami.com/bitnami
+    version: 13.2.24
+deprecated: false
+description:
+  Nango - A single API for all your integrations
+home: https://nango.dev
+icon: https://app.nango.dev/logo-dark-background-vertical.svg
+keywords:
+  - nango
+  - integrations
+  - api
+  - oauth
+  - apps
+  - open-source
+maintainers:
+  - email: khaliq@nango.dev
+    name: nango
+    url: https://app.nango.dev
+sources:
+  - https://github.com/nango/nango-helm-charts.git
