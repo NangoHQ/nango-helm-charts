@@ -38,19 +38,24 @@ spec:
             - name: NANGO_CALLBACK_URL
               value: {{ .Values.shared.CALLBACK_URL }}
             - name: TEMPORAL_ADDRESS
-              value: {{ .Values.temporal.TEMPORAL_ADDRESS }}
+              value: {{ .Values.temporalio.TEMPORAL_ADDRESS }}
             - name: TEMPORAL_NAMESPACE
-              value: {{ .Values.temporal.TEMPORAL_NAMESPACE }}
+              value: {{ .Values.temporalio.TEMPORAL_NAMESPACE }}
             - name: NODE_ENV
               value: {{ .Values.ENV | default "production" }}
             - name: NANGO_ENTERPRISE
-              value: "true"
+              value: "false"
             - name: NANGO_INTEGRATIONS_FULL_PATH
               value: /flows
           volumeMounts:
             - mountPath: /flows
               name: {{ .Values.jobs.volume.name }}
+            - mountPath: /etc/secrets/
+              name: {{ .Values.temporalio.volumeName }}
       volumes:
         - name: {{ .Values.jobs.volume.name }}
           persistentVolumeClaim:
             claimName: {{ .Values.jobs.volume.claimName }}
+        - name: {{ .Values.temporalio.volumeName }}
+          secret:
+            secretName: {{ .Values.temporalio.volumeName }}

@@ -15,6 +15,12 @@ postgresql:
     postgresPassword: nango
     database: nango
 
+temporal:
+  enabled: true
+  global:
+    serviceAccountName: default
+    secretName: nango-secret
+
 server:
   name: nango-server
   replicas: 1
@@ -44,6 +50,8 @@ shared:
   ENCRYPTION_KEY: ""
   CALLBACK_URL: ""
 
-temporal:
-  TEMPORAL_ADDRESS: "temporaltest-worker-headless"
+temporalio:
+  # uses https://github.com/alexandrevilain/temporal-operator for demo purposes
+  volumeName: temporal-secrets
+  TEMPORAL_ADDRESS: nango-temporal.default.svc:7233
   TEMPORAL_NAMESPACE: "default"
