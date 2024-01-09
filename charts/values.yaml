@@ -55,3 +55,5 @@ temporalio:
   volumeName: temporal-secrets
   TEMPORAL_ADDRESS: nango-sync.guqns.tmprl.cloud:7233
   TEMPORAL_NAMESPACE: nango-sync.guqns
+  TEMPORAL_KEY: BASE_64_VALUE # replace
+  TEMPORAL_CRT: BASE_64_VALUE # replace
