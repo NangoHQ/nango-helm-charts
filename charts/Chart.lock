@@ -1,0 +1,9 @@
+dependencies:
+- name: postgresql
+  repository: https://charts.bitnami.com/bitnami
+  version: 13.2.24
+- name: temporal
+  repository: https://airbytehq.github.io/helm-charts
+  version: 0.50.20
+digest: sha256:8c2cd0f4d2fe1c08608d40f83b07efb726997ef1126737096f5f49b7d7be254f
+generated: "2023-12-20T17:06:21.930252-05:00"

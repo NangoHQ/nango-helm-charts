@@ -53,5 +53,5 @@ shared:
 temporalio:
   # uses https://github.com/alexandrevilain/temporal-operator for demo purposes
   volumeName: temporal-secrets
-  TEMPORAL_ADDRESS: nango-temporal.default.svc:7233
-  TEMPORAL_NAMESPACE: "default"
+  TEMPORAL_ADDRESS: nango-sync.guqns.tmprl.cloud:7233
+  TEMPORAL_NAMESPACE: nango-sync.guqns
