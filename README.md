@@ -19,12 +19,16 @@ helm repo add nangohq https://nangohq.github.io/nango-helm-charts
 ```
 * If you had already added this repo earlier, run `helm repo update` to retrieve
 the latest versions of the packages.  You can then run `helm search repo
-nango` to see the charts.
-* To install the the nango chart
+nangohq` to see the charts.
+* To install the necessary nango charts
 ```
-helm install my-nango nangohq/nango
+helm install nango-jobs nangohq/jobs
+helm install nango-runner nangohq/runner
+helm install nango-server nangohq/server
 ```
 * To uninstall the chart
 ```
-helm delete my-nango
+helm delete nango-jobs
+helm delete nango-runner
+helm delete nango-server
 ```
