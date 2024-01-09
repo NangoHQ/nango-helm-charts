@@ -22,13 +22,9 @@ the latest versions of the packages.  You can then run `helm search repo
 nangohq` to see the charts.
 * To install the necessary nango charts
 ```
-helm install nango-jobs nangohq/jobs
-helm install nango-runner nangohq/runner
-helm install nango-server nangohq/server
+helm install nango nangohq/nango
 ```
 * To uninstall the chart
 ```
-helm delete nango-jobs
-helm delete nango-runner
-helm delete nango-server
+helm delete nango
 ```
