@@ -1,4 +1,0 @@
-apiVersion: v1
-name: jobs
-version: 0.0.1
-description: Jobs charts for k8s deployment

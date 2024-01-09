@@ -1,2 +1,59 @@
+postgresql:
+  enabled: true
+  fullnameOverride: nango-postgresql
+  primary:
+    persistence:
+      enabled: false
+    resources:
+      limits:
+        cpu: "1000m"
+        memory: "2048Mi"
+      requests:
+        cpu: "250m"
+        memory: "1024Mi"
+  auth:
+    postgresPassword: nango
+    database: nango
+
 temporal:
-  enabled: false
+  enabled: true
+  global:
+    serviceAccountName: default
+    secretName: nango-secret
+
+server:
+  name: nango-server
+  replicas: 1
+
+jobs:
+  name: nango-jobs
+  replicas: 1
+  volume:
+    class: standard
+    name: flows-volume
+    claimName: flow-claim
+    provisioner: rancher.io/local-path
+
+
+runner:
+  name: nango-runner
+  replicas: 1
+
+shared:
+  namespace: default
+  ENV: production
+  DB_HOST: nango-postgresql
+  DB_USER: postgres
+  DB_PORT: "5432"
+  DB_NAME: nango
+  DB_SSL: false
+  ENCRYPTION_KEY: ""
+  CALLBACK_URL: ""
+
+temporalio:
+  # uses https://github.com/alexandrevilain/temporal-operator for demo purposes
+  volumeName: temporal-secrets
+  TEMPORAL_ADDRESS: nango-sync.abc
+  TEMPORAL_NAMESPACE: nango-sync.def
+  TEMPORAL_KEY: BASE_64_VALUE # replace
+  TEMPORAL_CRT: BASE_64_VALUE # replace
