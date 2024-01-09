@@ -1,3 +1,0 @@
-server:
-  name: server
-  replicas: 1
