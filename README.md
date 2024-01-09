@@ -20,6 +20,8 @@ helm repo add nangohq https://nangohq.github.io/nango-helm-charts
 * If you had already added this repo earlier, run `helm repo update` to retrieve
 the latest versions of the packages.  You can then run `helm search repo
 nangohq` to see the charts.
+* Set your values.yaml file, you can use the configuration section below to formulate
+the file
 * To install the necessary nango charts
 ```
 helm install nango nangohq/nango
@@ -28,3 +30,44 @@ helm install nango nangohq/nango
 ```
 helm delete nango
 ```
+
+# Configuration
+
+| Component                | Key                            | Value        |
+|--------------------------|--------------------------------|--------------|
+| PostgreSQL               | enabled                        | true         |
+|                          | fullnameOverride               | nango-postgresql |
+|                          | primary.persistence.enabled     | false        |
+|                          | primary.resources.limits.cpu    | "1000m"      |
+|                          | primary.resources.limits.memory | "2048Mi"     |
+|                          | primary.resources.requests.cpu  | "250m"       |
+|                          | primary.resources.requests.memory | "1024Mi"    |
+|                          | auth.postgresPassword           | nango        |
+|                          | auth.database                   | nango        |
+| Temporal                 | enabled                        | true         |
+|                          | global.serviceAccountName       | default      |
+|                          | global.secretName               | nango-secret |
+| Server                   | name                           | server       |
+|                          | replicas                       | 1            |
+| Jobs                     | name                           | jobs         |
+|                          | replicas                       | 1            |
+|                          | volume.class                   | standard     |
+|                          | volume.name                    | flows-volume |
+|                          | volume.claimName               | flow-claim   |
+|                          | volume.provisioner             | rancher.io/local-path |
+| Runner                   | name                           | runner       |
+|                          | replicas                       | 1            |
+| Shared                   | namespace                      | default      |
+|                          | ENV                            | production   |
+|                          | DB_HOST                        | nango-postgresql |
+|                          | DB_USER                        | postgres     |
+|                          | DB_PORT                        | "5432"       |
+|                          | DB_NAME                        | nango        |
+|                          | DB_SSL                         | false        |
+|                          | ENCRYPTION_KEY                 | ""           |
+|                          | CALLBACK_URL                   | ""           |
+| Temporalio               | volumeName                     | temporal-secrets |
+|                          | TEMPORAL_ADDRESS               | nango-sync.abc |
+|                          | TEMPORAL_NAMESPACE             | nango-sync.def |
+|                          | TEMPORAL_KEY                   | BASE_64_VALUE |
+|                          | TEMPORAL_CRT                   | BASE_64_VALUE |

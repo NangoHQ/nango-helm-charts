@@ -1,7 +1,0 @@
-name: jobs
-replicas: 1
-volume:
-  class: standard
-  name: flows-volume
-  claimName: flow-claim
-  provisioner: rancher.io/local-path
