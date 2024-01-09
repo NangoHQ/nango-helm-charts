@@ -15,7 +15,7 @@ within the jobs template
 * Install helm, [docs](https://helm.sh/docs)
 * Add this repo
 ```
-helm repo add nangohq https://nangohq.github.io/helm-charts
+helm repo add nangohq https://nangohq.github.io/nango-helm-charts
 ```
 * If you had already added this repo earlier, run `helm repo update` to retrieve
 the latest versions of the packages.  You can then run `helm search repo
