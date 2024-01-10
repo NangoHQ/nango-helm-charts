@@ -51,7 +51,6 @@ helm delete nango
 |                          | replicas                       | 1            |
 | jobs                     | name                           | jobs         |
 |                          | replicas                       | 1            |
-|                          | volume.class                   | standard     |
 |                          | volume.name                    | flows-volume |
 |                          | volume.claimName               | flow-claim   |
 |                          | volume.aws                     | false        |
