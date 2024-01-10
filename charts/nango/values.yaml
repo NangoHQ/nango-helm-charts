@@ -23,6 +23,7 @@ temporal:
 
 server:
   name: server
+  useLoadBalancer: true
   replicas: 1
 
 jobs:
@@ -47,7 +48,8 @@ shared:
   DB_NAME: nango
   DB_SSL: false
   ENCRYPTION_KEY: ""
-  CALLBACK_URL: ""
+  APP_URL: https://your-hosted-instance.com
+  CALLBACK_URL: https://your-hosted-instance.com/oauth/callback
   flows_path: /flows
   useVolumeForFlows: true
 

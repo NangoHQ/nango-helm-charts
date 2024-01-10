@@ -41,6 +41,8 @@ spec:
               value: "{{ .Values.shared.DB_SSL | default false }}"
             - name: NANGO_ENCRYPTION_KEY
               value: {{ .Values.shared.ENCRYPTION_KEY | default "" }}
+            - name: NANGO_SERVER_URL
+              value: {{ .Values.shared.APP_URL }}
             - name: NANGO_CALLBACK_URL
               value: {{ .Values.shared.CALLBACK_URL }}
             - name: TEMPORAL_ADDRESS

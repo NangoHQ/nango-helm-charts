@@ -4,7 +4,7 @@ metadata:
   namespace: {{ .Values.shared.namespace }}
   name: {{ .Values.server.name | default "nango-server" }}
 spec:
-  type: NodePort
+  type: {{ if .Values.server.useLoadBalancer }}LoadBalancer{{ else }}NodePort{{ end }}
   ports:
     - name: http
       port: 80
