@@ -48,6 +48,8 @@ helm delete nango
 |                          | global.serviceAccountName       | default      |
 |                          | global.secretName               | nango-secret |
 | server                   | name                           | server       |
+|                          | useLoadBalancer                | true         |
+|                          | MAILGUN_API_KEY                | ""           |
 |                          | replicas                       | 1            |
 | jobs                     | name                           | jobs         |
 |                          | replicas                       | 1            |
@@ -65,7 +67,8 @@ helm delete nango
 |                          | DB_NAME                        | nango        |
 |                          | DB_SSL                         | false        |
 |                          | ENCRYPTION_KEY                 | ""           |
-|                          | CALLBACK_URL                   | ""           |
+|                          | APP_URL                        | https://your-hosted-instance.com |
+|                          | CALLBACK_URL                   | https://your-hosted-instance.com/oauth/callback |
 |                          | flows_path                     | /flows       |
 |                          | useVolumeForFlows              | true         |
 | temporalio               | volumeName                     | temporal-secrets |

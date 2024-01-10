@@ -55,6 +55,8 @@ spec:
               value: "true"
             - name: NANGO_INTEGRATIONS_FULL_PATH
               value: {{ .Values.shared.flows_path }}
+            - name: MAILGUN_API_KEY
+              value: {{ .Values.server.MAILGUN_API_KEY }}
           volumeMounts:
             {{- if .Values.shared.useVolumeForFlows }}
             - mountPath: {{ .Values.shared.flows_path }}
