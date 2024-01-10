@@ -35,7 +35,7 @@ helm delete nango
 
 | Component                | Key                            | Value        |
 |--------------------------|--------------------------------|--------------|
-| PostgreSQL               | enabled                        | true         |
+| postgresql               | enabled                        | true         |
 |                          | fullnameOverride               | nango-postgresql |
 |                          | primary.persistence.enabled     | false        |
 |                          | primary.resources.limits.cpu    | "1000m"      |
@@ -44,20 +44,21 @@ helm delete nango
 |                          | primary.resources.requests.memory | "1024Mi"    |
 |                          | auth.postgresPassword           | nango        |
 |                          | auth.database                   | nango        |
-| Temporal                 | enabled                        | true         |
+| temporal                 | enabled                        | true         |
 |                          | global.serviceAccountName       | default      |
 |                          | global.secretName               | nango-secret |
-| Server                   | name                           | server       |
+| server                   | name                           | server       |
 |                          | replicas                       | 1            |
-| Jobs                     | name                           | jobs         |
+| jobs                     | name                           | jobs         |
 |                          | replicas                       | 1            |
 |                          | volume.class                   | standard     |
 |                          | volume.name                    | flows-volume |
 |                          | volume.claimName               | flow-claim   |
-|                          | volume.provisioner             | rancher.io/local-path |
-| Runner                   | name                           | runner       |
+|                          | volume.aws                     | false        |
+|                          | volume.gcp                     | false        |
+| runner                   | name                           | runner       |
 |                          | replicas                       | 1            |
-| Shared                   | namespace                      | default      |
+| shared                   | namespace                      | default      |
 |                          | ENV                            | production   |
 |                          | DB_HOST                        | nango-postgresql |
 |                          | DB_USER                        | postgres     |
@@ -66,7 +67,7 @@ helm delete nango
 |                          | DB_SSL                         | false        |
 |                          | ENCRYPTION_KEY                 | ""           |
 |                          | CALLBACK_URL                   | ""           |
-| Temporalio               | volumeName                     | temporal-secrets |
+| temporalio               | volumeName                     | temporal-secrets |
 |                          | TEMPORAL_ADDRESS               | nango-sync.abc |
 |                          | TEMPORAL_NAMESPACE             | nango-sync.def |
 |                          | TEMPORAL_KEY                   | BASE_64_VALUE |

@@ -1,0 +1,11 @@
+{{- if .Values.jobs.volume.gcp }}
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: {{ .Values.jobs.volume.claimName }}
+  namespace: {{ .Values.shared.namespace }}
+provisioner: kubernetes.io/gce-pd
+parameters:
+  type: pd-standard
+  fsType: ext4
+{{- end }}
