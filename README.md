@@ -17,7 +17,7 @@ within the jobs template
 ```
 helm repo add nangohq https://nangohq.github.io/nango-helm-charts
 ```
-* If you had already added this repo earlier, run `helm repo update` to retrieve
+* If you had already added this repo earlier, run `helm repo update nangohq` to retrieve
 the latest versions of the packages.  You can then run `helm search repo
 nangohq` to see the charts.
 * Set your values.yaml file, you can use the configuration section below to formulate
@@ -51,7 +51,6 @@ helm delete nango
 |                          | replicas                       | 1            |
 | jobs                     | name                           | jobs         |
 |                          | replicas                       | 1            |
-|                          | volume.class                   | standard     |
 |                          | volume.name                    | flows-volume |
 |                          | volume.claimName               | flow-claim   |
 |                          | volume.aws                     | false        |
