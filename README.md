@@ -66,6 +66,8 @@ helm delete nango
 |                          | DB_SSL                         | false        |
 |                          | ENCRYPTION_KEY                 | ""           |
 |                          | CALLBACK_URL                   | ""           |
+|                          | flows_path                     | /flows       |
+|                          | useVolumeForFlows              | true         |
 | temporalio               | volumeName                     | temporal-secrets |
 |                          | TEMPORAL_ADDRESS               | nango-sync.abc |
 |                          | TEMPORAL_NAMESPACE             | nango-sync.def |

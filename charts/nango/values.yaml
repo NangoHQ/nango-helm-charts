@@ -48,6 +48,8 @@ shared:
   DB_SSL: false
   ENCRYPTION_KEY: ""
   CALLBACK_URL: ""
+  flows_path: /flows
+  useVolumeForFlows: true
 
 temporalio:
   volumeName: temporal-secrets
