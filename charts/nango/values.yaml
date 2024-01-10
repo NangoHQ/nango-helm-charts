@@ -29,7 +29,6 @@ jobs:
   name: jobs
   replicas: 1
   volume:
-    class: standard
     name: flows-volume
     claimName: flow-claim
     aws: false
