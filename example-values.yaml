@@ -16,7 +16,7 @@ postgresql:
     database: nango
 
 temporal:
-  enabled: true
+  enabled: false
   global:
     serviceAccountName: default
     secretName: nango-secret
@@ -51,7 +51,6 @@ shared:
   CALLBACK_URL: ""
 
 temporalio:
-  # uses https://github.com/alexandrevilain/temporal-operator for demo purposes
   volumeName: temporal-secrets
   TEMPORAL_ADDRESS: nango-sync.abc
   TEMPORAL_NAMESPACE: nango-sync.def

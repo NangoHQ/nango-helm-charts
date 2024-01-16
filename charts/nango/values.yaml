@@ -24,6 +24,7 @@ temporal:
 server:
   name: server
   useLoadBalancer: true
+  MAILGUN_API_KEY: ""
   replicas: 1
 
 jobs:

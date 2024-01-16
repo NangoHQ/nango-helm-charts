@@ -44,7 +44,7 @@ spec:
             - name: NODE_ENV
               value: {{ .Values.ENV | default "production" }}
             - name: NANGO_ENTERPRISE
-              value: "false"
+              value: "true"
             - name: NANGO_INTEGRATIONS_FULL_PATH
               value: {{ .Values.shared.flows_path }}
           volumeMounts:

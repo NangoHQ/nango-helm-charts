@@ -10,4 +10,5 @@ parameters:
   fsType: ext4
   iopsPerGB: "10"
   encrypted: "true"
+volumeBindingMode: WaitForFirstConsumer
 {{- end }}
