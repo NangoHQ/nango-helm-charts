@@ -1,6 +1,3 @@
-Nango Helm Charts
-==================
-
 # Overview
 * In order to run Nango in a kubernetes cluster some components must be in place
 for the application to run as expected
