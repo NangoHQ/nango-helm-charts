@@ -10,6 +10,34 @@ along with a `$TEMPORAL_NAMESPACE.key` and `$TEMPORAL_NAMESPACE.crt` files
 to be set as secrets in kubernetes. Setting the files as secrets can be done by
 populating the temporal-secrets.yaml with the base64 encoded values to the file 
 within the jobs template
+* The values you need to obtain from a Nango developer are
+```
+TEMPORAL_ADDRESS
+TEMPORAL_NAMESPACE
+TEMPORAL_KEY
+TEMPORAL_CERT
+MAILGUN_API_KEY
+```
+
+## Volume
+* In order to run syncs and actions a volume is used across services to allow 
+the different components to coordinate the execution of a sync. Therefore within
+the jobs template there is a `jobs-pvc.yaml` and a `jobs-${aws|gcp}-storage-class.yaml`
+that attempts to create a volume that is used across the `jobs` and `server`
+components
+* That volume should attach to each pod, but if you see issues with this please
+reach out!
+
+## Exposing the Server
+* In order to do the OAuth handshake the server component needs to publicly 
+accessible to catch the OAuth callback. Therefore by default if using AWS
+the server service automatically uses a LoadBalancer to expose it publicly.
+You can set `useLoadBalancer` to false if you want to expose the server in a
+different way.
+* If you're using [Porter](https://www.porter.run/) there is an issue that the 
+load balancer that is created is internal only and the server isn't exposed 
+correctly. Please reach out and we can work with Porter and you to diagnose this
+known issue.
 
 # Usage
 * Install helm, [docs](https://helm.sh/docs)
@@ -33,7 +61,7 @@ helm delete nango
 
 # Configuration
 
-| Component                | Key                            | Value        |
+| Component                | Key                            | Default Value|
 |--------------------------|--------------------------------|--------------|
 | postgresql               | enabled                        | true         |
 |                          | fullnameOverride               | nango-postgresql |
@@ -44,7 +72,7 @@ helm delete nango
 |                          | primary.resources.requests.memory | "1024Mi"    |
 |                          | auth.postgresPassword           | nango        |
 |                          | auth.database                   | nango        |
-| temporal                 | enabled                        | true         |
+| temporal                 | enabled                        | false         |
 |                          | global.serviceAccountName       | default      |
 |                          | global.secretName               | nango-secret |
 | server                   | name                           | server       |
