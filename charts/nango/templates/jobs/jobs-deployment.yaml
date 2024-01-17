@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: {{ .Values.jobs.name | default "nango-jobs" }}
-          image: nangohq/nango-jobs:production
+          image: nangohq/nango-jobs:enterprise
           imagePullPolicy: {{ .Values.imagePullPolicy | default "Always" }}
           env:
             - name: NANGO_DB_HOST
@@ -24,17 +24,26 @@ spec:
               value: {{ .Values.shared.DB_NAME }}
             - name: NANGO_DB_USER
               value: {{ .Values.shared.DB_USER }}
+              {{- if .Values.shared.DB_URL }}
+              name: NANGO_DATABASE_URL
+              value: {{ .Values.shared.DB_URL }}
+              {{- end }}
             - name: NANGO_DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: nango-postgresql
+                  name: {{ if .Values.postgresql.enabled }}nango-postgresql{{ else }}nango-secrets{{ end }}
                   key: postgres-password
             - name: NANGO_DB_PORT
               value: "{{ .Values.shared.DB_PORT | default 5432 }}"
             - name: NANGO_DB_SSL
               value: "{{ .Values.shared.DB_SSL | default false }}"
+              {{- if .Values.shared.encryptionEnabled }}
             - name: NANGO_ENCRYPTION_KEY
-              value: {{ .Values.shared.ENCRYPTION_KEY | default "" }}
+              valueFrom:
+                secretKeyRef:
+                  name: nango-secrets
+                  key: encryption-key
+              {{- end }}
             - name: NANGO_CALLBACK_URL
               value: {{ .Values.shared.CALLBACK_URL }}
             - name: TEMPORAL_ADDRESS
@@ -54,6 +63,7 @@ spec:
             {{- end }}
             - mountPath: /etc/secrets/
               name: {{ .Values.temporalio.volumeName }}
+              readOnly: true
       volumes:
         {{- if .Values.shared.useVolumeForFlows }}
         - name: {{ .Values.jobs.volume.name }}

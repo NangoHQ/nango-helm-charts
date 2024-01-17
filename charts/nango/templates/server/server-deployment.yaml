@@ -33,14 +33,19 @@ spec:
             - name: NANGO_DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: nango-postgresql
+                  name: {{ if .Values.postgresql.enabled }}nango-postgresql{{ else }}nango-secrets{{ end }}
                   key: postgres-password
             - name: NANGO_DB_PORT
               value: "{{ .Values.shared.DB_PORT | default 5432 }}"
             - name: NANGO_DB_SSL
               value: "{{ .Values.shared.DB_SSL | default false }}"
+              {{- if .Values.shared.encryptionEnabled }}
             - name: NANGO_ENCRYPTION_KEY
-              value: {{ .Values.shared.ENCRYPTION_KEY | default "" }}
+              valueFrom:
+                secretKeyRef:
+                  name: nango-secrets
+                  key: encryption-key
+              {{- end }}
             - name: NANGO_SERVER_URL
               value: {{ .Values.shared.APP_URL }}
             - name: NANGO_CALLBACK_URL
@@ -56,7 +61,10 @@ spec:
             - name: NANGO_INTEGRATIONS_FULL_PATH
               value: {{ .Values.shared.flows_path }}
             - name: MAILGUN_API_KEY
-              value: {{ .Values.server.MAILGUN_API_KEY }}
+              valueFrom:
+                secretKeyRef:
+                  name: nango-secrets
+                  key: mailgun-api-key
           volumeMounts:
             {{- if .Values.shared.useVolumeForFlows }}
             - mountPath: {{ .Values.shared.flows_path }}
@@ -64,6 +72,7 @@ spec:
             {{- end }}
             - mountPath: /etc/secrets/
               name: {{ .Values.temporalio.volumeName }}
+              readOnly: true
       volumes:
         {{- if .Values.shared.useVolumeForFlows }}
         - name: {{ .Values.jobs.volume.name }}

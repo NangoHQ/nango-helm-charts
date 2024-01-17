@@ -16,7 +16,7 @@ postgresql:
     database: nango
 
 temporal:
-  enabled: true
+  enabled: false
   global:
     serviceAccountName: default
     secretName: nango-secret
@@ -42,22 +42,20 @@ runner:
 
 shared:
   namespace: default
+  encryptionEnabled: false
+  flows_path: /flows
+  useVolumeForFlows: true
   ENV: production
   DB_HOST: nango-postgresql
   DB_USER: postgres
   DB_PORT: "5432"
   DB_NAME: nango
   DB_SSL: false
-  ENCRYPTION_KEY: ""
   APP_URL: https://your-hosted-instance.com
   CALLBACK_URL: https://your-hosted-instance.com/oauth/callback
-  flows_path: /flows
-  useVolumeForFlows: true
 
 temporalio:
-  volumeName: temporal-secrets
+  volumeName: nango-temporal-secrets
   TEMPORAL_ADDRESS: nango-sync.abc
   TEMPORAL_NAMESPACE: nango-sync.def
-  TEMPORAL_KEY: BASE_64_VALUE
-  TEMPORAL_CRT: BASE_64_VALUE
 
