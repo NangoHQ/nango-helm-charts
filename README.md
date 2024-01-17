@@ -37,21 +37,20 @@ kubectl create secret generic nango-secrets \
 ## `nango-temporal-secrets`
 
 Contains two files received from a Nango developer: `TEMPORAL_KEY` and `TEMPORAL_CERT`.
-The secret's name depends on `TEMPORAL_NAMESPACE`. Before creating the secret, encode these files in base64:
+The secret's name depends on `TEMPORAL_NAMESPACE`. Then create the secret:
+```bash
+kubectl create secret generic nango-temporal-secrets \
+    --from-file=name-of-your-temporal-namespace.key \
+    --from-file=name-of-your-temporal-namespace.crt
+```
+
+Alternatively use a YAML file for all secret creation (ensure all values are
+base64 encoded). To encode the temporal key and cert:
 ```bash
 TEMPORAL_KEY_BASE64=$(cat path/to/temporal.key | base64 | tr -d '\n')
 TEMPORAL_CRT_BASE64=$(cat path/to/temporal.crt | base64 | tr -d '\n')
 ```
-
-Then create the secret:
-```bash
-kubectl create secret generic nango-temporal-secrets \
-    --from-literal=TEMPORAL_NAMESPACE.key=$TEMPORAL_KEY_BASE64 \
-    --from-literal=TEMPORAL_NAMESPACE.crt=$TEMPORAL_CRT_BASE64
-```
-
-Alternatively use a YAML file for all secret creation (ensure all values are
-base64 encoded)
+Then to create the secrets:
 ```yaml
 apiVersion: v1
 kind: Secret
