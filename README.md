@@ -34,7 +34,7 @@ kubectl create secret generic nango-secrets \
   --from-literal=mailgun-api-key=key-from-nango-dev
   ```
 
-## nango-temporal-secrets
+## `nango-temporal-secrets`
 
 Contains two files received from a Nango developer: `TEMPORAL_KEY` and `TEMPORAL_CERT`.
 The secret's name depends on `TEMPORAL_NAMESPACE`. Before creating the secret, encode these files in base64:
