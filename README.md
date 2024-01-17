@@ -1,13 +1,12 @@
 # Overview
-* In order to run Nango in a kubernetes cluster some components must be in place
-for the application to run as expected
-* Syncs and actions in nango have a dependency on [temporal](https://temporal.io/)
-and expect `TEMPORAL_ADDRESS` and `TEMPORAL_NAMESPACE` env variables to be set
-along with a `$TEMPORAL_NAMESPACE.key` and `$TEMPORAL_NAMESPACE.crt` files
-to be set as secrets in kubernetes. Setting the files as secrets can be done by
-populating the temporal-secrets.yaml with the base64 encoded values to the file 
-within the jobs template
-* The values you need to obtain from a Nango developer are
+
+Nango requires specific components and configurations to operate correctly within a Kubernetes cluster. Key dependencies include:
+
+- **[Temporal](https://temporal.io/)**: Nango relies on Temporal for syncs and actions. 
+The environment variables `TEMPORAL_ADDRESS` and `TEMPORAL_NAMESPACE` must be set which
+you can receive from a Nango developer. Additionally, `TEMPORAL_NAMESPACE.key` 
+and `TEMPORAL_NAMESPACE.crt` files need to be configured as Kubernetes secrets.
+- **Required Values**: Obtain the following values from a Nango developer:
 ```
 TEMPORAL_ADDRESS
 TEMPORAL_NAMESPACE
@@ -16,41 +15,100 @@ TEMPORAL_CERT
 MAILGUN_API_KEY
 ```
 
-## Volume
-* In order to run syncs and actions a volume is used across services to allow 
-the different components to coordinate the execution of a sync. Therefore within
-the jobs template there is a `jobs-pvc.yaml` and a `jobs-${aws|gcp}-storage-class.yaml`
-that attempts to create a volume that is used across the `jobs` and `server`
-components
-* That volume should attach to each pod, but if you see issues with this please
-reach out!
+# Setting Up Secrets
 
-## Exposing the Server
-* In order to do the OAuth handshake the server component needs to publicly 
-accessible to catch the OAuth callback. Therefore by default if using AWS
-the server service automatically uses a LoadBalancer to expose it publicly.
-You can set `useLoadBalancer` to false if you want to expose the server in a
-different way.
-* If you're using [Porter](https://www.porter.run/) there is an issue that the 
-load balancer that is created is internal only and the server isn't exposed 
-correctly. Please reach out and we can work with Porter and you to diagnose this
-known issue.
+Nango expects the following secrets:
+
+## `nango-secrets`
+
+This secret should contain:
+- `postgres-password`: Required if `postgresql.enabled` is set to `false` (i.e., using an external database).
+- `encryption-key`: Required if `shared.encryptionEnabled` is set to `true`.
+- `mailgun-api-key`.
+
+Example command to create `nango-secrets`:
+```bash
+kubectl create secret generic nango-secrets \
+  --from-literal=postgres-password=secure-pw \
+  --from-literal=encryption-key=base64-encoded-256-bit-key \
+  --from-literal=mailgun-api-key=key-from-nango-dev
+  ```
+
+## nango-temporal-secrets
+
+Contains two files received from a Nango developer: `TEMPORAL_KEY` and `TEMPORAL_CERT`.
+The secret's name depends on `TEMPORAL_NAMESPACE`. Before creating the secret, encode these files in base64:
+```bash
+TEMPORAL_KEY_BASE64=$(cat path/to/temporal.key | base64 | tr -d '\n')
+TEMPORAL_CRT_BASE64=$(cat path/to/temporal.crt | base64 | tr -d '\n')
+```
+
+Then create the secret:
+```bash
+kubectl create secret generic nango-temporal-secrets \
+    --from-literal=TEMPORAL_NAMESPACE.key=$TEMPORAL_KEY_BASE64 \
+    --from-literal=TEMPORAL_NAMESPACE.crt=$TEMPORAL_CRT_BASE64
+```
+
+Alternatively use a YAML file for all secret creation (ensure all values are
+base64 encoded)
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: nango-temporal-secrets
+type: Opaque
+data:
+  name-of-your-temporal-namespace.key: [base64-encoded-key]
+  name-of-your-temporal-namespace.crt: [base64-encoded-crt]
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: nango-secrets
+type: Opaque
+data:
+  postgres-password: [base64-encoded-password]
+  encryption-key: [base64-encoded-encryption-key-which-means-you-need-to-base64-encode-the-base64-256-bit-key]
+  mailgun-api-key: [base64-encoded-api-key]
+```
+
+# Persistent Volume Configuration
+
+To facilitate syncs and actions, Nango utilizes a persistent volume across services.
+The jobs-pvc.yaml and jobs-${aws|gcp}-storage-class.yaml in the jobs template
+are responsible for creating this volume, used by the jobs and server components.
+Reach out for assistance if you encounter issues with the volume attachment.
+
+# Exposing the Server
+
+The server component, crucial for OAuth handshake, needs to be publicly accessible. 
+By default, on AWS, a LoadBalancer exposes the server. Set useLoadBalancer
+to false to use an alternate exposure method.
+
+Note for Porter Users: There's a known issue where the server might not be
+correctly exposed due to an internal-only load balancer. Please contact us for support.
 
 # Usage
-* Install helm, [docs](https://helm.sh/docs)
-* Add this repo
-```
+1. Install helm: Follow the [official Helm documentation](https://helm.sh/docs)
+
+2. Add the Nango Repository
+```bash
 helm repo add nangohq https://nangohq.github.io/nango-helm-charts
 ```
-* If you had already added this repo earlier, run `helm repo update nangohq` to retrieve
-the latest versions of the packages.  You can then run `helm search repo
-nangohq` to see the charts.
-* Set your values.yaml file, you can use the configuration section below to formulate
-the file
-* To install the necessary nango charts
+3. Update the Repository (if previously added):
+```bash
+helm repo update nangohq
+helm search repo nangohq
 ```
+4. Configure values.yaml: Refer to the configuration section below.
+5. Install Nango charts
+```bash
 helm install nango nangohq/nango
 ```
+
 * To uninstall the chart
 ```
 helm delete nango
@@ -74,7 +132,6 @@ helm delete nango
 |                          | global.secretName               | nango-secret |
 | server                   | name                           | server       |
 |                          | useLoadBalancer                | true         |
-|                          | MAILGUN_API_KEY                | ""           |
 |                          | replicas                       | 1            |
 | jobs                     | name                           | jobs         |
 |                          | replicas                       | 1            |
@@ -91,7 +148,6 @@ helm delete nango
 |                          | DB_PORT                        | "5432"       |
 |                          | DB_NAME                        | nango        |
 |                          | DB_SSL                         | false        |
-|                          | ENCRYPTION_KEY                 | ""           |
 |                          | APP_URL                        | https://your-hosted-instance.com |
 |                          | CALLBACK_URL                   | https://your-hosted-instance.com/oauth/callback |
 |                          | flows_path                     | /flows       |
@@ -99,5 +155,3 @@ helm delete nango
 | temporalio               | volumeName                     | temporal-secrets |
 |                          | TEMPORAL_ADDRESS               | nango-sync.abc |
 |                          | TEMPORAL_NAMESPACE             | nango-sync.def |
-|                          | TEMPORAL_KEY                   | BASE_64_VALUE |
-|                          | TEMPORAL_CRT                   | BASE_64_VALUE |
