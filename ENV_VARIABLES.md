@@ -15,6 +15,7 @@ NODE_ENV
 NANGO_ENTERPRISE # set to true
 MAILGUN_API_KEY # provided by Nango
 PERSIST_SERVICE_URL
+JOBS_SERVICE_URL
 ```
 
 # Optional
