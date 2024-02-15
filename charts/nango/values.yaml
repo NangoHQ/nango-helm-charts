@@ -40,6 +40,11 @@ runner:
   name: runner
   replicas: 1
 
+persist:
+  name: persist
+  url: http://nango-persist
+  replicas: 1
+
 shared:
   namespace: default
   encryptionEnabled: false

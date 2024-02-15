@@ -140,6 +140,9 @@ helm delete nango
 |                          | volume.gcp                     | false        |
 | runner                   | name                           | runner       |
 |                          | replicas                       | 1            |
+| persist                  | name                           | persist      |
+|                          | replicas                       | 1            |
+|                          | url                            | http://nango-persist |
 | shared                   | namespace                      | default      |
 |                          | ENV                            | production   |
 |                          | DB_HOST                        | nango-postgresql |
