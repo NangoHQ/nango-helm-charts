@@ -52,6 +52,8 @@ spec:
               value: {{ .Values.temporalio.TEMPORAL_NAMESPACE }}
             - name: NODE_ENV
               value: {{ .Values.ENV | default "production" }}
+            - name: NANGO_SERVER_URL
+              value: {{ .Values.shared.APP_URL }}
             - name: NANGO_ENTERPRISE
               value: "true"
             - name: NANGO_INTEGRATIONS_FULL_PATH
