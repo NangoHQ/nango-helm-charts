@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: {{ .Values.runner.name | default "nango-runner" }}
-          image: nangohq/nango-runner:enterprise
+          image: nangohq/nango-runner:{{ .Values.runner.tag | default "enterprise" }}
           imagePullPolicy: {{ .Values.imagePullPolicy | default "Always" }}
           env:
             - name: PERSIST_SERVICE_URL

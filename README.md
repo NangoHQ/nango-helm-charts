@@ -130,17 +130,21 @@ helm delete nango
 |                          | global.serviceAccountName       | default      |
 |                          | global.secretName               | nango-secret |
 | server                   | name                           | server       |
+|                          | tag                            | enterprise   |
 |                          | useLoadBalancer                | true         |
 |                          | replicas                       | 1            |
 | jobs                     | name                           | jobs         |
+|                          | tag                            | enterprise   |
 |                          | replicas                       | 1            |
 |                          | volume.name                    | flows-volume |
 |                          | volume.claimName               | flow-claim   |
 |                          | volume.aws                     | false        |
 |                          | volume.gcp                     | false        |
 | runner                   | name                           | runner       |
+|                          | tag                            | enterprise   |
 |                          | replicas                       | 1            |
 | persist                  | name                           | persist      |
+|                          | tag                            | enterprise   |
 |                          | replicas                       | 1            |
 |                          | url                            | http://nango-persist |
 | shared                   | namespace                      | default      |

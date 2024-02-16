@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: {{ .Values.jobs.name | default "nango-jobs" }}
-          image: nangohq/nango-jobs:enterprise
+          image: nangohq/nango-jobs:{{ .Values.jobs.tag | default "enterprise" }}
           imagePullPolicy: {{ .Values.imagePullPolicy | default "Always" }}
           env:
             - name: NANGO_DB_HOST

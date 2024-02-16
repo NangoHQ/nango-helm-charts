@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: {{ .Values.persist.name | default "nango-persist" }}
-          image: nangohq/nango-persist:enterprise
+          image: nangohq/nango-persist:{{ .Values.persist.tag | default "enterprise" }}
           imagePullPolicy: {{ .Values.imagePullPolicy | default "Always" }}
           env:
             - name: NANGO_DB_HOST
