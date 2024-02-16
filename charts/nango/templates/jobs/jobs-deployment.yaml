@@ -58,6 +58,8 @@ spec:
               value: {{ .Values.shared.flows_path }}
             - name: NANGO_RUNNER_PATH
               value: "/nango/packages/runner/dist/app.js"
+            - name: PERSIST_SERVICE_URL
+              value: {{ .Values.persist.url }}
           volumeMounts:
             {{- if .Values.shared.useVolumeForFlows }}
             - mountPath: {{ .Values.shared.flows_path }}
