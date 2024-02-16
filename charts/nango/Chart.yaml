@@ -1,7 +1,7 @@
 apiVersion: v2
 name: nango
 type: application
-version: 0.0.15
+version: 0.0.16
 appVersion: 0.0.2
 dependencies:
   - condition: postgresql.enabled
