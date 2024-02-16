@@ -22,3 +22,5 @@ spec:
               value: {{ .Values.persist.url }}
             - name: NANGO_ENTERPRISE
               value: "true"
+            - name: NANGO_RUNNER_PATH
+              value: "/nango/packages/runner/dist/app.js"
