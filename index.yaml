@@ -3,6 +3,40 @@ entries:
   nango:
   - apiVersion: v2
     appVersion: 0.0.2
+    created: "2024-03-01T08:45:49.411152427Z"
+    dependencies:
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 13.2.24
+    - condition: temporal.enabled
+      name: temporal
+      repository: https://airbytehq.github.io/helm-charts
+      version: 0.50.20
+    description: Nango - A single API for all your integrations
+    digest: 7a5fdcb06f918dbab5439f920cb99eb75a6df64cec12632e16bf1bf0e06fe696
+    home: https://nango.dev
+    icon: https://app.nango.dev/logo-dark-background-vertical.svg
+    keywords:
+    - nango
+    - integrations
+    - api
+    - oauth
+    - apps
+    - open-source
+    maintainers:
+    - email: khaliq@nango.dev
+      name: nango
+      url: https://app.nango.dev
+    name: nango
+    sources:
+    - https://github.com/nango/nango-helm-charts.git
+    type: application
+    urls:
+    - https://github.com/NangoHQ/nango-helm-charts/releases/download/nango-0.0.22/nango-0.0.22.tgz
+    version: 0.0.22
+  - apiVersion: v2
+    appVersion: 0.0.2
     created: "2024-02-16T17:25:59.1086001Z"
     dependencies:
     - condition: postgresql.enabled
@@ -681,4 +715,4 @@ entries:
     urls:
     - https://github.com/NangoHQ/nango-helm-charts/releases/download/nango-0.0.2/nango-0.0.2.tgz
     version: 0.0.2
-generated: "2024-02-16T17:25:59.108715044Z"
+generated: "2024-03-01T08:45:49.411301914Z"
