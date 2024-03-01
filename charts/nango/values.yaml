@@ -38,6 +38,7 @@ jobs:
 
 runner:
   name: runner
+  url: http://nango-runner
   replicas: 1
 
 persist:
