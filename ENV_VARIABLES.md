@@ -17,7 +17,6 @@ MAILGUN_API_KEY # provided by Nango (server, jobs, persist)
 PERSIST_SERVICE_URL (runner, jobs)
 JOBS_SERVICE_URL (jobs)
 RUNNER_SERVICE_URL (jobs)
-NANGO_ENTERPRISE (server, jobs, persist, runner)
 ```
 
 # Optional
