@@ -45,6 +45,7 @@ persist:
   name: persist
   url: http://nango-persist
   replicas: 1
+  tag: e6fd036d8bf2f5b7f9a8cd574746821e72b3801e # 2024/06/07
 
 shared:
   namespace: default
