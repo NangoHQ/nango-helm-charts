@@ -2,17 +2,19 @@
 
 Nango requires specific components and configurations to operate correctly within a Kubernetes cluster. Key dependencies include:
 
-- **[Temporal](https://temporal.io/)**: Nango relies on Temporal for syncs and actions.
-The environment variables `TEMPORAL_ADDRESS` and `TEMPORAL_NAMESPACE` must be set which
-you can receive from a Nango developer. Additionally, `TEMPORAL_NAMESPACE.key`
-and `TEMPORAL_NAMESPACE.crt` files need to be configured as Kubernetes secrets.
+- **[Elasticsearch](https://www.elastic.co/)**: Nango relies on Elasticsearch for logging.
+Nango can operate without running Elasticsearch and the environment variable `NANGO_LOGS_ENABLED`
+determines if logs are ingested and displayed in the Nango UI. If you are running Ela
+need to set:
+```
+NANGO_LOGS_ENABLED
+NANGO_LOGS_ES_PWD
+NANGO_LOGS_ES_URL
+NANGO_LOGS_ES_USER
+```
 - **Required Values**: Obtain the following values from a Nango developer:
 
 ```
-TEMPORAL_ADDRESS
-TEMPORAL_NAMESPACE
-TEMPORAL_KEY
-TEMPORAL_CERT
 MAILGUN_API_KEY
 ```
 
@@ -37,39 +39,9 @@ kubectl create secret generic nango-secrets \
   --from-literal=mailgun-api-key=key-from-nango-dev
   ```
 
-## `nango-temporal-secrets`
-
-Contains two files received from a Nango developer: `TEMPORAL_KEY` and `TEMPORAL_CERT`.
-The secret's name depends on `TEMPORAL_NAMESPACE`. Then create the secret:
-
-```bash
-kubectl create secret generic nango-temporal-secrets \
-    --from-file=name-of-your-temporal-namespace.key \
-    --from-file=name-of-your-temporal-namespace.crt
-```
-
-Alternatively use a YAML file for all secret creation (ensure all values are
-base64 encoded). To encode the temporal key and cert:
-
-```bash
-TEMPORAL_KEY_BASE64=$(cat path/to/temporal.key | base64 | tr -d '\n')
-TEMPORAL_CRT_BASE64=$(cat path/to/temporal.crt | base64 | tr -d '\n')
-```
-
 Then to create the secrets:
 
 ```yaml
-apiVersion: v1
-kind: Secret
-metadata:
-  name: nango-temporal-secrets
-type: Opaque
-data:
-  name-of-your-temporal-namespace.key: [base64-encoded-key]
-  name-of-your-temporal-namespace.crt: [base64-encoded-crt]
-
----
-
 apiVersion: v1
 kind: Secret
 metadata:
@@ -140,9 +112,11 @@ helm delete nango
 |                          | primary.resources.requests.memory | "1024Mi"    |
 |                          | auth.postgresPassword           | nango        |
 |                          | auth.database                   | nango        |
-| temporal                 | enabled                        | false         |
-|                          | global.serviceAccountName       | default      |
-|                          | global.secretName               | nango-secret |
+| elasticsearch            | enabled                        | false         |
+|                          | fullnameOverride               | nango-elasticsearch |
+|                          | clusterName                    | elastic      |
+|                          | security.enabled               | true         |
+|                          | security.elasticPassword       | nango        |
 | server                   | name                           | server       |
 |                          | tag                            | enterprise   |
 |                          | useLoadBalancer                | true         |
@@ -172,6 +146,3 @@ helm delete nango
 |                          | CALLBACK_URL                   | `https://your-hosted-instance.com/oauth/callback` |
 |                          | flows_path                     | /flows       |
 |                          | useVolumeForFlows              | true         |
-| temporalio               | volumeName                     | temporal-secrets |
-|                          | TEMPORAL_ADDRESS               | nango-sync.abc |
-|                          | TEMPORAL_NAMESPACE             | nango-sync.def |

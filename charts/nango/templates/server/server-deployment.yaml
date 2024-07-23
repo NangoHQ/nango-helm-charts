@@ -15,8 +15,9 @@ spec:
     spec:
       containers:
         - name: {{ .Values.server.name | default "nango-server" }}
-          image: nangohq/nango-server:{{ .Values.persist.tag | default "enterprise" }}
+          image: nangohq/nango:prod-{{ .Values.server.tag | default .Values.shared.tag }}
           imagePullPolicy: {{ .Values.imagePullPolicy  | default "Always" }}
+          args: ["node", "packages/server/dist/server.js"]
           ports:
             - containerPort: 3003
           env:
@@ -50,10 +51,6 @@ spec:
               value: {{ .Values.shared.APP_URL }}
             - name: NANGO_CALLBACK_URL
               value: {{ .Values.shared.CALLBACK_URL }}
-            - name: TEMPORAL_ADDRESS
-              value: {{ .Values.temporalio.TEMPORAL_ADDRESS }}
-            - name: TEMPORAL_NAMESPACE
-              value: {{ .Values.temporalio.TEMPORAL_NAMESPACE }}
             - name: NODE_ENV
               value: {{ .Values.shared.ENV | default "production" }}
             - name: NANGO_ENTERPRISE
@@ -70,15 +67,9 @@ spec:
             - mountPath: {{ .Values.shared.flows_path }}
               name: {{ .Values.jobs.volume.name }}
             {{- end }}
-            - mountPath: /etc/secrets/
-              name: {{ .Values.temporalio.volumeName }}
-              readOnly: true
       volumes:
         {{- if .Values.shared.useVolumeForFlows }}
         - name: {{ .Values.jobs.volume.name }}
           persistentVolumeClaim:
             claimName: {{ .Values.jobs.volume.claimName }}
         {{- end }}
-        - name: {{ .Values.temporalio.volumeName }}
-          secret:
-            secretName: {{ .Values.temporalio.volumeName }}
