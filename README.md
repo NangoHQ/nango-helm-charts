@@ -4,7 +4,7 @@ Nango requires specific components and configurations to operate correctly withi
 
 - **[Elasticsearch](https://www.elastic.co/)**: Nango relies on Elasticsearch for logging.
 Nango can operate without running Elasticsearch and the environment variable `NANGO_LOGS_ENABLED`
-determines if logs are ingested and displayed in the Nango UI. If you are running Ela
+determines if logs are ingested and displayed in the Nango UI. If you are running Elasticsearch you
 need to set:
 ```
 NANGO_LOGS_ENABLED
@@ -12,6 +12,8 @@ NANGO_LOGS_ES_PWD
 NANGO_LOGS_ES_URL
 NANGO_LOGS_ES_USER
 ```
+Note that these helm charts include a self hosted Elasticsearch version but 
+using that for production workloads is **not recommended**.
 - **Required Values**: Obtain the following values from a Nango developer:
 
 ```
