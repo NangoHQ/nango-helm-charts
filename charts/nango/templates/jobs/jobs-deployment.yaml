@@ -15,8 +15,9 @@ spec:
     spec:
       containers:
         - name: {{ .Values.jobs.name | default "nango-jobs" }}
-          image: nangohq/nango-jobs:{{ .Values.jobs.tag | default "enterprise" }}
+          image: nangohq/nango:prod-{{ .Values.jobs.tag | default .Values.shared.tag }}
           imagePullPolicy: {{ .Values.imagePullPolicy | default "Always" }}
+          args: ["node", "packages/jobs/dist/app.js"]
           env:
             - name: NANGO_DB_HOST
               value: {{ .Values.shared.DB_HOST }}
@@ -46,10 +47,6 @@ spec:
               {{- end }}
             - name: NANGO_CALLBACK_URL
               value: {{ .Values.shared.CALLBACK_URL }}
-            - name: TEMPORAL_ADDRESS
-              value: {{ .Values.temporalio.TEMPORAL_ADDRESS }}
-            - name: TEMPORAL_NAMESPACE
-              value: {{ .Values.temporalio.TEMPORAL_NAMESPACE }}
             - name: NODE_ENV
               value: {{ .Values.ENV | default "production" }}
             - name: NANGO_SERVER_URL
@@ -59,25 +56,29 @@ spec:
             - name: NANGO_INTEGRATIONS_FULL_PATH
               value: {{ .Values.shared.flows_path }}
             - name: NANGO_RUNNER_PATH
-              value: "/nango/packages/runner/dist/app.js"
+              value: "/app/nango/packages/runner/dist/app.js"
             - name: PERSIST_SERVICE_URL
               value: {{ .Values.persist.url }}
             - name: RUNNER_SERVICE_URL
               value: {{ .Values.runner.url }}
+            - name: ORCHESTRATOR_SERVICE_URL
+              value: {{ .Values.orchestrator.url }}
+            - name: NANGO_LOGS_ENABLED
+              value: "{{ .Values.shared.NANGO_LOGS_ENABLED }}"
+            - name: NANGO_LOGS_ES_PWD
+              value: {{ .Values.shared.NANGO_LOGS_ES_PWD }}
+            - name: NANGO_LOGS_ES_URL
+              value: {{ .Values.shared.NANGO_LOGS_ES_URL }}
+            - name: NANGO_LOGS_ES_USER
+              value: {{ .Values.shared.NANGO_LOGS_ES_USER }}
           volumeMounts:
             {{- if .Values.shared.useVolumeForFlows }}
             - mountPath: {{ .Values.shared.flows_path }}
               name: {{ .Values.jobs.volume.name }}
             {{- end }}
-            - mountPath: /etc/secrets/
-              name: {{ .Values.temporalio.volumeName }}
-              readOnly: true
       volumes:
         {{- if .Values.shared.useVolumeForFlows }}
         - name: {{ .Values.jobs.volume.name }}
           persistentVolumeClaim:
             claimName: {{ .Values.jobs.volume.claimName }}
         {{- end }}
-        - name: {{ .Values.temporalio.volumeName }}
-          secret:
-            secretName: {{ .Values.temporalio.volumeName }}

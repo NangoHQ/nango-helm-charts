@@ -15,11 +15,23 @@ postgresql:
     postgresPassword: nango
     database: nango
 
-temporal:
-  enabled: false
-  global:
-    serviceAccountName: default
-    secretName: nango-secret
+elasticsearch:
+  enabled: true
+  fullnameOverride: nango-elasticsearch
+  clusterName: elastic
+  # single node cluster
+  master:
+    masterOnly: false
+    replicaCount: 1
+  data:
+    replicaCount: 0
+  coordinating:
+    replicaCount: 0
+  ingest:
+    replicaCount: 0
+  security:
+    enabled: true
+    elasticPassword: nango
 
 server:
   name: server
@@ -45,7 +57,11 @@ persist:
   name: persist
   url: http://nango-persist
   replicas: 1
-  tag: e6fd036d8bf2f5b7f9a8cd574746821e72b3801e # 2024/06/07
+
+orchestrator:
+  name: orchestrator
+  url: http://nango-orchestrator
+  replicas: 1
 
 shared:
   namespace: default
@@ -60,9 +76,8 @@ shared:
   DB_SSL: false
   APP_URL: https://your-hosted-instance.com
   CALLBACK_URL: https://your-hosted-instance.com/oauth/callback
-
-temporalio:
-  volumeName: nango-temporal-secrets
-  TEMPORAL_ADDRESS: nango-sync.abc
-  TEMPORAL_NAMESPACE: nango-sync.def
-
+  NANGO_LOGS_ENABLED: true
+  NANGO_LOGS_ES_PWD: nango
+  NANGO_LOGS_ES_URL: https://nango-elasticsearch.default.svc.cluster.local:9200
+  NANGO_LOGS_ES_USER: elastic
+  tag: 8b2deab4b62b955bc118b4bdcdda3b9d1b4fad68 # 2024/07/23

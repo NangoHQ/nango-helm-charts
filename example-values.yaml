@@ -15,11 +15,42 @@ postgresql:
     postgresPassword: nango
     database: nango
 
-temporal:
-  enabled: false
-  global:
-    serviceAccountName: default
-    secretName: nango-secret
+elasticsearch:
+  enabled: true
+  fullnameOverride: nango-elasticsearch
+  clusterName: elastic
+  nodeGroup: master
+  masterOnly: true
+  replicas: 1
+  minimumMasterNodes: 1
+  resources:
+    limits:
+      cpu: "1000m"
+      memory: "2048Mi"
+    requests:
+      cpu: "250m"
+      memory: "1024Mi"
+  security:
+    enabled: true
+    elasticPassword: "nango"
+  service:
+    type: ClusterIP
+    ports:
+      restAPI: 9200
+      transport: 9300
+  persistence:
+    enabled: false
+  podSecurityContext:
+    fsGroup: 1001
+  containerSecurityContext:
+    runAsUser: 1001
+    runAsNonRoot: true
+  readinessProbe:
+    initialDelaySeconds: 90
+    periodSeconds: 10
+  livenessProbe:
+    initialDelaySeconds: 180
+    periodSeconds: 20
 
 server:
   name: nango-server
@@ -39,7 +70,11 @@ persist:
   name: persist
   url: http://nango-persist
   replicas: 1
-  tag: e6fd036d8bf2f5b7f9a8cd574746821e72b3801e # 2024/06/07
+
+orchestrator:
+  name: orchestrator
+  url: http://nango-orchestrator
+  replicas: 1
 
 shared:
   namespace: default
@@ -51,7 +86,8 @@ shared:
   DB_NAME: nango
   DB_SSL: false
   CALLBACK_URL: ""
-
-temporalio:
-  TEMPORAL_ADDRESS: nango-sync.abc
-  TEMPORAL_NAMESPACE: nango-sync.def
+  NANGO_LOGS_ENABLED: true
+  NANGO_LOGS_ES_PWD: nango
+  NANGO_LOGS_ES_URL: https://nango-elasticsearch.default.svc.cluster.local:9200
+  NANGO_LOGS_ES_USER: elastic
+  tag: 8b2deab4b62b955bc118b4bdcdda3b9d1b4fad68
