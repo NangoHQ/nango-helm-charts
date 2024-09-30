@@ -1,17 +1,17 @@
 apiVersion: v2
 name: nango
 type: application
-version: 0.0.14
+version: 0.0.24
 appVersion: 0.0.2
 dependencies:
   - condition: postgresql.enabled
     name: postgresql
     repository: https://charts.bitnami.com/bitnami
     version: 13.2.24
-  - condition: temporal.enabled
-    name: temporal
-    repository: https://airbytehq.github.io/helm-charts
-    version: 0.50.20
+  - condition: elasticsearch.enabled
+    name: elasticsearch
+    repository: https://charts.bitnami.com/bitnami
+    version: 21.3.3
 deprecated: false
 description:
   Nango - A single API for all your integrations

@@ -2,22 +2,22 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   namespace: {{ .Values.shared.namespace }}
-  name: {{ .Values.persist.name | default "nango-persist" }}
+  name: {{ .Values.orchestrator.name | default "nango-orchestrator" }}
 spec:
-  replicas: {{ .Values.persist.replicas | default 1 }}
+  replicas: {{ .Values.orchestrator.replicas | default 1 }}
   selector:
     matchLabels:
-      app: {{ .Values.persist.name | default "nango-persist" }}
+      app: {{ .Values.orchestrator.name | default "nango-orchestrator" }}
   template:
     metadata:
       labels:
-        app: {{ .Values.persist.name | default "nango-persist" }}
+        app: {{ .Values.orchestrator.name | default "nango-orchestrator" }}
     spec:
       containers:
-        - name: {{ .Values.persist.name | default "nango-persist" }}
-          image: nangohq/nango:prod-{{ .Values.persist.tag | default .Values.shared.tag }}
+        - name: {{ .Values.orchestrator.name | default "nango-orchestrator" }}
+          image: nangohq/nango:prod-{{ .Values.orchestrator.tag | default .Values.shared.tag }}
           imagePullPolicy: {{ .Values.imagePullPolicy | default "Always" }}
-          args: ["node", "packages/persist/dist/app.js"]
+          args: ["node", "packages/orchestrator/dist/app.js"]
           env:
             - name: NANGO_DB_HOST
               value: {{ .Values.shared.DB_HOST }}
@@ -47,11 +47,3 @@ spec:
               {{ end }}
             - name: NANGO_ENTERPRISE
               value: "true"
-            - name: NANGO_LOGS_ENABLED
-              value: "{{ .Values.shared.NANGO_LOGS_ENABLED }}"
-            - name: NANGO_LOGS_ES_PWD
-              value: {{ .Values.shared.NANGO_LOGS_ES_PWD }}
-            - name: NANGO_LOGS_ES_URL
-              value: {{ .Values.shared.NANGO_LOGS_ES_URL }}
-            - name: NANGO_LOGS_ES_USER
-              value: {{ .Values.shared.NANGO_LOGS_ES_USER }}
