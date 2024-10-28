@@ -16,7 +16,7 @@ postgresql:
     database: nango
 
 elasticsearch:
-  enabled: true
+  enabled: false
   fullnameOverride: nango-elasticsearch
   clusterName: elastic
   # single node cluster
@@ -38,6 +38,7 @@ server:
   useLoadBalancer: true
   MAILGUN_API_KEY: ""
   replicas: 1
+  SERVER_PORT: 3306
 
 jobs:
   name: jobs

@@ -63,7 +63,7 @@ spec:
                   name: nango-secrets
                   key: mailgun-api-key
             - name: SERVER_PORT
-              value: {{ .Values.shared.SERVER_PORT  | default 3003 }}
+              value: {{ .Values.server.SERVER_PORT }}
           volumeMounts:
             {{- if .Values.shared.useVolumeForFlows }}
             - mountPath: {{ .Values.shared.flows_path }}
