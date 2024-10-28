@@ -35,10 +35,10 @@ elasticsearch:
 
 server:
   name: server
+  replicas: 1
   useLoadBalancer: true
   MAILGUN_API_KEY: ""
-  replicas: 1
-  SERVER_PORT: 3306
+  SERVER_PORT: 3003
 
 jobs:
   name: jobs
