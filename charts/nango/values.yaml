@@ -38,7 +38,7 @@ server:
   replicas: 1
   useLoadBalancer: true
   MAILGUN_API_KEY: ""
-  SERVER_PORT: 3003
+  SERVER_PORT: "3003"
 
 jobs:
   name: jobs
