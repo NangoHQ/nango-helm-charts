@@ -16,7 +16,7 @@ postgresql:
     database: nango
 
 elasticsearch:
-  enabled: false
+  enabled: true
   fullnameOverride: nango-elasticsearch
   clusterName: elastic
   # single node cluster
