@@ -19,7 +19,7 @@ spec:
           imagePullPolicy: {{ .Values.imagePullPolicy  | default "Always" }}
           args: ["node", "packages/server/dist/server.js"]
           ports:
-            - containerPort: 3003
+            - containerPort: {{ .Values.server.SERVER_PORT }}
           env:
             - name: NANGO_DB_HOST
               value: {{ .Values.shared.DB_HOST }}
@@ -62,6 +62,8 @@ spec:
                 secretKeyRef:
                   name: nango-secrets
                   key: mailgun-api-key
+            - name: SERVER_PORT
+              value: "{{ .Values.server.SERVER_PORT }}"
           volumeMounts:
             {{- if .Values.shared.useVolumeForFlows }}
             - mountPath: {{ .Values.shared.flows_path }}
