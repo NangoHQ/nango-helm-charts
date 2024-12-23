@@ -69,16 +69,16 @@ shared:
   encryptionEnabled: false
   flows_path: /flows
   useVolumeForFlows: true
-  ENV: production
-  DB_HOST: nango-postgresql
-  DB_USER: postgres
-  DB_PORT: "5432"
-  DB_NAME: nango
-  DB_SSL: false
-  APP_URL: https://your-hosted-instance.com
-  CALLBACK_URL: https://your-hosted-instance.com/oauth/callback
+  NODE_ENV: production
+  NANGO_DB_HOST: nango-postgresql
+  NANGO_DB_USER: postgres
+  NANGO_DB_PORT: "5432"
+  NANGO_DB_NAME: nango
+  NANGO_DB_SSL: false
+  NANGO_SERVER_URL: https://your-hosted-instance.com
+  NANGO_CALLBACK_URL: https://your-hosted-instance.com/oauth/callback
   NANGO_LOGS_ENABLED: true
   NANGO_LOGS_ES_PWD: nango
   NANGO_LOGS_ES_URL: https://nango-elasticsearch.default.svc.cluster.local:9200
   NANGO_LOGS_ES_USER: elastic
-  tag: 8b2deab4b62b955bc118b4bdcdda3b9d1b4fad68 # 2024/07/23
+  tag: 23dd7e17fa32a0c23cabfb34cceecf30b293d38a # 2024/12/23
