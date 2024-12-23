@@ -54,7 +54,7 @@ spec:
             - name: FLAG_SERVE_CONNECT_UI
               value: "true"
             - name: NANGO_CALLBACK_URL
-              value: {{ .Values.shared.CALLBACK_URL }}
+              value: {{ .Values.shared.NANGO_CALLBACK_URL }}
             - name: NODE_ENV
               value: {{ .Values.shared.NODE_ENV | default "production" }}
             - name: NANGO_ENTERPRISE

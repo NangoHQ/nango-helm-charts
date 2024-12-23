@@ -145,6 +145,6 @@ helm delete nango
 |                          | NANGO_DB_NAME                  | nango        |
 |                          | NANGO_DB_SSL                   | false        |
 |                          | NANGO_SERVER_URL               | `https://your-hosted-instance.com` |
-|                          | CALLBACK_URL                   | `https://your-hosted-instance.com/oauth/callback` |
+|                          | NANGO_CALLBACK_URL             | `https://your-hosted-instance.com/oauth/callback` |
 |                          | flows_path                     | /flows       |
 |                          | useVolumeForFlows              | true         |
