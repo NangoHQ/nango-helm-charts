@@ -138,13 +138,13 @@ helm delete nango
 |                          | replicas                       | 1            |
 |                          | url                            | `http://nango-persist` |
 | shared                   | namespace                      | default      |
-|                          | ENV                            | production   |
-|                          | DB_HOST                        | nango-postgresql |
-|                          | DB_USER                        | postgres     |
-|                          | DB_PORT                        | "5432"       |
-|                          | DB_NAME                        | nango        |
-|                          | DB_SSL                         | false        |
-|                          | APP_URL                        | `https://your-hosted-instance.com` |
+|                          | NODE_ENV                       | production   |
+|                          | NANGO_DB_HOST                  | nango-postgresql |
+|                          | NANGO_DB_USER                  | postgres     |
+|                          | NANGO_DB_PORT                  | "5432"       |
+|                          | NANGO_DB_NAME                  | nango        |
+|                          | NANGO_DB_SSL                   | false        |
+|                          | NANGO_SERVER_URL               | `https://your-hosted-instance.com` |
 |                          | CALLBACK_URL                   | `https://your-hosted-instance.com/oauth/callback` |
 |                          | flows_path                     | /flows       |
 |                          | useVolumeForFlows              | true         |
