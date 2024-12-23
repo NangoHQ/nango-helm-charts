@@ -20,14 +20,14 @@ spec:
           args: ["node", "packages/jobs/dist/app.js"]
           env:
             - name: NANGO_DB_HOST
-              value: {{ .Values.shared.DB_HOST }}
+              value: {{ .Values.shared.NANGO_DB_HOST }}
             - name: NANGO_DB_NAME
-              value: {{ .Values.shared.DB_NAME }}
+              value: {{ .Values.shared.NANGO_DB_NAME }}
             - name: NANGO_DB_USER
-              value: {{ .Values.shared.DB_USER }}
-              {{- if .Values.shared.DB_URL }}
+              value: {{ .Values.shared.NANGO_DB_USER }}
+              {{- if .Values.shared.NANGO_NANGO_DATABASE_URL }}
               name: NANGO_DATABASE_URL
-              value: {{ .Values.shared.DB_URL }}
+              value: {{ .Values.shared.NANGO_DATABASE_URL }}
               {{- end }}
             - name: NANGO_DB_PASSWORD
               valueFrom:
@@ -35,9 +35,9 @@ spec:
                   name: {{ if .Values.postgresql.enabled }}nango-postgresql{{ else }}nango-secrets{{ end }}
                   key: postgres-password
             - name: NANGO_DB_PORT
-              value: "{{ .Values.shared.DB_PORT | default 5432 }}"
+              value: "{{ .Values.shared.NANGO_DB_PORT | default 5432 }}"
             - name: NANGO_DB_SSL
-              value: "{{ .Values.shared.DB_SSL | default false }}"
+              value: "{{ .Values.shared.NANGO_DB_SSL | default false }}"
               {{- if .Values.shared.encryptionEnabled }}
             - name: NANGO_ENCRYPTION_KEY
               valueFrom:
@@ -46,11 +46,11 @@ spec:
                   key: encryption-key
               {{- end }}
             - name: NANGO_CALLBACK_URL
-              value: {{ .Values.shared.CALLBACK_URL }}
+              value: {{ .Values.shared.NANGO_CALLBACK_URL }}
             - name: NODE_ENV
-              value: {{ .Values.ENV | default "production" }}
+              value: {{ .Values.NODE_ENV | default "production" }}
             - name: NANGO_SERVER_URL
-              value: {{ .Values.shared.APP_URL }}
+              value: {{ .Values.shared.NANGO_SERVER_URL }}
             - name: NANGO_ENTERPRISE
               value: "true"
             - name: NANGO_INTEGRATIONS_FULL_PATH
