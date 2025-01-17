@@ -62,6 +62,9 @@ spec:
                 secretKeyRef:
                   name: nango-secrets
                   key: mailgun-api-key
+            {{- if .Values.server.env }}
+            {{- toYaml .Values.server.env | nindent 12 }}
+            {{- end }}
           volumeMounts:
             {{- if .Values.shared.useVolumeForFlows }}
             - mountPath: {{ .Values.shared.flows_path }}
