@@ -72,6 +72,9 @@ spec:
                   key: mailgun-api-key
             - name: SERVER_PORT
               value: "{{ .Values.server.SERVER_PORT }}"
+            {{- if .Values.server.env }}
+            {{- toYaml .Values.server.env | nindent 12 }}
+            {{- end }}
           volumeMounts:
             {{- if .Values.shared.useVolumeForFlows }}
             - mountPath: {{ .Values.shared.flows_path }}

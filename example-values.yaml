@@ -55,6 +55,18 @@ elasticsearch:
 server:
   name: nango-server
   replicas: 1
+  # you can set /any/ nango-server environment variable required utilizing the "env" key as follows:
+  # the example below shows a configuration to enable basic auth
+  # env:
+  #   - name: FLAG_AUTH_ENABLED
+  #     value: "false"
+  #   - name: NANGO_DASHBOARD_USERNAME
+  #     value: nango
+  #   - name: NANGO_DASHBOARD_PASSWORD
+  #     valueFrom:
+  #       secretKeyRef:
+  #         name: nango-secrets
+  #         key: nango-dashboard-password
 
 jobs:
   name: nango-jobs
