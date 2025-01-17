@@ -81,4 +81,4 @@ shared:
   NANGO_LOGS_ES_PWD: nango
   NANGO_LOGS_ES_URL: https://nango-elasticsearch.default.svc.cluster.local:9200
   NANGO_LOGS_ES_USER: elastic
-  tag: 23dd7e17fa32a0c23cabfb34cceecf30b293d38a # 2024/12/23
+  tag: prod-23dd7e17fa32a0c23cabfb34cceecf30b293d38a # 2024/12/23

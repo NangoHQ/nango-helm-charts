@@ -13,9 +13,13 @@ spec:
       labels:
         app: {{ .Values.runner.name | default "nango-runner" }}
     spec:
+      {{- with .Values.shared.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: {{ .Values.runner.name | default "nango-runner" }}
-          image: nangohq/nango:prod-{{ .Values.runner.tag | default .Values.shared.tag }}
+          image: {{ .Values.shared.imageRegistry | default "nangohq" }}/{{ .Values.shared.imageRepository | default "nango" }}:{{ .Values.runner.tag | default .Values.shared.tag }}
           imagePullPolicy: {{ .Values.imagePullPolicy | default "Always" }}
           args: ["node", "packages/runner/dist/app.js"]
           env:

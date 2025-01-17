@@ -13,9 +13,13 @@ spec:
       labels:
         app: {{ .Values.server.name | default "nango-server" }}
     spec:
+      {{- with .Values.shared.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: {{ .Values.server.name | default "nango-server" }}
-          image: nangohq/nango:prod-{{ .Values.server.tag | default .Values.shared.tag }}
+          image: {{ .Values.shared.imageRegistry | default "nangohq" }}/{{ .Values.shared.imageRepository | default "nango" }}:{{ .Values.server.tag | default .Values.shared.tag }}
           imagePullPolicy: {{ .Values.imagePullPolicy  | default "Always" }}
           args: ["node", "packages/server/dist/server.js"]
           ports:
