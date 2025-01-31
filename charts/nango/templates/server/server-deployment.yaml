@@ -65,6 +65,8 @@ spec:
               value: "true"
             - name: NANGO_INTEGRATIONS_FULL_PATH
               value: {{ .Values.shared.flows_path }}
+            - name: ORCHESTRATOR_SERVICE_URL
+              value: {{ .Values.orchestrator.url }}
             - name: MAILGUN_API_KEY
               valueFrom:
                 secretKeyRef:
