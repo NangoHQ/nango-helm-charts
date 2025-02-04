@@ -17,6 +17,10 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- with .Values.server.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: {{ .Values.server.name | default "nango-server" }}
           image: {{ .Values.shared.imageRegistry | default "nangohq" }}/{{ .Values.shared.imageRepository | default "nango" }}:{{ .Values.server.tag | default .Values.shared.tag }}
