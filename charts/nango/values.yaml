@@ -81,4 +81,4 @@ shared:
   NANGO_LOGS_ES_PWD: nango
   NANGO_LOGS_ES_URL: https://nango-elasticsearch.default.svc.cluster.local:9200
   NANGO_LOGS_ES_USER: elastic
-  tag: 8e1afd4f9c1a48112b87c75ae6699debdb8f1a48 # 2025/02/10
+  tag: 6adbaf17e6cba479564277b1f5224f42558454f4 # 2025/02/10
