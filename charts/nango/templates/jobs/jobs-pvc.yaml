@@ -5,7 +5,7 @@ metadata:
   name: {{ .Values.jobs.volume.claimName }}
   namespace: {{ .Values.shared.namespace }}
 spec:
-  storageClassName: {{ .Values.jobs.volume.claimName }}
+  storageClassName: {{ .Values.jobs.volume.storageClassName }}
   accessModes:
   - ReadWriteOnce
   resources:

@@ -34,33 +34,35 @@ elasticsearch:
     elasticPassword: nango
 
 server:
-  name: server
+  name: nango-self-server
   replicas: 1
   useLoadBalancer: true
   MAILGUN_API_KEY: ""
   SERVER_PORT: "8080"
 
 jobs:
-  name: jobs
+  name: nango-self-jobs
   replicas: 1
   volume:
     name: flows-volume
     claimName: flow-claim
+    storageClassName: standard
     aws: false
     gcp: false
 
 runner:
-  name: runner
+  name: nango-self-runner
   url: http://nango-runner
   replicas: 1
+  nodeId: 1
 
 persist:
-  name: persist
+  name: nango-self-persist
   url: http://nango-persist
   replicas: 1
 
 orchestrator:
-  name: orchestrator
+  name: nango-self-orchestrator
   url: http://nango-orchestrator
   replicas: 1
 
