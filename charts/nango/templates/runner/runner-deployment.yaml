@@ -32,4 +32,4 @@ spec:
             - name: NANGO_ENTERPRISE
               value: "true"
             - name: RUNNER_NODE_ID
-              value: {{ .Values.runner.nodeId | default "1" }}
+              value: {{ .Values.runner.nodeId | default "1" | quote }}
