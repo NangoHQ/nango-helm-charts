@@ -54,7 +54,7 @@ runner:
   name: nango-self-runner
   url: http://nango-runner
   replicas: 1
-  nodeId: 1
+  nodeId: "1"
 
 persist:
   name: nango-self-persist
