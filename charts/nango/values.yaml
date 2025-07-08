@@ -35,6 +35,7 @@ elasticsearch:
 
 server:
   name: nango-self-server
+  url: http://nango-self-server
   replicas: 1
   useLoadBalancer: true
   MAILGUN_API_KEY: ""
@@ -42,6 +43,7 @@ server:
 
 jobs:
   name: nango-self-jobs
+  url: http://nango-self-jobs
   replicas: 1
   volume:
     name: flows-volume
@@ -52,18 +54,18 @@ jobs:
 
 runner:
   name: nango-self-runner
-  url: http://nango-runner
+  url: http://nango-self-runner
   replicas: 1
   nodeId: "1"
 
 persist:
   name: nango-self-persist
-  url: http://nango-persist
+  url: http://nango-self-persist
   replicas: 1
 
 orchestrator:
   name: nango-self-orchestrator
-  url: http://nango-orchestrator
+  url: http://nango-self-orchestrator
   replicas: 1
 
 shared:
