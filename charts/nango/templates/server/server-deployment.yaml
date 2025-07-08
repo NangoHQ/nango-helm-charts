@@ -25,7 +25,7 @@ spec:
         - name: {{ .Values.server.name | default "nango-server" }}
           image: {{ .Values.shared.imageRegistry | default "nangohq" }}/{{ .Values.shared.imageRepository | default "nango" }}:{{ .Values.server.tag | default .Values.shared.tag }}
           imagePullPolicy: {{ .Values.imagePullPolicy  | default "Always" }}
-          args: ["node", "packages/server/dist/server.js"]
+          args: ["packages/server/entrypoint.sh]
           ports:
             - containerPort: {{ .Values.server.SERVER_PORT }}
           env:
@@ -58,9 +58,9 @@ spec:
             - name: NANGO_SERVER_URL
               value: {{ .Values.shared.NANGO_SERVER_URL }}
             - name: NANGO_PUBLIC_CONNECT_URL
-              value: {{ .Values.shared.NANGO_SERVER_URL }}
+              value: {{ .Values.shared.NANGO_PUBLIC_CONNECT_URL }}
             - name: FLAG_SERVE_CONNECT_UI
-              value: "true"
+              value: {{ .Values.shared.FLAG_SERVE_CONNECT_UI | default true | quote }}
             - name: NANGO_CALLBACK_URL
               value: {{ .Values.shared.NANGO_CALLBACK_URL }}
             - name: NODE_ENV

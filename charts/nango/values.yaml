@@ -80,9 +80,11 @@ shared:
   NANGO_DB_NAME: nango
   NANGO_DB_SSL: false
   NANGO_SERVER_URL: https://your-hosted-instance.com
+  NANGO_PUBLIC_CONNECT_URL: https://your-hosted-instance.com
   NANGO_CALLBACK_URL: https://your-hosted-instance.com/oauth/callback
   NANGO_LOGS_ENABLED: true
   NANGO_LOGS_ES_PWD: nango
   NANGO_LOGS_ES_URL: https://nango-elasticsearch.default.svc.cluster.local:9200
   NANGO_LOGS_ES_USER: elastic
+  FLAG_SERVE_CONNECT_UI: true
   tag: 6adbaf17e6cba479564277b1f5224f42558454f4 # 2025/02/10
