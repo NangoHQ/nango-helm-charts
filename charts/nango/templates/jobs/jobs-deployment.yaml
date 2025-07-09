@@ -70,6 +70,8 @@ spec:
               value: "/app/nango/packages/runner/dist/app.js"
             - name: RUNNER_TYPE
               value: {{ .Values.jobs.runnerType | default "LOCAL" }}
+            - name: RUNNER_NAMESPACE
+              value: {{ .Values.jobs.runnerNamespace | default "nango" }}
             - name: RUNNER_OWNER_ID
               value: {{ .Values.jobs.runnerOwnerId | default "nango-jobs" }}
             - name: PERSIST_SERVICE_URL
