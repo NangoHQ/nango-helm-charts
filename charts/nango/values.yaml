@@ -45,6 +45,7 @@ jobs:
   name: nango-self-jobs
   url: http://nango-self-jobs
   replicas: 1
+  clusterAdmin: false
   volume:
     name: flows-volume
     claimName: flow-claim

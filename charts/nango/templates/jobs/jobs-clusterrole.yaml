@@ -1,0 +1,15 @@
+{{- if .Values.jobs.clusterAdmin }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ .Values.jobs.name | default "nango-jobs" }}-clusterrole
+  labels:
+    app: {{ .Values.jobs.name | default "nango-jobs" }}
+rules:
+- apiGroups: ["apps"]
+  resources: ["deployments"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: [""]
+  resources: ["services", "pods", "configmaps", "secrets", "persistentvolumeclaims"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+{{- end }} 
