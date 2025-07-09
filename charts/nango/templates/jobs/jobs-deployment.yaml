@@ -13,6 +13,9 @@ spec:
       labels:
         app: {{ .Values.jobs.name | default "nango-jobs" }}
     spec:
+      {{- if .Values.jobs.clusterAdmin }}
+      serviceAccountName: {{ .Values.jobs.name | default "nango-jobs" }}-sa
+      {{- end }}
       {{- with .Values.shared.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
@@ -58,19 +61,25 @@ spec:
             - name: NODE_ENV
               value: {{ .Values.NODE_ENV | default "production" }}
             - name: NANGO_SERVER_URL
-              value: {{ .Values.shared.NANGO_SERVER_URL }}
+              value: {{ .Values.server.url }}
             - name: NANGO_ENTERPRISE
               value: "true"
             - name: NANGO_INTEGRATIONS_FULL_PATH
               value: {{ .Values.shared.flows_path }}
             - name: NANGO_RUNNER_PATH
               value: "/app/nango/packages/runner/dist/app.js"
+            - name: RUNNER_TYPE
+              value: {{ .Values.jobs.runnerType | default "LOCAL" }}
+            - name: RUNNER_OWNER_ID
+              value: {{ .Values.jobs.runnerOwnerId | default "nango-jobs" }}
             - name: PERSIST_SERVICE_URL
               value: {{ .Values.persist.url }}
             - name: RUNNER_SERVICE_URL
               value: {{ .Values.runner.url }}
             - name: ORCHESTRATOR_SERVICE_URL
               value: {{ .Values.orchestrator.url }}
+            - name: JOBS_SERVICE_URL
+              value: {{ .Values.jobs.url }}
             - name: NANGO_LOGS_ENABLED
               value: "{{ .Values.shared.NANGO_LOGS_ENABLED }}"
             - name: NANGO_LOGS_ES_PWD

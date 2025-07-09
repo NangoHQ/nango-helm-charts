@@ -71,6 +71,7 @@ server:
 jobs:
   name: nango-jobs
   replicas: 1
+  clusterAdmin: false
   volume:
     aws: true
 

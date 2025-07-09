@@ -1,0 +1,16 @@
+{{- if .Values.jobs.clusterAdmin }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ .Values.jobs.name | default "nango-jobs" }}-clusterrolebinding
+  labels:
+    app: {{ .Values.jobs.name | default "nango-jobs" }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ .Values.jobs.name | default "nango-jobs" }}-clusterrole
+subjects:
+- kind: ServiceAccount
+  name: {{ .Values.jobs.name | default "nango-jobs" }}-sa
+  namespace: {{ .Values.shared.namespace }}
+{{- end }} 
