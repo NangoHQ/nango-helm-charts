@@ -72,6 +72,8 @@ spec:
               value: {{ .Values.jobs.runnerType | default "LOCAL" }}
             - name: RUNNER_NAMESPACE
               value: {{ .Values.jobs.runnerNamespace | default "nango" }}
+            - name: NAMESPACE_PER_RUNNER
+              value: {{ .Values.jobs.namespacePerRunner | default false | quote }}
             - name: RUNNER_OWNER_ID
               value: {{ .Values.jobs.runnerOwnerId | default "nango-jobs" }}
             - name: PERSIST_SERVICE_URL
