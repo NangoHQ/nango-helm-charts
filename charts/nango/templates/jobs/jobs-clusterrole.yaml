@@ -12,4 +12,7 @@ rules:
 - apiGroups: [""]
   resources: ["services", "pods", "configmaps", "secrets", "persistentvolumeclaims", "namespaces"]
   verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: ["networking.k8s.io"]
+  resources: ["networkpolicies"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
 {{- end }} 
