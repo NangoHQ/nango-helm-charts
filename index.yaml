@@ -3,6 +3,40 @@ entries:
   nango:
   - apiVersion: v2
     appVersion: 0.0.2
+    created: "2025-07-23T13:14:40.101890381Z"
+    dependencies:
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 13.2.24
+    - condition: elasticsearch.enabled
+      name: elasticsearch
+      repository: https://charts.bitnami.com/bitnami
+      version: 21.3.3
+    description: Nango - A single API for all your integrations
+    digest: 965d116f66599ea78128e1ea3af1623886e6c350e0be14f413b7893d62ec2851
+    home: https://nango.dev
+    icon: https://app.nango.dev/logo-dark-background-vertical.svg
+    keywords:
+    - nango
+    - integrations
+    - api
+    - oauth
+    - apps
+    - open-source
+    maintainers:
+    - email: khaliq@nango.dev
+      name: nango
+      url: https://app.nango.dev
+    name: nango
+    sources:
+    - https://github.com/nango/nango-helm-charts.git
+    type: application
+    urls:
+    - https://github.com/NangoHQ/nango-helm-charts/releases/download/nango-1.1.4/nango-1.1.4.tgz
+    version: 1.1.4
+  - apiVersion: v2
+    appVersion: 0.0.2
     created: "2025-07-17T08:37:39.117904966Z"
     dependencies:
     - condition: postgresql.enabled
@@ -1293,4 +1327,4 @@ entries:
     urls:
     - https://github.com/NangoHQ/nango-helm-charts/releases/download/nango-0.0.2/nango-0.0.2.tgz
     version: 0.0.2
-generated: "2025-07-17T08:37:39.118191706Z"
+generated: "2025-07-23T13:14:40.102233254Z"
