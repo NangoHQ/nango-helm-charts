@@ -48,6 +48,8 @@ spec:
               value: "{{ .Values.shared.NANGO_DB_PORT | default 5432 }}"
             - name: NANGO_DB_SSL
               value: "{{ .Values.shared.NANGO_DB_SSL | default false }}"
+            - name: RECORDS_DATABASE_SSL
+              value: "{{ .Values.server.RECORDS_DATABASE_SSL | default false }}"
               {{- if .Values.shared.encryptionEnabled }}
             - name: NANGO_ENCRYPTION_KEY
               valueFrom:
