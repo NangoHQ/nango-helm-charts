@@ -55,3 +55,5 @@ spec:
               {{ end }}
             - name: NANGO_ENTERPRISE
               value: "true"
+            - name: ORCHESTRATOR_DB_SSL
+              value: "{{ .Values.orchestrator.ORCHESTRATOR_DB_SSL | default false }}"

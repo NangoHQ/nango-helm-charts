@@ -69,6 +69,7 @@ orchestrator:
   name: nango-self-orchestrator
   url: http://nango-self-orchestrator
   replicas: 1
+  ORCHESTRATOR_DB_SSL: false
 
 shared:
   namespace: default
