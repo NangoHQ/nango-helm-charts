@@ -1,6 +1,127 @@
+global:
+  #Global namespace values
+  namespace: nango
+  #Global ontainer image values
+  image:
+    registry: "nangohq"
+    repository: "nango"
+    tag: "latest"
+    pullPolicy: "Always"
+  
+security:
+  encryptionEnabled: false
+
+logging:
+  logsEnabled: true
+  logsESUrl: "https://nango-elasticsearch.nango:9200"
+  logsESUser: "elastic"
+  logsESPassword: "nango"
+  logsESIndex: "nango-logs"
+
+auth:
+  workos:
+    apiKey: ""
+    clientId: ""
+  nango:
+    dashboardUsername: ""
+    dashboardPassword: ""
+    localNangoUserId: ""
+
+database:
+  useSsl: true
+  host: "nango-postgresql.nango"
+  port: "5432"
+  user: "postgres"
+  password: "nango123"
+  database: "nango"
+
+schedules:
+  exportUsageMinutes: "5"
+  timeoutLogsMinutes: "10"
+  deleteOldJobsLimit: "1000"
+  deleteOldDataEveryMinute: "10"
+  deleteOldJobsMaxDays: "31"
+  deleteOldPivateKeysMaxDays: "31"
+  deleteOldOAuthSessionsMaxDays: "2"
+  deleteOldInvitationsMaxDays: "2"
+  deleteOldConfigsMaxDays: "31"
+  deleteOldSyncConfigsMaxDays: "31"
+  deleteOldConnectionsMaxDays: "31"
+  deleteOldEnvironmentsMaxDays: "31"
+  refreshConnectionsEveryMinutes: "10"
+  refreshConnectionsLimit: "100"
+  persistAccountUsageMinutes: "30"
+
+#Server values
+server:
+  name: nango-server-dev
+  url: http://nango-server-dev.nango
+  publicUrl: https://nango-server-dev.dev
+  port: "8080"
+  webSocketsPath: '/'
+  defaultRateLimitPerMinute: 3500
+  database:
+    useSsl: true
+
+connect:
+  publicUrl: https://nango-connect-dev.dev
+  port: "3009"
+
+persist:
+  name: nango-persist-dev
+  url: http://nango-persist-dev.nango
+  port: "3007"
+
+orchestrator:
+  name: nango-orchestrator-dev
+  url: http://nango-orchestrator-dev.nango
+  port: "3008"
+  database:
+    useSsl: true
+
+scheduler:
+  expiringTickIntervalMs: "1000"
+  cleaningTickIntervalMs: "1000"
+  cleaningOlderThanDays: "5"
+  schdedulingTickIntervalMs: "100"
+
+jobs:
+  name: nango-jobs-dev
+  url: http://nango-jobs-dev.nango
+  port: "3005"
+  providers:
+    url: http://nango-server-dev.nango/providers.yaml
+    reloadInterval: "60000"
+  database:
+    useSsl: true
+  #TODO: need to structure the properties below slightly differently
+  serviceAccount:
+    create: true
+    name: nango-jobs-dev-sa
+  # clusterAdmin: false -> this should be handled by the above
+  volume:
+    name: flows-volume
+    claimName: flow-claim
+    storageClassName: standard
+    aws: false
+    gcp: false
+
+runner:
+  name: nango-runner-dev
+  url: http://nango-runner-dev.nango
+  port: "3006"
+  idleMaxDurationMs: "0" 
+  memoryWarningThreshold: "85"
+  local:
+    path: "../runner/dist/app.js"
+    nodeId: "1"
+  kubernetes:
+    namespace: nango-runner
+    namespacePerRunner: true
+  
 postgresql:
+  namespace: nango
   enabled: true
-  fullnameOverride: nango-postgresql
   primary:
     persistence:
       enabled: false
@@ -16,8 +137,8 @@ postgresql:
     database: nango
 
 elasticsearch:
+  namespace: nango
   enabled: true
-  fullnameOverride: nango-elasticsearch
   clusterName: elastic
   # single node cluster
   master:
@@ -32,62 +153,3 @@ elasticsearch:
   security:
     enabled: true
     elasticPassword: nango
-
-server:
-  name: nango-self-server
-  url: http://nango-self-server
-  replicas: 1
-  useLoadBalancer: true
-  MAILGUN_API_KEY: ""
-  SERVER_PORT: "8080"
-  RECORDS_DATABASE_SSL: true
-
-jobs:
-  name: nango-self-jobs
-  url: http://nango-self-jobs
-  replicas: 1
-  clusterAdmin: false
-  volume:
-    name: flows-volume
-    claimName: flow-claim
-    storageClassName: standard
-    aws: false
-    gcp: false
-
-runner:
-  name: nango-self-runner
-  url: http://nango-self-runner
-  replicas: 1
-  nodeId: "1"
-
-persist:
-  name: nango-self-persist
-  url: http://nango-self-persist
-  replicas: 1
-
-orchestrator:
-  name: nango-self-orchestrator
-  url: http://nango-self-orchestrator
-  replicas: 1
-  ORCHESTRATOR_DB_SSL: false
-
-shared:
-  namespace: default
-  encryptionEnabled: false
-  flows_path: /flows
-  useVolumeForFlows: true
-  NODE_ENV: production
-  NANGO_DB_HOST: nango-postgresql
-  NANGO_DB_USER: postgres
-  NANGO_DB_PORT: "5432"
-  NANGO_DB_NAME: nango
-  NANGO_DB_SSL: false
-  NANGO_SERVER_URL: https://your-hosted-instance.com
-  NANGO_PUBLIC_CONNECT_URL: https://your-hosted-instance.com
-  NANGO_CALLBACK_URL: https://your-hosted-instance.com/oauth/callback
-  NANGO_LOGS_ENABLED: true
-  NANGO_LOGS_ES_PWD: nango
-  NANGO_LOGS_ES_URL: https://nango-elasticsearch.default.svc.cluster.local:9200
-  NANGO_LOGS_ES_USER: elastic
-  FLAG_SERVE_CONNECT_UI: true
-  tag: 6adbaf17e6cba479564277b1f5224f42558454f4 # 2025/02/10

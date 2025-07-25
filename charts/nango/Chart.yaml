@@ -1,17 +1,20 @@
 apiVersion: v2
 name: nango
 type: application
-version: 1.1.5
-appVersion: 0.0.2
+version: 2.0.0
 dependencies:
   - condition: postgresql.enabled
     name: postgresql
     repository: https://charts.bitnami.com/bitnami
-    version: 13.2.24
+    version: ~16.7.0
   - condition: elasticsearch.enabled
     name: elasticsearch
     repository: https://charts.bitnami.com/bitnami
-    version: 21.3.3
+    version: ~22.0.0
+  - condition: redis.enabled
+    name: redis
+    repository: https://charts.bitnami.com/bitnami
+    version: ~21.0.0
 deprecated: false
 description: Nango - A single API for all your integrations
 home: https://nango.dev
