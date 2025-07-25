@@ -99,12 +99,12 @@ jobs:
     create: true
     name: nango-jobs-dev-sa
   # clusterAdmin: false -> this should be handled by the above
-  volume:
-    name: flows-volume
-    claimName: flow-claim
-    storageClassName: standard
-    aws: false
-    gcp: false
+  persistence:
+    enabled: true
+    name: nango-jobs-dev-pvc
+    mountPath: /flows
+    storageClass: ""
+    size: "1Gi"
 
 runner:
   name: nango-runner-dev
