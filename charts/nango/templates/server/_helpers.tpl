@@ -30,8 +30,8 @@ Allow the release namespace to be overridden for multi-namespace deployments in 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "server.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create -}}
+{{- define "server.names.serviceAccountName" -}}
+{{- if .Values.server.serviceAccount.create -}}
     {{ default (include "common.names.fullname" .) .Values.server.serviceAccount.name }}
 {{- else -}}
     {{ default "default" .Values.server.serviceAccount.name }}
