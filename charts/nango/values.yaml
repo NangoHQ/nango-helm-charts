@@ -1,124 +1,268 @@
+## @param nameOverride String to partially override common.names.name
+##
+nameOverride: ""
+## @param fullnameOverride String to fully override common.names.fullname
+##
+fullnameOverride: ""
+## @param namespaceOverride String to fully override common.names.namespace
+##
+namespaceOverride: ""
+## @param commonLabels Labels to add to all deployed objects
+##
+commonLabels: {}
+## @param commonAnnotations Annotations to add to all deployed objects
+##
+commonAnnotations: {}
+
 global:
-  #Global namespace values
-  namespace: nango
   #Global ontainer image values
   image:
     registry: "nangohq"
     repository: "nango"
     tag: "latest"
-    pullPolicy: "Always"
+    digest: ""
+    pullPolicy: "IfNotPresent"
+    pullSecrets: []
   
-security:
-  encryptionEnabled: false
-
-logging:
-  logsEnabled: true
-  logsESUrl: "https://nango-elasticsearch.nango:9200"
-  logsESUser: "elastic"
-  logsESPassword: "nango"
-  logsESIndex: "nango-logs"
-
-auth:
-  workos:
-    apiKey: ""
-    clientId: ""
-  nango:
-    dashboardUsername: ""
-    dashboardPassword: ""
-    localNangoUserId: ""
-
-database:
-  useSsl: true
-  host: "nango-postgresql.nango"
-  port: "5432"
-  user: "postgres"
-  password: "nango123"
-  database: "nango"
-
-schedules:
-  exportUsageMinutes: "5"
-  timeoutLogsMinutes: "10"
-  deleteOldJobsLimit: "1000"
-  deleteOldDataEveryMinute: "10"
-  deleteOldJobsMaxDays: "31"
-  deleteOldPivateKeysMaxDays: "31"
-  deleteOldOAuthSessionsMaxDays: "2"
-  deleteOldInvitationsMaxDays: "2"
-  deleteOldConfigsMaxDays: "31"
-  deleteOldSyncConfigsMaxDays: "31"
-  deleteOldConnectionsMaxDays: "31"
-  deleteOldEnvironmentsMaxDays: "31"
-  refreshConnectionsEveryMinutes: "10"
-  refreshConnectionsLimit: "100"
-  persistAccountUsageMinutes: "30"
-
-#Server values
 server:
-  name: nango-server-dev
-  url: http://nango-server-dev.nango
-  publicUrl: https://nango-server-dev.dev
-  port: "8080"
-  webSocketsPath: '/'
-  defaultRateLimitPerMinute: 3500
-  database:
-    useSsl: true
-
-connect:
-  publicUrl: https://nango-connect-dev.dev
-  port: "3009"
+  name: server
+  url: http://nango-server-default.nango
+  publicUrl: https://nango-server-default.dev
+  ## @param server.containerPorts.http server HTTP container port
+  ## @param server.containerPorts.https server HTTPS container port
+  ##
+  containerPorts:
+    http: 80
+    https: 443
+  ## @param server.extraContainerPorts Optionally specify extra list of additional ports for server containers
+  ## e.g:
+  ## extraContainerPorts:
+  ##   - name: myservice
+  ##     containerPort: 9090
+  ##
+  extraContainerPorts: []
+  updateStrategy:
+    type: "RollingUpdate"
+  ## Pod Disruption Budget configuration
+  ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb
+  ## @param server.pdb.create Enable/disable a Pod Disruption Budget creation
+  ## @param server.pdb.minAvailable Minimum number/percentage of pods that should remain scheduled
+  ## @param server.pdb.maxUnavailable Maximum number/percentage of pods that may be made unavailable. Defaults to `1` if both `server.pdb.minAvailable` and `server.pdb.maxUnavailable` are empty.
+  ##
+  pdb:
+    create: false
+    minAvailable: ""
+    maxUnavailable: ""
+  ## Autoscaling configuration
+  ## ref: https://kubernetes.io/docs/concepts/workloads/autoscaling/
+  ##
+  autoscaling:
+    ## @param server.autoscaling.hpa.enabled Enable HPA for server pods
+    ## @param server.autoscaling.hpa.minReplicas Minimum number of replicas
+    ## @param server.autoscaling.hpa.maxReplicas Maximum number of replicas
+    ## @param server.autoscaling.hpa.targetCPU Target CPU utilization percentage
+    ## @param server.autoscaling.hpa.targetMemory Target Memory utilization percentage
+    ##
+    hpa:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 3
+      targetCPU: 75
+      targetMemory: ""
+    ## @param server.autoscaling.vpa.enabled Enable VPA for server pods
+    ## @param server.autoscaling.vpa.annotations Annotations for VPA resource
+    ## @param server.autoscaling.vpa.controlledResources VPA List of resources that the vertical pod autoscaler can control. Defaults to cpu and memory
+    ## @param server.autoscaling.vpa.maxAllowed VPA Max allowed resources for the pod
+    ## @param server.autoscaling.vpa.minAllowed VPA Min allowed resources for the pod
+    ##
+    vpa:
+      enabled: false
+      annotations: {}
+      controlledResources: []
+      maxAllowed: {}
+      minAllowed: {}
+      ## @param server.autoscaling.vpa.updatePolicy.updateMode Autoscaling update policy
+      ## Specifies whether recommended updates are applied when a Pod is started and whether recommended updates are applied during the life of a Pod
+      ## Possible values are "Off", "Initial", "Recreate", and "Auto".
+      ##
+      updatePolicy:
+        updateMode: Auto
+  ## @param server.sidecars Add additional sidecar containers to the server pods
+  ## e.g:
+  ## sidecars:
+  ##   - name: your-image-name
+  ##     image: your-image
+  ##     imagePullPolicy: Always
+  ##     ports:
+  ##       - name: portname
+  ##         containerPort: 1234
+  ##
+  sidecars: []
+  ## server resource requests and limits
+  ## ref: http://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/
+  ## @param server.resourcesPreset Set server container resources according to one common preset (allowed values: none, nano, micro, small, medium, large, xlarge, 2xlarge). This is ignored if server.resources is set (server.resources is recommended for production).
+  ##
+  resourcesPreset: "nano"
+  ## @param server.resources Set server container requests and limits for different resources like CPU or memory (essential for production workloads)
+  ## Example:
+  ## resources:
+  ##   requests:
+  ##     cpu: 2
+  ##     memory: 512Mi
+  ##   limits:
+  ##     cpu: 3
+  ##     memory: 1024Mi
+  ##
+  resources: {}
+  ## @param server.extraEnvVars Array with extra environment variables to add to server containers
+  ## e.g:
+  ## extraEnvVars:
+  ##   - name: FOO
+  ##     value: "bar"
+  ##
+  extraEnvVars: []
+  ## @param server.extraEnvVarsCM Name of existing ConfigMap containing extra env vars for server containers
+  ##
+  extraEnvVarsCM: ""
+  ## @param server.extraEnvVarsSecret Name of existing Secret containing extra env vars for server containers
+  ##
+  extraEnvVarsSecret: ""
+  ## Configure extra options for %%MAIN_CONTAINER_NAME%% containers' liveness and readiness probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
+  ## @param server.livenessProbe.enabled Enable livenessProbe on server containers
+  ## @param server.livenessProbe.initialDelaySeconds Initial delay seconds for livenessProbe
+  ## @param server.livenessProbe.periodSeconds Period seconds for livenessProbe
+  ## @param server.livenessProbe.timeoutSeconds Timeout seconds for livenessProbe
+  ## @param server.livenessProbe.failureThreshold Failure threshold for livenessProbe
+  ## @param server.livenessProbe.successThreshold Success threshold for livenessProbe
+  ##
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: foo
+    periodSeconds: bar
+    timeoutSeconds: foo
+    failureThreshold: bar
+    successThreshold: foo
+  ## @param server.readinessProbe.enabled Enable readinessProbe on server containers
+  ## @param server.readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
+  ## @param server.readinessProbe.periodSeconds Period seconds for readinessProbe
+  ## @param server.readinessProbe.timeoutSeconds Timeout seconds for readinessProbe
+  ## @param server.readinessProbe.failureThreshold Failure threshold for readinessProbe
+  ## @param server.readinessProbe.successThreshold Success threshold for readinessProbe
+  ##
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: foo
+    periodSeconds: bar
+    timeoutSeconds: foo
+    failureThreshold: bar
+    successThreshold: foo
+  ## @param server.startupProbe.enabled Enable startupProbe on server containers
+  ## @param server.startupProbe.initialDelaySeconds Initial delay seconds for startupProbe
+  ## @param server.startupProbe.periodSeconds Period seconds for startupProbe
+  ## @param server.startupProbe.timeoutSeconds Timeout seconds for startupProbe
+  ## @param server.startupProbe.failureThreshold Failure threshold for startupProbe
+  ## @param server.startupProbe.successThreshold Success threshold for startupProbe
+  ##
+  startupProbe:
+    enabled: false
+    initialDelaySeconds: foo
+    periodSeconds: bar
+    timeoutSeconds: foo
+    failureThreshold: bar
+  ## @param %%MAIN_OBJECT_BLOCK%%.deploymentAnnotations Annotations for %%MAIN_CONTAINER_NAME%% deployment
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  ##
+  deploymentAnnotations: {}
+  ## Enable persistence using Persistent Volume Claims
+  ## ref: https://kubernetes.io/docs/concepts/storage/persistent-volumes/
+  ##
+  persistence:
+    ## @param persistence.enabled Enable persistence using Persistent Volume Claims
+    ##
+    enabled: true
+    ## @param persistence.mountPath Path to mount the volume at.
+    ##
+    mountPath: /nango/server/data
+    ## @param persistence.subPath The subdirectory of the volume to mount to, useful in dev environments and one PV for multiple services
+    ##
+    subPath: ""
+    ## @param persistence.storageClass Storage class of backing PVC
+    ## If defined, storageClassName: <storageClass>
+    ## If set to "-", storageClassName: "", which disables dynamic provisioning
+    ## If undefined (the default) or set to null, no storageClassName spec is
+    ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+    ##   GKE, AWS & OpenStack)
+    ##
+    storageClass: ""
+    ## @param persistence.annotations Persistent Volume Claim annotations
+    ##
+    annotations: {}
+    ## @param persistence.accessModes Persistent Volume Access Modes
+    ##
+    accessModes:
+      - ReadWriteOnce
+    ## @param persistence.size Size of data volume
+    ##
+    size: 8Gi
+    ## @param persistence.dataSource Custom PVC data source
+    ##
+    dataSource: {}
+    ## @param persistence.existingClaim The name of an existing PVC to use for persistence
+    ##
+    existingClaim: ""
+    ## @param persistence.selector Selector to match an existing Persistent Volume 
+    ## If set, the PVC can't have a PV dynamically provisioned for it
+    ## E.g.
+    ## selector:
+    ##   matchLabels:
+    ##     app: my-app
+    ##
+    selector: {}
 
 persist:
-  name: nango-persist-dev
-  url: http://nango-persist-dev.nango
+  name: persist
+  url: http://nango-persist-default.nango
   port: "3007"
 
 orchestrator:
-  name: nango-orchestrator-dev
-  url: http://nango-orchestrator-dev.nango
+  name: orchestrator
+  url: http://nango-orchestrator-default.nango
   port: "3008"
-  database:
-    useSsl: true
-
-scheduler:
-  expiringTickIntervalMs: "1000"
-  cleaningTickIntervalMs: "1000"
-  cleaningOlderThanDays: "5"
-  schdedulingTickIntervalMs: "100"
 
 jobs:
-  name: nango-jobs-dev
-  url: http://nango-jobs-dev.nango
+  name: jobs
+  url: http://nango-jobs-default.nango
   port: "3005"
-  providers:
-    url: http://nango-server-dev.nango/providers.yaml
-    reloadInterval: "60000"
-  database:
-    useSsl: true
-  #TODO: need to structure the properties below slightly differently
   serviceAccount:
     create: true
-    name: nango-jobs-dev-sa
+    name: nango-jobs-default-sa
   # clusterAdmin: false -> this should be handled by the above
   persistence:
     enabled: true
-    name: nango-jobs-dev-pvc
+    name: nango-jobs-default-pvc
     mountPath: /flows
     storageClass: ""
     size: "1Gi"
 
 runner:
-  name: nango-runner-dev
-  url: http://nango-runner-dev.nango
+  name: runner
+  url: http://nango-runner-default.nango
   port: "3006"
-  idleMaxDurationMs: "0" 
-  memoryWarningThreshold: "85"
-  local:
-    path: "../runner/dist/app.js"
-    nodeId: "1"
-  kubernetes:
-    namespace: nango-runner
-    namespacePerRunner: true
-  
+
+redis:  
+  enabled: true
+  primary:
+    persistence:
+      enabled: false
+    resources:
+      limits:
+        cpu: "1000m"
+        memory: "2048Mi"
+      requests:
+        cpu: "250m"
+        memory: "1024Mi"
+
 postgresql:
   namespace: nango
   enabled: true

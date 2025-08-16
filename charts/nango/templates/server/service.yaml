@@ -1,8 +1,8 @@
 apiVersion: v1
 kind: Service
 metadata:
-  namespace: {{ .Values.shared.namespace }}
-  name: {{ .Values.server.name | default "nango-server" }}
+  namespace: {{ .Values.server.namespace | .Values.global.namespace }}
+  name: {{ include "server.names.component" . }}
 spec:
   type: {{ if .Values.server.useLoadBalancer }}LoadBalancer{{ else }}NodePort{{ end }}
   ports:
