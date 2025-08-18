@@ -380,11 +380,11 @@ server:
   ##
   livenessProbe:
     enabled: true
-    initialDelaySeconds: foo
-    periodSeconds: bar
-    timeoutSeconds: foo
-    failureThreshold: bar
-    successThreshold: foo
+    initialDelaySeconds: 20
+    periodSeconds: 10
+    timeoutSeconds: 3
+    failureThreshold: 6
+    successThreshold: 1
   ## @param server.readinessProbe.enabled Enable readinessProbe on server containers
   ## @param server.readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
   ## @param server.readinessProbe.periodSeconds Period seconds for readinessProbe
@@ -394,11 +394,11 @@ server:
   ##
   readinessProbe:
     enabled: true
-    initialDelaySeconds: foo
-    periodSeconds: bar
-    timeoutSeconds: foo
-    failureThreshold: bar
-    successThreshold: foo
+    initialDelaySeconds: 2
+    periodSeconds: 5
+    timeoutSeconds: 2
+    failureThreshold: 3
+    successThreshold: 1
   ## @param server.startupProbe.enabled Enable startupProbe on server containers
   ## @param server.startupProbe.initialDelaySeconds Initial delay seconds for startupProbe
   ## @param server.startupProbe.periodSeconds Period seconds for startupProbe
@@ -408,10 +408,11 @@ server:
   ##
   startupProbe:
     enabled: false
-    initialDelaySeconds: foo
-    periodSeconds: bar
-    timeoutSeconds: foo
-    failureThreshold: bar
+    initialDelaySeconds: 0
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 24
+    successThreshold: 1
   ## Configure Pods Security Context
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
   ## @param server.podSecurityContext.enabled Enable server pods' Security Context
