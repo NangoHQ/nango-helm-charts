@@ -1,0 +1,67 @@
+{{- if .Values.jobs.networkPolicy.enabled }}
+apiVersion: {{ include "common.capabilities.networkPolicy.apiVersion" . }}
+kind: NetworkPolicy
+metadata:
+  name: {{ template "jobs.names.fullname" . }}
+  namespace: {{ include "jobs.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component:  {{ include "jobs.names.component" . }}
+  {{- if .Values.commonAnnotations }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  {{- $podLabels := include "common.tplvalues.merge" ( dict "values" ( list .Values.jobs.podLabels .Values.commonLabels ) "context" . ) }}
+  podSelector:
+    matchLabels: {{- include "common.labels.matchLabels" ( dict "customLabels" $podLabels "context" $ ) | nindent 6 }}
+      app.kubernetes.io/component: {{ include "jobs.names.component" . }}
+  policyTypes:
+    - Ingress
+    - Egress
+  egress:
+    {{- if .Values.jobs.networkPolicy.allowExternalEgress }}
+    - {}
+    {{- else }}
+    - ports:
+        # Allow dns resolution
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+    {{- if .Values.jobs.networkPolicy.extraEgress }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.jobs.networkPolicy.extraEgress "context" $ ) | nindent 4 }}
+    {{- end }}
+    {{- end }}
+  ingress:
+    - ports:
+        - port: {{ .Values.jobs.containerPorts.http }}
+        - port: {{ .Values.jobs.containerPorts.https }}
+        {{- range .Values.jobs.extraContainerPorts }}
+        - port: {{ .containerPort }}
+        {{- end }}
+      {{- if not .Values.jobs.networkPolicy.allowExternal }}
+      from:
+        - podSelector:
+            matchLabels: {{- include "common.labels.matchLabels" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 14 }}
+        {{- if .Values.jobs.networkPolicy.addExternalClientAccess }}
+        - podSelector:
+            matchLabels:
+              {{ template "jobs.names.fullname" . }}-client: "true"
+        {{- end }}
+        {{- if .Values.jobs.networkPolicy.ingressPodMatchLabels }}
+        - podSelector:
+            matchLabels: {{- include "common.tplvalues.render" (dict "value" .Values.jobs.networkPolicy.ingressPodMatchLabels "context" $ ) | nindent 14 }}
+        {{- end }}
+        {{- if .Values.jobs.networkPolicy.ingressNSMatchLabels }}
+        - namespaceSelector:
+            matchLabels: {{- include "common.tplvalues.render" (dict "value" .Values.jobs.networkPolicy.ingressNSMatchLabels "context" $ ) | nindent 14 }}
+          {{- if .Values.jobs.networkPolicy.ingressNSPodMatchLabels }}
+          podSelector:
+            matchLabels:
+              matchLabels: {{- include "common.tplvalues.render" (dict "value" .Values.jobs.networkPolicy.ingressNSPodMatchLabels "context" $ ) | nindent 14 }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
+    {{- if .Values.jobs.networkPolicy.extraIngress }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.jobs.networkPolicy.extraIngress "context" $ ) | nindent 4 }}
+    {{- end }}
+{{- end }}

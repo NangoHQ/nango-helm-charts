@@ -3,7 +3,7 @@ apiVersion: {{ include "common.capabilities.policy.apiVersion" . }}
 kind: PodDisruptionBudget
 metadata:
   name: {{ include "server.names.fullname" . }}
-  namespace: {{ include "common.names.namespace" . | quote }}
+  namespace: {{ include "server.names.namespace" . | quote }}
   labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
     app.kubernetes.io/component: {{ include "server.names.component" . }}
   {{- if .Values.commonAnnotations }}

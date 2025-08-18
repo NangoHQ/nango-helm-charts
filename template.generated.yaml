@@ -1,0 +1,1654 @@
+---
+# Source: nango/charts/postgresql/templates/primary/networkpolicy.yaml
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: nango-v2-postgresql
+  namespace: "default"
+  labels:
+    app.kubernetes.io/instance: nango-v2
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: postgresql
+    app.kubernetes.io/version: 17.6.0
+    helm.sh/chart: postgresql-16.7.26
+    app.kubernetes.io/component: primary
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: nango-v2
+      app.kubernetes.io/name: postgresql
+      app.kubernetes.io/component: primary
+  policyTypes:
+    - Ingress
+    - Egress
+  egress:
+    - {}
+  ingress:
+    - ports:
+        - port: 5432
+---
+# Source: nango/charts/redis/templates/networkpolicy.yaml
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: nango-v2-redis
+  namespace: "default"
+  labels:
+    app.kubernetes.io/instance: nango-v2
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/version: 8.0.0
+    helm.sh/chart: redis-21.0.3
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: nango-v2
+      app.kubernetes.io/name: redis
+  policyTypes:
+    - Ingress
+    - Egress
+  egress:
+    - {}
+  ingress:
+    # Allow inbound connections
+    - ports:
+        - port: 6379
+---
+# Source: nango/templates/jobs/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: nango-v2-jobs
+  namespace: "nango"
+  labels:
+    app.kubernetes.io/instance: nango-v2
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: nango
+    helm.sh/chart: nango-2.0.0
+    app.kubernetes.io/component:  jobs
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: nango-v2
+      app.kubernetes.io/name: nango
+      app.kubernetes.io/component: jobs
+  policyTypes:
+    - Ingress
+    - Egress
+  egress:
+    - {}
+  ingress:
+    - ports:
+        - port: 3005
+        - port: 3005
+---
+# Source: nango/templates/server/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: nango-v2-server
+  namespace: "nango"
+  labels:
+    app.kubernetes.io/instance: nango-v2
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: nango
+    helm.sh/chart: nango-2.0.0
+    app.kubernetes.io/component:  server
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: nango-v2
+      app.kubernetes.io/name: nango
+      app.kubernetes.io/component: server
+  policyTypes:
+    - Ingress
+    - Egress
+  egress:
+    - {}
+  ingress:
+    - ports:
+        - port: 8080
+        - port: 8080
+---
+# Source: nango/charts/postgresql/templates/primary/pdb.yaml
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: nango-v2-postgresql
+  namespace: "default"
+  labels:
+    app.kubernetes.io/instance: nango-v2
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: postgresql
+    app.kubernetes.io/version: 17.6.0
+    helm.sh/chart: postgresql-16.7.26
+    app.kubernetes.io/component: primary
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: nango-v2
+      app.kubernetes.io/name: postgresql
+      app.kubernetes.io/component: primary
+---
+# Source: nango/charts/redis/templates/master/pdb.yaml
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: nango-v2-redis-master
+  namespace: "default"
+  labels:
+    app.kubernetes.io/instance: nango-v2
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/version: 8.0.0
+    helm.sh/chart: redis-21.0.3
+    app.kubernetes.io/component: master
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: nango-v2
+      app.kubernetes.io/name: redis
+      app.kubernetes.io/component: master
+---
+# Source: nango/charts/redis/templates/replicas/pdb.yaml
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: nango-v2-redis-replicas
+  namespace: "default"
+  labels:
+    app.kubernetes.io/instance: nango-v2
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/version: 8.0.0
+    helm.sh/chart: redis-21.0.3
+    app.kubernetes.io/component: replica
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: nango-v2
+      app.kubernetes.io/name: redis
+      app.kubernetes.io/component: replica
+---
+# Source: nango/charts/postgresql/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: nango-v2-postgresql
+  namespace: "default"
+  labels:
+    app.kubernetes.io/instance: nango-v2
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: postgresql
+    app.kubernetes.io/version: 17.6.0
+    helm.sh/chart: postgresql-16.7.26
+automountServiceAccountToken: false
+---
+# Source: nango/charts/redis/templates/master/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+automountServiceAccountToken: false
+metadata:
+  name: nango-v2-redis-master
+  namespace: "default"
+  labels:
+    app.kubernetes.io/instance: nango-v2
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/version: 8.0.0
+    helm.sh/chart: redis-21.0.3
+---
+# Source: nango/charts/redis/templates/replicas/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+automountServiceAccountToken: false
+metadata:
+  name: nango-v2-redis-replica
+  namespace: "default"
+  labels:
+    app.kubernetes.io/instance: nango-v2
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/version: 8.0.0
+    helm.sh/chart: redis-21.0.3
+---
+# Source: nango/charts/postgresql/templates/secrets.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: nango-v2-postgresql
+  namespace: "default"
+  labels:
+    app.kubernetes.io/instance: nango-v2
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: postgresql
+    app.kubernetes.io/version: 17.6.0
+    helm.sh/chart: postgresql-16.7.26
+type: Opaque
+data:
+  postgres-password: "bmFuZ28="
+  # We don't auto-generate LDAP password when it's not provided as we do for other passwords
+---
+# Source: nango/charts/redis/templates/secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: nango-v2-redis
+  namespace: "default"
+  labels:
+    app.kubernetes.io/instance: nango-v2
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/version: 8.0.0
+    helm.sh/chart: redis-21.0.3
+type: Opaque
+data:
+  redis-password: "VG5rSXh2TG9FeA=="
+---
+# Source: nango/charts/redis/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nango-v2-redis-configuration
+  namespace: "default"
+  labels:
+    app.kubernetes.io/instance: nango-v2
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/version: 8.0.0
+    helm.sh/chart: redis-21.0.3
+data:
+  redis.conf: |-
+    # User-supplied common configuration:
+    # Enable AOF https://redis.io/topics/persistence#append-only-file
+    appendonly yes
+    # Disable RDB persistence, AOF persistence already enabled.
+    save ""
+    # End of common configuration
+  master.conf: |-
+    dir /data
+    # User-supplied master configuration:
+    rename-command FLUSHDB ""
+    rename-command FLUSHALL ""
+    # End of master configuration
+  replica.conf: |-
+    dir /data
+    # User-supplied replica configuration:
+    rename-command FLUSHDB ""
+    rename-command FLUSHALL ""
+    # End of replica configuration
+  users.acl: |-
+---
+# Source: nango/charts/redis/templates/health-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nango-v2-redis-health
+  namespace: "default"
+  labels:
+    app.kubernetes.io/instance: nango-v2
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/version: 8.0.0
+    helm.sh/chart: redis-21.0.3
+data:
+  ping_readiness_local.sh: |-
+    #!/bin/bash
+
+    [[ -f $REDIS_PASSWORD_FILE ]] && export REDIS_PASSWORD="$(< "${REDIS_PASSWORD_FILE}")"
+    [[ -n "$REDIS_PASSWORD" ]] && export REDISCLI_AUTH="$REDIS_PASSWORD"
+    response=$(
+      timeout -s 15 $1 \
+      redis-cli \
+        -h localhost \
+        -p $REDIS_PORT \
+        ping
+    )
+    if [ "$?" -eq "124" ]; then
+      echo "Timed out"
+      exit 1
+    fi
+    if [ "$response" != "PONG" ]; then
+      echo "$response"
+      exit 1
+    fi
+  ping_liveness_local.sh: |-
+    #!/bin/bash
+
+    [[ -f $REDIS_PASSWORD_FILE ]] && export REDIS_PASSWORD="$(< "${REDIS_PASSWORD_FILE}")"
+    [[ -n "$REDIS_PASSWORD" ]] && export REDISCLI_AUTH="$REDIS_PASSWORD"
+    response=$(
+      timeout -s 15 $1 \
+      redis-cli \
+        -h localhost \
+        -p $REDIS_PORT \
+        ping
+    )
+    if [ "$?" -eq "124" ]; then
+      echo "Timed out"
+      exit 1
+    fi
+    responseFirstWord=$(echo $response | head -n1 | awk '{print $1;}')
+    if [ "$response" != "PONG" ] && [ "$responseFirstWord" != "LOADING" ] && [ "$responseFirstWord" != "MASTERDOWN" ]; then
+      echo "$response"
+      exit 1
+    fi
+  ping_readiness_master.sh: |-
+    #!/bin/bash
+
+    [[ -f $REDIS_MASTER_PASSWORD_FILE ]] && export REDIS_MASTER_PASSWORD="$(< "${REDIS_MASTER_PASSWORD_FILE}")"
+    [[ -n "$REDIS_MASTER_PASSWORD" ]] && export REDISCLI_AUTH="$REDIS_MASTER_PASSWORD"
+    response=$(
+      timeout -s 15 $1 \
+      redis-cli \
+        -h $REDIS_MASTER_HOST \
+        -p $REDIS_MASTER_PORT_NUMBER \
+        ping
+    )
+    if [ "$?" -eq "124" ]; then
+      echo "Timed out"
+      exit 1
+    fi
+    if [ "$response" != "PONG" ]; then
+      echo "$response"
+      exit 1
+    fi
+  ping_liveness_master.sh: |-
+    #!/bin/bash
+
+    [[ -f $REDIS_MASTER_PASSWORD_FILE ]] && export REDIS_MASTER_PASSWORD="$(< "${REDIS_MASTER_PASSWORD_FILE}")"
+    [[ -n "$REDIS_MASTER_PASSWORD" ]] && export REDISCLI_AUTH="$REDIS_MASTER_PASSWORD"
+    response=$(
+      timeout -s 15 $1 \
+      redis-cli \
+        -h $REDIS_MASTER_HOST \
+        -p $REDIS_MASTER_PORT_NUMBER \
+        ping
+    )
+    if [ "$?" -eq "124" ]; then
+      echo "Timed out"
+      exit 1
+    fi
+    responseFirstWord=$(echo $response | head -n1 | awk '{print $1;}')
+    if [ "$response" != "PONG" ] && [ "$responseFirstWord" != "LOADING" ]; then
+      echo "$response"
+      exit 1
+    fi
+  ping_readiness_local_and_master.sh: |-
+    script_dir="$(dirname "$0")"
+    exit_status=0
+    "$script_dir/ping_readiness_local.sh" $1 || exit_status=$?
+    "$script_dir/ping_readiness_master.sh" $1 || exit_status=$?
+    exit $exit_status
+  ping_liveness_local_and_master.sh: |-
+    script_dir="$(dirname "$0")"
+    exit_status=0
+    "$script_dir/ping_liveness_local.sh" $1 || exit_status=$?
+    "$script_dir/ping_liveness_master.sh" $1 || exit_status=$?
+    exit $exit_status
+---
+# Source: nango/charts/redis/templates/scripts-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nango-v2-redis-scripts
+  namespace: "default"
+  labels:
+    app.kubernetes.io/instance: nango-v2
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/version: 8.0.0
+    helm.sh/chart: redis-21.0.3
+data:
+  start-master.sh: |
+    #!/bin/bash
+
+    [[ -f $REDIS_PASSWORD_FILE ]] && export REDIS_PASSWORD="$(< "${REDIS_PASSWORD_FILE}")"
+    if [[ -f /opt/bitnami/redis/mounted-etc/master.conf ]];then
+        cp /opt/bitnami/redis/mounted-etc/master.conf /opt/bitnami/redis/etc/master.conf
+    fi
+    if [[ -f /opt/bitnami/redis/mounted-etc/redis.conf ]];then
+        cp /opt/bitnami/redis/mounted-etc/redis.conf /opt/bitnami/redis/etc/redis.conf
+    fi
+    if [[ -f /opt/bitnami/redis/mounted-etc/users.acl ]];then
+        cp /opt/bitnami/redis/mounted-etc/users.acl /opt/bitnami/redis/etc/users.acl
+    fi
+    ARGS=("--port" "${REDIS_PORT}")
+    ARGS+=("--requirepass" "${REDIS_PASSWORD}")
+    ARGS+=("--masterauth" "${REDIS_PASSWORD}")
+    ARGS+=("--include" "/opt/bitnami/redis/etc/redis.conf")
+    ARGS+=("--include" "/opt/bitnami/redis/etc/master.conf")
+    exec redis-server "${ARGS[@]}"
+  start-replica.sh: |
+    #!/bin/bash
+
+    get_port() {
+        hostname="$1"
+        type="$2"
+
+        port_var=$(echo "${hostname^^}_SERVICE_PORT_$type" | sed "s/-/_/g")
+        port=${!port_var}
+
+        if [ -z "$port" ]; then
+            case $type in
+                "SENTINEL")
+                    echo 26379
+                    ;;
+                "REDIS")
+                    echo 6379
+                    ;;
+            esac
+        else
+            echo $port
+        fi
+    }
+
+    get_full_hostname() {
+        hostname="$1"
+        full_hostname="${hostname}.${HEADLESS_SERVICE}"
+        echo "${full_hostname}"
+    }
+
+    REDISPORT=$(get_port "$HOSTNAME" "REDIS")
+    HEADLESS_SERVICE="nango-v2-redis-headless.default.svc.cluster.local"
+
+    [[ -f $REDIS_PASSWORD_FILE ]] && export REDIS_PASSWORD="$(< "${REDIS_PASSWORD_FILE}")"
+    [[ -f $REDIS_MASTER_PASSWORD_FILE ]] && export REDIS_MASTER_PASSWORD="$(< "${REDIS_MASTER_PASSWORD_FILE}")"
+    if [[ -f /opt/bitnami/redis/mounted-etc/replica.conf ]];then
+        cp /opt/bitnami/redis/mounted-etc/replica.conf /opt/bitnami/redis/etc/replica.conf
+    fi
+    if [[ -f /opt/bitnami/redis/mounted-etc/redis.conf ]];then
+        cp /opt/bitnami/redis/mounted-etc/redis.conf /opt/bitnami/redis/etc/redis.conf
+    fi
+    if [[ -f /opt/bitnami/redis/mounted-etc/users.acl ]];then
+        cp /opt/bitnami/redis/mounted-etc/users.acl /opt/bitnami/redis/etc/users.acl
+    fi
+
+    echo "" >> /opt/bitnami/redis/etc/replica.conf
+    echo "replica-announce-port $REDISPORT" >> /opt/bitnami/redis/etc/replica.conf
+    echo "replica-announce-ip $(get_full_hostname "$HOSTNAME")" >> /opt/bitnami/redis/etc/replica.conf
+    ARGS=("--port" "${REDIS_PORT}")
+    ARGS+=("--replicaof" "${REDIS_MASTER_HOST}" "${REDIS_MASTER_PORT_NUMBER}")
+    ARGS+=("--requirepass" "${REDIS_PASSWORD}")
+    ARGS+=("--masterauth" "${REDIS_MASTER_PASSWORD}")
+    ARGS+=("--include" "/opt/bitnami/redis/etc/redis.conf")
+    ARGS+=("--include" "/opt/bitnami/redis/etc/replica.conf")
+    exec redis-server "${ARGS[@]}"
+---
+# Source: nango/templates/jobs/pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nango-v2-jobs
+  namespace: "nango"
+  labels:
+    app.kubernetes.io/instance: nango-v2
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: nango
+    helm.sh/chart: nango-2.0.0
+    app.kubernetes.io/component: jobs
+spec:
+  accessModes:
+    - "ReadWriteOnce"
+  resources:
+    requests:
+      storage: "1Gi"
+---
+# Source: nango/templates/server/pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nango-v2-server
+  namespace: "nango"
+  labels:
+    app.kubernetes.io/instance: nango-v2
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: nango
+    helm.sh/chart: nango-2.0.0
+    app.kubernetes.io/component: server
+spec:
+  accessModes:
+    - "ReadWriteOnce"
+  resources:
+    requests:
+      storage: "8Gi"
+---
+# Source: nango/templates/jobs/clusterrolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: nango-v2-jobs
+  labels:
+    app.kubernetes.io/instance: nango-v2
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: nango
+    helm.sh/chart: nango-2.0.0
+    app.kubernetes.io/component: jobs
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: nango-v2-jobs
+subjects:
+  - kind: ServiceAccount
+    name: default
+    namespace: "nango"
+---
+# Source: nango/templates/jobs/role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: nango-v2-jobs
+  namespace: "nango"
+  labels:
+    app.kubernetes.io/instance: nango-v2
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: nango
+    helm.sh/chart: nango-2.0.0
+    app.kubernetes.io/component: jobs
+rules:
+  # TODO: Update resources and verbs to the proper values for the application cases
+  - apiGroups: [""]
+    resources: ["*"]
+    verbs: ["*"]
+  - apiGroups: [""]
+    resources: ["*"]
+    verbs: ["*"]
+  - apiGroups:
+    - apps
+    resources:
+    - deployments
+    verbs:
+    - get
+    - list
+    - watch
+    - create
+    - update
+  - apiGroups:
+    - ""
+    resources:
+    - networkpolicies
+    verbs:
+    - get
+    - list
+    - watch
+    - create
+    - update
+    - patch
+    - delete
+---
+# Source: nango/charts/postgresql/templates/primary/svc-headless.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: nango-v2-postgresql-hl
+  namespace: "default"
+  labels:
+    app.kubernetes.io/instance: nango-v2
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: postgresql
+    app.kubernetes.io/version: 17.6.0
+    helm.sh/chart: postgresql-16.7.26
+    app.kubernetes.io/component: primary
+  annotations:
+spec:
+  type: ClusterIP
+  clusterIP: None
+  # We want all pods in the StatefulSet to have their addresses published for
+  # the sake of the other Postgresql pods even before they're ready, since they
+  # have to be able to talk to each other in order to become ready.
+  publishNotReadyAddresses: true
+  ports:
+    - name: tcp-postgresql
+      port: 5432
+      targetPort: tcp-postgresql
+  selector:
+    app.kubernetes.io/instance: nango-v2
+    app.kubernetes.io/name: postgresql
+    app.kubernetes.io/component: primary
+---
+# Source: nango/charts/postgresql/templates/primary/svc.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: nango-v2-postgresql
+  namespace: "default"
+  labels:
+    app.kubernetes.io/instance: nango-v2
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: postgresql
+    app.kubernetes.io/version: 17.6.0
+    helm.sh/chart: postgresql-16.7.26
+    app.kubernetes.io/component: primary
+spec:
+  type: ClusterIP
+  sessionAffinity: None
+  ports:
+    - name: tcp-postgresql
+      port: 5432
+      targetPort: tcp-postgresql
+      nodePort: null
+  selector:
+    app.kubernetes.io/instance: nango-v2
+    app.kubernetes.io/name: postgresql
+    app.kubernetes.io/component: primary
+---
+# Source: nango/charts/redis/templates/headless-svc.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: nango-v2-redis-headless
+  namespace: "default"
+  labels:
+    app.kubernetes.io/instance: nango-v2
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/version: 8.0.0
+    helm.sh/chart: redis-21.0.3
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - name: tcp-redis
+      port: 6379
+      targetPort: redis
+  selector:
+    app.kubernetes.io/instance: nango-v2
+    app.kubernetes.io/name: redis
+---
+# Source: nango/charts/redis/templates/master/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: nango-v2-redis-master
+  namespace: "default"
+  labels:
+    app.kubernetes.io/instance: nango-v2
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/version: 8.0.0
+    helm.sh/chart: redis-21.0.3
+    app.kubernetes.io/component: master
+spec:
+  type: ClusterIP
+  internalTrafficPolicy: Cluster
+  sessionAffinity: None
+  ports:
+    - name: tcp-redis
+      port: 6379
+      targetPort: redis
+      nodePort: null
+  selector:
+    app.kubernetes.io/instance: nango-v2
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/component: master
+---
+# Source: nango/charts/redis/templates/replicas/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: nango-v2-redis-replicas
+  namespace: "default"
+  labels:
+    app.kubernetes.io/instance: nango-v2
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/version: 8.0.0
+    helm.sh/chart: redis-21.0.3
+    app.kubernetes.io/component: replica
+spec:
+  type: ClusterIP
+  internalTrafficPolicy: Cluster
+  sessionAffinity: None
+  ports:
+    - name: tcp-redis
+      port: 6379
+      targetPort: redis
+      nodePort: null
+  selector:
+    app.kubernetes.io/instance: nango-v2
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/component: replica
+---
+# Source: nango/templates/jobs/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: nango-v2-jobs
+  namespace: "nango"
+  labels:
+    app.kubernetes.io/instance: nango-v2
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: nango
+    helm.sh/chart: nango-2.0.0
+    app.kubernetes.io/component: jobs
+spec:
+  type: LoadBalancer
+  sessionAffinity: None
+  externalTrafficPolicy: "Cluster"
+  ports:
+    - name: server
+      port: 80
+      targetPort: 3005
+      protocol: TCP
+  selector:
+    app.kubernetes.io/instance: nango-v2
+    app.kubernetes.io/name: nango
+    app.kubernetes.io/component: jobs
+---
+# Source: nango/templates/orchestrator/orchestrator-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: default
+  name: orchestrator
+spec:
+  type: NodePort
+  ports:
+    - name: http
+      port: 80
+      targetPort: 3008
+  selector:
+    app: orchestrator
+---
+# Source: nango/templates/persist/persist-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: default
+  name: persist
+spec:
+  type: NodePort
+  ports:
+    - name: http
+      port: 80
+      targetPort: 3007
+  selector:
+    app: persist
+---
+# Source: nango/templates/runner/runner-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: default
+  name: runner
+spec:
+  type: NodePort
+  ports:
+    - name: http
+      port: 80
+      targetPort: 3006
+  selector:
+    app: runner
+---
+# Source: nango/templates/server/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: nango-v2-server
+  namespace: "nango"
+  labels:
+    app.kubernetes.io/instance: nango-v2
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: nango
+    helm.sh/chart: nango-2.0.0
+    app.kubernetes.io/component: server
+spec:
+  type: LoadBalancer
+  sessionAffinity: None
+  externalTrafficPolicy: "Cluster"
+  ports:
+    - name: server
+      port: 80
+      targetPort: 8080
+      protocol: TCP
+  selector:
+    app.kubernetes.io/instance: nango-v2
+    app.kubernetes.io/name: nango
+    app.kubernetes.io/component: server
+---
+# Source: nango/templates/jobs/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nango-v2-jobs
+  namespace: "nango"
+  labels:
+    app.kubernetes.io/instance: nango-v2
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: nango
+    helm.sh/chart: nango-2.0.0
+    app.kubernetes.io/component: jobs
+spec:
+  replicas: 
+  strategy:
+    type: RollingUpdate
+  selector: 
+    matchLabels:
+      app.kubernetes.io/component: jobs
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: nango-v2
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: nango
+        helm.sh/chart: nango-2.0.0
+        app.kubernetes.io/component: jobs
+    spec:
+      serviceAccountName: default
+      containers:
+        - name: jobs
+          image: nangohq/nango:latest
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              cpu: 150m
+              ephemeral-storage: 2Gi
+              memory: 192Mi
+            requests:
+              cpu: 100m
+              ephemeral-storage: 50Mi
+              memory: 128Mi
+          ports:
+            - name: http
+              containerPort: 3005
+            - name: https
+              containerPort: 3005
+          livenessProbe:
+            failureThreshold: 6
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 3
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+          readinessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 2
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 2
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+          env:
+          envFrom:
+          volumeMounts:
+            - name: data
+              mountPath: /nango/jobs/data
+            - name: empty-dir
+              mountPath: /tmp
+              subPath: tmp-dir
+      volumes:
+        - name: empty-dir
+          emptyDir: {}
+        - name: data
+          persistentVolumeClaim:
+            claimName: nango-v2-jobs
+---
+# Source: nango/templates/orchestrator/orchestrator-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: default
+  name: orchestrator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: orchestrator
+  template:
+    metadata:
+      labels:
+        app: orchestrator
+    spec:
+      containers:
+        - name: orchestrator
+          image: nangohq/nango:6adbaf17e6cba479564277b1f5224f42558454f4
+          imagePullPolicy: Always
+          args: ["node", "packages/orchestrator/dist/app.js"]
+          env:
+            - name: NANGO_DB_HOST
+              value: nango-postgresql
+            - name: NANGO_DB_NAME
+              value: nango
+            - name: NANGO_DB_USER
+              value: postgres
+            - name: NANGO_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: nango-postgresql
+                  key: postgres-password
+            - name: NANGO_DB_PORT
+              value: "5432"
+            - name: NANGO_DB_SSL
+              value: "false"
+            - name: NANGO_ENTERPRISE
+              value: "true"
+            - name: ORCHESTRATOR_DB_SSL
+              value: "false"
+---
+# Source: nango/templates/persist/persist-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: default
+  name: persist
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: persist
+  template:
+    metadata:
+      labels:
+        app: persist
+    spec:
+      containers:
+        - name: persist
+          image: nangohq/nango:6adbaf17e6cba479564277b1f5224f42558454f4
+          imagePullPolicy: Always
+          args: ["node", "packages/persist/dist/app.js"]
+          env:
+            - name: NANGO_DB_HOST
+              value: nango-postgresql
+            - name: NANGO_DB_NAME
+              value: nango
+            - name: NANGO_DB_USER
+              value: postgres
+            - name: NANGO_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: nango-postgresql
+                  key: postgres-password
+            - name: NANGO_DB_PORT
+              value: "5432"
+            - name: NANGO_DB_SSL
+              value: "false"
+            - name: NANGO_ENTERPRISE
+              value: "true"
+            - name: NANGO_LOGS_ENABLED
+              value: "true"
+            - name: NANGO_LOGS_ES_PWD
+              value: nango
+            - name: NANGO_LOGS_ES_URL
+              value: https://nango-elasticsearch.default.svc.cluster.local:9200
+            - name: NANGO_LOGS_ES_USER
+              value: elastic
+---
+# Source: nango/templates/runner/runner-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: default
+  name: runner
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: runner 
+  template:
+    metadata:
+      labels:
+        app: runner
+    spec:
+      containers:
+        - name: runner
+          image: nangohq/nango:6adbaf17e6cba479564277b1f5224f42558454f4
+          imagePullPolicy: Always
+          args: ["node", "packages/runner/dist/app.js"]
+          env:
+            - name: PERSIST_SERVICE_URL
+              value: http://nango-persist-default.nango
+            - name: NANGO_ENTERPRISE
+              value: "true"
+            - name: RUNNER_NODE_ID
+              value: "1"
+---
+# Source: nango/templates/server/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nango-v2-server
+  namespace: "nango"
+  labels:
+    app.kubernetes.io/instance: nango-v2
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: nango
+    helm.sh/chart: nango-2.0.0
+    app.kubernetes.io/component: server
+spec:
+  replicas: 
+  strategy:
+    type: RollingUpdate
+  selector: 
+    matchLabels:
+      app.kubernetes.io/component: server
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: nango-v2
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: nango
+        helm.sh/chart: nango-2.0.0
+        app.kubernetes.io/component: server
+    spec:
+      serviceAccountName: default
+      containers:
+        - name: server
+          image: nangohq/nango:latest
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              cpu: 150m
+              ephemeral-storage: 2Gi
+              memory: 192Mi
+            requests:
+              cpu: 100m
+              ephemeral-storage: 50Mi
+              memory: 128Mi
+          ports:
+            - name: http
+              containerPort: 8080
+            - name: https
+              containerPort: 8080
+          livenessProbe:
+            failureThreshold: 6
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 3
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+          readinessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 2
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 2
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+          env:
+          envFrom:
+          volumeMounts:
+            - name: data
+              mountPath: /nango/server/data
+            - name: empty-dir
+              mountPath: /tmp
+              subPath: tmp-dir
+      volumes:
+        - name: empty-dir
+          emptyDir: {}
+        - name: data
+          persistentVolumeClaim:
+            claimName: nango-v2-server
+---
+# Source: nango/charts/postgresql/templates/primary/statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: nango-v2-postgresql
+  namespace: "default"
+  labels:
+    app.kubernetes.io/instance: nango-v2
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: postgresql
+    app.kubernetes.io/version: 17.6.0
+    helm.sh/chart: postgresql-16.7.26
+    app.kubernetes.io/component: primary
+spec:
+  replicas: 1
+  serviceName: nango-v2-postgresql-hl
+  updateStrategy:
+    rollingUpdate: {}
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: nango-v2
+      app.kubernetes.io/name: postgresql
+      app.kubernetes.io/component: primary
+  template:
+    metadata:
+      name: nango-v2-postgresql
+      labels:
+        app.kubernetes.io/instance: nango-v2
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: postgresql
+        app.kubernetes.io/version: 17.6.0
+        helm.sh/chart: postgresql-16.7.26
+        app.kubernetes.io/component: primary
+    spec:
+      serviceAccountName: nango-v2-postgresql
+      
+      automountServiceAccountToken: false
+      affinity:
+        podAffinity:
+          
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/instance: nango-v2
+                    app.kubernetes.io/name: postgresql
+                    app.kubernetes.io/component: primary
+                topologyKey: kubernetes.io/hostname
+              weight: 1
+        nodeAffinity:
+          
+      securityContext:
+        fsGroup: 1001
+        fsGroupChangePolicy: Always
+        supplementalGroups: []
+        sysctls: []
+      hostNetwork: false
+      hostIPC: false
+      containers:
+        - name: postgresql
+          image: docker.io/bitnami/postgresql:17.6.0-debian-12-r0
+          imagePullPolicy: "IfNotPresent"
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsGroup: 1001
+            runAsNonRoot: true
+            runAsUser: 1001
+            seLinuxOptions: {}
+            seccompProfile:
+              type: RuntimeDefault
+          env:
+            - name: BITNAMI_DEBUG
+              value: "false"
+            - name: POSTGRESQL_PORT_NUMBER
+              value: "5432"
+            - name: POSTGRESQL_VOLUME_DIR
+              value: "/bitnami/postgresql"
+            - name: PGDATA
+              value: "/bitnami/postgresql/data"
+            # Authentication
+            - name: POSTGRES_PASSWORD_FILE
+              value: /opt/bitnami/postgresql/secrets/postgres-password
+            - name: POSTGRES_DATABASE
+              value: "nango"
+            # LDAP
+            - name: POSTGRESQL_ENABLE_LDAP
+              value: "no"
+            # TLS
+            - name: POSTGRESQL_ENABLE_TLS
+              value: "no"
+            # Audit
+            - name: POSTGRESQL_LOG_HOSTNAME
+              value: "false"
+            - name: POSTGRESQL_LOG_CONNECTIONS
+              value: "false"
+            - name: POSTGRESQL_LOG_DISCONNECTIONS
+              value: "false"
+            - name: POSTGRESQL_PGAUDIT_LOG_CATALOG
+              value: "off"
+            # Others
+            - name: POSTGRESQL_CLIENT_MIN_MESSAGES
+              value: "error"
+            - name: POSTGRESQL_SHARED_PRELOAD_LIBRARIES
+              value: "pgaudit"
+          ports:
+            - name: tcp-postgresql
+              containerPort: 5432
+          livenessProbe:
+            failureThreshold: 6
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - exec pg_isready -U "postgres" -d "dbname=nango" -h 127.0.0.1 -p 5432
+          readinessProbe:
+            failureThreshold: 6
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - -e
+                - |
+                  exec pg_isready -U "postgres" -d "dbname=nango" -h 127.0.0.1 -p 5432
+                  [ -f /opt/bitnami/postgresql/tmp/.initialized ] || [ -f /bitnami/postgresql/.initialized ]
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 2048Mi
+            requests:
+              cpu: 250m
+              memory: 1024Mi
+          volumeMounts:
+            - name: empty-dir
+              mountPath: /tmp
+              subPath: tmp-dir
+            - name: empty-dir
+              mountPath: /opt/bitnami/postgresql/conf
+              subPath: app-conf-dir
+            - name: empty-dir
+              mountPath: /opt/bitnami/postgresql/tmp
+              subPath: app-tmp-dir
+            - name: postgresql-password
+              mountPath: /opt/bitnami/postgresql/secrets/
+            - name: dshm
+              mountPath: /dev/shm
+            - name: data
+              mountPath: /bitnami/postgresql
+      volumes:
+        - name: empty-dir
+          emptyDir: {}
+        - name: postgresql-password
+          secret:
+            secretName: nango-v2-postgresql
+        - name: dshm
+          emptyDir:
+            medium: Memory
+        - name: data
+          emptyDir: {}
+---
+# Source: nango/charts/redis/templates/master/application.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: nango-v2-redis-master
+  namespace: "default"
+  labels:
+    app.kubernetes.io/instance: nango-v2
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/version: 8.0.0
+    helm.sh/chart: redis-21.0.3
+    app.kubernetes.io/component: master
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: nango-v2
+      app.kubernetes.io/name: redis
+      app.kubernetes.io/component: master
+  serviceName: nango-v2-redis-headless
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: nango-v2
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: redis
+        app.kubernetes.io/version: 8.0.0
+        helm.sh/chart: redis-21.0.3
+        app.kubernetes.io/component: master
+      annotations:
+        checksum/configmap: 2a9ab4a5432825504d910f022638674ce88eaefe9f9f595ad8bc107377d104fb
+        checksum/health: aff24913d801436ea469d8d374b2ddb3ec4c43ee7ab24663d5f8ff1a1b6991a9
+        checksum/scripts: 74d5b0feaff258e6e2ad36a9203fc4e9e8e2f9c10876eb16fc7691b71477ec2e
+        checksum/secret: a00a6b9c3da2ae60d00a9e33e30241f538e91270f823839be001c722a8f21d65
+    spec:
+      
+      securityContext:
+        fsGroup: 1001
+        fsGroupChangePolicy: Always
+        supplementalGroups: []
+        sysctls: []
+      serviceAccountName: nango-v2-redis-master
+      automountServiceAccountToken: false
+      affinity:
+        podAffinity:
+          
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/instance: nango-v2
+                    app.kubernetes.io/name: redis
+                    app.kubernetes.io/component: master
+                topologyKey: kubernetes.io/hostname
+              weight: 1
+        nodeAffinity:
+          
+      enableServiceLinks: true
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: redis
+          image: docker.io/bitnami/redis:8.0.0-debian-12-r0
+          imagePullPolicy: "IfNotPresent"
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsGroup: 1001
+            runAsNonRoot: true
+            runAsUser: 1001
+            seLinuxOptions: {}
+            seccompProfile:
+              type: RuntimeDefault
+          command:
+            - /bin/bash
+          args:
+            - -ec
+            - /opt/bitnami/scripts/start-scripts/start-master.sh
+          env:
+            - name: BITNAMI_DEBUG
+              value: "false"
+            - name: REDIS_REPLICATION_MODE
+              value: master
+            - name: ALLOW_EMPTY_PASSWORD
+              value: "no"
+            - name: REDIS_PASSWORD_FILE
+              value: "/opt/bitnami/redis/secrets/redis-password"
+            - name: REDIS_TLS_ENABLED
+              value: "no"
+            - name: REDIS_PORT
+              value: "6379"
+          ports:
+            - name: redis
+              containerPort: 6379
+          livenessProbe:
+            initialDelaySeconds: 20
+            periodSeconds: 5
+            # One second longer than command timeout should prevent generation of zombie processes.
+            timeoutSeconds: 6
+            successThreshold: 1
+            failureThreshold: 5
+            exec:
+              command:
+                - /bin/bash
+                - -ec
+                - /health/ping_liveness_local.sh 5
+          readinessProbe:
+            initialDelaySeconds: 20
+            periodSeconds: 5
+            timeoutSeconds: 2
+            successThreshold: 1
+            failureThreshold: 5
+            exec:
+              command:
+                - /bin/bash
+                - -ec
+                - /health/ping_readiness_local.sh 1
+          resources:
+            limits:
+              cpu: 150m
+              ephemeral-storage: 2Gi
+              memory: 192Mi
+            requests:
+              cpu: 100m
+              ephemeral-storage: 50Mi
+              memory: 128Mi
+          volumeMounts:
+            - name: start-scripts
+              mountPath: /opt/bitnami/scripts/start-scripts
+            - name: health
+              mountPath: /health
+            - name: redis-password
+              mountPath: /opt/bitnami/redis/secrets/
+            - name: redis-data
+              mountPath: /data
+            - name: config
+              mountPath: /opt/bitnami/redis/mounted-etc
+            - name: empty-dir
+              mountPath: /opt/bitnami/redis/etc/
+              subPath: app-conf-dir
+            - name: empty-dir
+              mountPath: /tmp
+              subPath: tmp-dir
+      volumes:
+        - name: start-scripts
+          configMap:
+            name: nango-v2-redis-scripts
+            defaultMode: 0755
+        - name: health
+          configMap:
+            name: nango-v2-redis-health
+            defaultMode: 0755
+        - name: redis-password
+          
+          secret:
+            secretName: nango-v2-redis
+            items:
+            - key: redis-password
+              path: redis-password
+        - name: config
+          configMap:
+            name: nango-v2-redis-configuration
+        - name: empty-dir
+          emptyDir: {}
+  volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: redis-data
+        labels:
+          app.kubernetes.io/instance: nango-v2
+          app.kubernetes.io/name: redis
+          app.kubernetes.io/component: master
+      spec:
+        accessModes:
+          - "ReadWriteOnce"
+        resources:
+          requests:
+            storage: "8Gi"
+---
+# Source: nango/charts/redis/templates/replicas/application.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: nango-v2-redis-replicas
+  namespace: "default"
+  labels:
+    app.kubernetes.io/instance: nango-v2
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/version: 8.0.0
+    helm.sh/chart: redis-21.0.3
+    app.kubernetes.io/component: replica
+spec:
+  replicas: 3
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: nango-v2
+      app.kubernetes.io/name: redis
+      app.kubernetes.io/component: replica
+  serviceName: nango-v2-redis-headless
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: nango-v2
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: redis
+        app.kubernetes.io/version: 8.0.0
+        helm.sh/chart: redis-21.0.3
+        app.kubernetes.io/component: replica
+      annotations:
+        checksum/configmap: 2a9ab4a5432825504d910f022638674ce88eaefe9f9f595ad8bc107377d104fb
+        checksum/health: aff24913d801436ea469d8d374b2ddb3ec4c43ee7ab24663d5f8ff1a1b6991a9
+        checksum/scripts: 74d5b0feaff258e6e2ad36a9203fc4e9e8e2f9c10876eb16fc7691b71477ec2e
+        checksum/secret: c08d231cd6a4f2a09cf45a07eda2a5166f1a59cb95e2dcb218b4381c81b499d4
+    spec:
+      
+      securityContext:
+        fsGroup: 1001
+        fsGroupChangePolicy: Always
+        supplementalGroups: []
+        sysctls: []
+      serviceAccountName: nango-v2-redis-replica
+      automountServiceAccountToken: false
+      affinity:
+        podAffinity:
+          
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/instance: nango-v2
+                    app.kubernetes.io/name: redis
+                    app.kubernetes.io/component: replica
+                topologyKey: kubernetes.io/hostname
+              weight: 1
+        nodeAffinity:
+          
+      enableServiceLinks: true
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: redis
+          image: docker.io/bitnami/redis:8.0.0-debian-12-r0
+          imagePullPolicy: "IfNotPresent"
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsGroup: 1001
+            runAsNonRoot: true
+            runAsUser: 1001
+            seLinuxOptions: {}
+            seccompProfile:
+              type: RuntimeDefault
+          command:
+            - /bin/bash
+          args:
+            - -ec
+            - /opt/bitnami/scripts/start-scripts/start-replica.sh
+          env:
+            - name: BITNAMI_DEBUG
+              value: "false"
+            - name: REDIS_REPLICATION_MODE
+              value: replica
+            - name: REDIS_MASTER_HOST
+              value: nango-v2-redis-master-0.nango-v2-redis-headless.default.svc.cluster.local
+            - name: REDIS_MASTER_PORT_NUMBER
+              value: "6379"
+            - name: ALLOW_EMPTY_PASSWORD
+              value: "no"
+            - name: REDIS_PASSWORD_FILE
+              value: "/opt/bitnami/redis/secrets/redis-password"
+            - name: REDIS_MASTER_PASSWORD_FILE
+              value: "/opt/bitnami/redis/secrets/redis-password"
+            - name: REDIS_TLS_ENABLED
+              value: "no"
+            - name: REDIS_PORT
+              value: "6379"
+          ports:
+            - name: redis
+              containerPort: 6379
+          startupProbe:
+            failureThreshold: 22
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+            tcpSocket:
+              port: redis
+          livenessProbe:
+            initialDelaySeconds: 20
+            periodSeconds: 5
+            timeoutSeconds: 6
+            successThreshold: 1
+            failureThreshold: 5
+            exec:
+              command:
+                - /bin/bash
+                - -ec
+                - /health/ping_liveness_local_and_master.sh 5
+          readinessProbe:
+            initialDelaySeconds: 20
+            periodSeconds: 5
+            timeoutSeconds: 2
+            successThreshold: 1
+            failureThreshold: 5
+            exec:
+              command:
+                - /bin/bash
+                - -ec
+                - /health/ping_readiness_local_and_master.sh 1
+          resources:
+            limits:
+              cpu: 150m
+              ephemeral-storage: 2Gi
+              memory: 192Mi
+            requests:
+              cpu: 100m
+              ephemeral-storage: 50Mi
+              memory: 128Mi
+          volumeMounts:
+            - name: start-scripts
+              mountPath: /opt/bitnami/scripts/start-scripts
+            - name: health
+              mountPath: /health
+            - name: redis-password
+              mountPath: /opt/bitnami/redis/secrets/
+            - name: redis-data
+              mountPath: /data
+            - name: config
+              mountPath: /opt/bitnami/redis/mounted-etc
+            - name: empty-dir
+              mountPath: /opt/bitnami/redis/etc
+              subPath: app-conf-dir
+            - name: empty-dir
+              mountPath: /tmp
+              subPath: tmp-dir
+      volumes:
+        - name: start-scripts
+          configMap:
+            name: nango-v2-redis-scripts
+            defaultMode: 0755
+        - name: health
+          configMap:
+            name: nango-v2-redis-health
+            defaultMode: 0755
+        - name: redis-password
+          
+          secret:
+            secretName: nango-v2-redis
+            items:
+            - key: redis-password
+              path: redis-password
+        - name: config
+          configMap:
+            name: nango-v2-redis-configuration
+        - name: empty-dir
+          emptyDir: {}
+  volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: redis-data
+        labels:
+          app.kubernetes.io/instance: nango-v2
+          app.kubernetes.io/name: redis
+          app.kubernetes.io/component: replica
+      spec:
+        accessModes:
+          - "ReadWriteOnce"
+        resources:
+          requests:
+            storage: "8Gi"

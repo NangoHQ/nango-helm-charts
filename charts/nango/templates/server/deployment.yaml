@@ -140,7 +140,7 @@ spec:
         - name: data
         {{- if .Values.server.persistence.enabled }}
           persistentVolumeClaim:
-            claimName: {{ default (include "common.names.fullname" .) .Values.server.persistence.existingClaim }}
+            claimName: {{ default (include "server.names.fullname" .) .Values.server.persistence.existingClaim }}
         {{- else }}
           emptyDir: {}
         {{- end }}

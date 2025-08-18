@@ -2,8 +2,8 @@
 apiVersion: {{ include "common.capabilities.networkPolicy.apiVersion" . }}
 kind: NetworkPolicy
 metadata:
-  name: {{ template "common.names.fullname" . }}
-  namespace: {{ include "common.names.namespace" . | quote }}
+  name: {{ template "server.names.fullname" . }}
+  namespace: {{ include "server.names.namespace" . | quote }}
   labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
     app.kubernetes.io/component:  {{ include "server.names.component" . }}
   {{- if .Values.commonAnnotations }}
@@ -45,7 +45,7 @@ spec:
         {{- if .Values.server.networkPolicy.addExternalClientAccess }}
         - podSelector:
             matchLabels:
-              {{ template "common.names.fullname" . }}-client: "true"
+              {{ template "server.names.fullname" . }}-client: "true"
         {{- end }}
         {{- if .Values.server.networkPolicy.ingressPodMatchLabels }}
         - podSelector:

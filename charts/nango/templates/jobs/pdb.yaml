@@ -1,0 +1,23 @@
+{{- if .Values.jobs.pdb.create }}
+apiVersion: {{ include "common.capabilities.policy.apiVersion" . }}
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "jobs.names.fullname" . }}
+  namespace: {{ include "jobs.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: {{ include "jobs.names.component" . }}
+  {{- if .Values.commonAnnotations }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if .Values.jobs.pdb.minAvailable }}
+  minAvailable: {{ .Values.jobs.pdb.minAvailable }}
+  {{- end  }}
+  {{- if or .Values.jobs.pdb.maxUnavailable ( not .Values.jobs.pdb.minAvailable ) }}
+  maxUnavailable: {{ .Values.jobs.pdb.maxUnavailable | default 1 }}
+  {{- end  }}
+  {{- $podLabels := include "common.tplvalues.merge" ( dict "values" ( list .Values.jobs.podLabels .Values.commonLabels ) "context" . ) }}
+  selector:
+    matchLabels: {{- include "common.labels.matchLabels" ( dict "customLabels" $podLabels "context" $ ) | nindent 6 }}
+      app.kubernetes.io/component: {{ include "jobs.names.component" . }}
+{{- end }}
