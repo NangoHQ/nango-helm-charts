@@ -11,7 +11,7 @@ metadata:
   {{- end }}
 spec:
   {{- if not .Values.server.autoscaling.hpa.enabled }}
-  replicas: {{ include "server.replicaCount" . }}
+  replicas: {{ .Values.server.replicaCount }}
   {{- end -}}
   {{- if .Values.server.updateStrategy }}
   strategy: {{- toYaml .Values.server.updateStrategy | nindent 4 }}
@@ -31,7 +31,7 @@ spec:
       {{- if .Values.server.imagePullSecrets }}
       imagePullSecrets: {{- include "common.tplvalues.render" ( dict "value" .Values.server.imagePullSecrets "context" $) | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ template "server.serviceAccountName" . }}
+      serviceAccountName: {{ template "server.names.serviceAccountName" . }}
       {{- if .Values.server.hostAliases }}
       hostAliases: {{- include "common.tplvalues.render" (dict "value" .Values.server.hostAliases "context" $) | nindent 8 }}
       {{- end }}
@@ -59,7 +59,7 @@ spec:
       containers:
         - name: {{ include "server.names.component" . }}
           image: {{ template "server.image" . }}
-          imagePullPolicy: {{ include "service.images.pullPolicy" . }}
+          imagePullPolicy: {{ include "server.images.pullPolicy" . }}
           {{- if .Values.server.command }}
           command: {{- include "common.tplvalues.render" (dict "value" .Values.server.command "context" $) | nindent 12 }}
           {{- end }}
@@ -81,15 +81,12 @@ spec:
             {{- end }}
           {{- if .Values.server.livenessProbe.enabled }}
           livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.server.livenessProbe "enabled") "context" $) | nindent 12 }}
-            %%httpGet || command || etc%%
           {{- end }}
           {{- if .Values.server.readinessProbe.enabled }}
           readinessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.server.readinessProbe "enabled") "context" $) | nindent 12 }}
-            %%httpGet || command || etc%%
           {{- end }}
           {{- if .Values.server.startupProbe.enabled }}
           startupProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.server.startupProbe "enabled") "context" $) | nindent 12 }}
-            %%httpGet || command || etc%%
           {{- end }}
           {{- if .Values.server.sidecars }}
           sidecars: {{- include "common.tplvalues.render" ( dict "value" .Values.server.sidecars "context" $) | nindent 12 }}
@@ -123,12 +120,12 @@ spec:
         - name: empty-dir
           emptyDir: {}
         - name: data
-        {{- if .Values.persistence.enabled }}
+        {{- if .Values.server.persistence.enabled }}
           persistentVolumeClaim:
-            claimName: {{ default (include "common.names.fullname" .) .Values.persistence.existingClaim }}
+            claimName: {{ default (include "common.names.fullname" .) .Values.server.persistence.existingClaim }}
         {{- else }}
           emptyDir: {}
         {{- end }}
-        {{- if .Values.%%MAIN_OBJECT_BLOCK%%.extraVolumes }}
-        {{- include "common.tplvalues.render" (dict "value" .Values.%%MAIN_OBJECT_BLOCK%%.extraVolumes "context" $) | nindent 8 }}
+        {{- if .Values.server.extraVolumes }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.server.extraVolumes "context" $) | nindent 8 }}
         {{- end }}

@@ -7,7 +7,7 @@ Return the proper image name.
 {{- $separator := ":" -}}
 {{- $termination := default ((.global).tag) .imageRoot.tag | toString -}}
 
-{{- if not (default ((.global).tag).imageRoot.tag) }}
+{{- if not (default (.global).tag .imageRoot.tag) }}
   {{- if .chart }}
     {{- $termination = .chart.AppVersion | toString -}}
   {{- end -}}
@@ -24,5 +24,5 @@ Return the proper image name.
 {{- end -}}
 
 {{- define "common.images.pullPolicy" -}}
-{{- default ((.global).pullPolicy .imageRoot.pullPolicy) -}}
+{{- default (.global).pullPolicy .imageRoot.pullPolicy -}}
 {{- end -}}

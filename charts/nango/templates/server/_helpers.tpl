@@ -2,11 +2,11 @@
 Expand the name of the chart.
 */}}
 {{- define "server.names.name" -}}
-{{- default (include "common.names.name") .Values.server.nameOverride | trunc 63 | trimSuffix "-" -}}
+{{- default (include "common.names.name" .) .Values.server.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
-{{- define "server.names.name" -}}
-{{- default (include "common.names.fullname") .Values.server.fullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- define "server.names.fullname" -}}
+{{- default (include "common.names.fullname" .) .Values.server.fullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{- define "server.names.component" -}}
@@ -45,6 +45,6 @@ Return the proper server image name
 {{ include "common.images.image" (dict "imageRoot" .Values.server.image "global" .Values.global.image) }}
 {{- end -}}
 
-{{- define "service.images.pullPolicy" -}}
-{{  include "common.images.pullPolicy" (dict "imageRoot" .Values.server.image "global" .Values.global.image)}}
+{{- define "server.images.pullPolicy" -}}
+{{ include "common.images.pullPolicy" (dict "imageRoot" .Values.server.image "global" .Values.global.image)}}
 {{- end -}}
