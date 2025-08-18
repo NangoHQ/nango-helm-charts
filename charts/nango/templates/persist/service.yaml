@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "persist.names.fullname" . }}
+  namespace: {{ include "persist.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: {{ include "persist.names.component" . }}
+  {{- if or .Values.persist.service.annotations .Values.commonAnnotations }}
+  {{- $annotations := include "common.tplvalues.merge" (dict "values" (list .Values.persist.service.annotations .Values.commonAnnotations) "context" .) }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" $annotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.persist.service.type }}
+  {{- if and .Values.persist.service.clusterIP (eq .Values.persist.service.type "ClusterIP") }}
+  clusterIP: {{ .Values.persist.service.clusterIP }}
+  {{- end }}
+  {{- if .Values.persist.service.sessionAffinity }}
+  sessionAffinity: {{ .Values.persist.service.sessionAffinity }}
+  {{- end }}
+  {{- if .Values.persist.service.sessionAffinityConfig }}
+  sessionAffinityConfig: {{- include "common.tplvalues.render" (dict "value" .Values.persist.service.sessionAffinityConfig "context" $) | nindent 4 }}
+  {{- end }}
+  {{- if or (eq .Values.persist.service.type "LoadBalancer") (eq .Values.persist.service.type "NodePort") }}
+  externalTrafficPolicy: {{ .Values.persist.service.externalTrafficPolicy | quote }}
+  {{- end }}
+  {{- if and (eq .Values.persist.service.type "LoadBalancer") (not (empty .Values.persist.service.loadBalancerSourceRanges)) }}
+  loadBalancerSourceRanges: {{ .Values.persist.service.loadBalancerSourceRanges }}
+  {{- end }}
+  {{- if and (eq .Values.persist.service.type "LoadBalancer") (not (empty .Values.persist.service.loadBalancerIP)) }}
+  loadBalancerIP: {{ .Values.persist.service.loadBalancerIP }}
+  {{- end }}
+  ports:
+    - name: persist
+      port: {{ .Values.persist.service.ports.http }}
+      {{- if not (eq .Values.persist.service.ports.http .Values.persist.containerPorts.http) }}
+      targetPort: {{ .Values.persist.containerPorts.http }}
+      {{- end }}
+      protocol: TCP
+      {{- if and (or (eq .Values.persist.service.type "NodePort") (eq .Values.persist.service.type "LoadBalancer")) (not (empty .Values.persist.service.nodePorts.http)) }}
+      nodePort: {{ .Values.persist.service.nodePorts.http }}
+      {{- else if eq .Values.persist.service.type "ClusterIP" }}
+      nodePort: null
+      {{- end }}
+    {{- if .Values.persist.service.extraPorts }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.persist.service.extraPorts "context" $) | nindent 4 }}
+    {{- end }}
+  {{- $podLabels := include "common.tplvalues.merge" (dict "values" (list .Values.persist.podLabels .Values.commonLabels) "context" .) | fromYaml }}
+  selector: {{- include "common.labels.matchLabels" ( dict "customLabels" $podLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: {{ include "persist.names.component" . }}

@@ -1,0 +1,23 @@
+{{- if .Values.orchestrator.pdb.create }}
+apiVersion: {{ include "common.capabilities.policy.apiVersion" . }}
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "orchestrator.names.fullname" . }}
+  namespace: {{ include "orchestrator.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: {{ include "orchestrator.names.component" . }}
+  {{- if .Values.commonAnnotations }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if .Values.orchestrator.pdb.minAvailable }}
+  minAvailable: {{ .Values.orchestrator.pdb.minAvailable }}
+  {{- end  }}
+  {{- if or .Values.orchestrator.pdb.maxUnavailable ( not .Values.orchestrator.pdb.minAvailable ) }}
+  maxUnavailable: {{ .Values.orchestrator.pdb.maxUnavailable | default 1 }}
+  {{- end  }}
+  {{- $podLabels := include "common.tplvalues.merge" ( dict "values" ( list .Values.orchestrator.podLabels .Values.commonLabels ) "context" . ) }}
+  selector:
+    matchLabels: {{- include "common.labels.matchLabels" ( dict "customLabels" $podLabels "context" $ ) | nindent 6 }}
+      app.kubernetes.io/component: {{ include "orchestrator.names.component" . }}
+{{- end }}

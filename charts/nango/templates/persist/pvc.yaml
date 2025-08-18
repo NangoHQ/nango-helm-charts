@@ -1,0 +1,28 @@
+{{- if and .Values.persist.persistence.enabled (not .Values.persist.persistence.existingClaim) -}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "persist.names.fullname" . }}
+  namespace: {{ include "persist.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: {{ include "persist.names.component" . }}
+  {{- if or .Values.persist.persistence.annotations .Values.commonAnnotations }}
+  {{- $annotations := include "common.tplvalues.merge" (dict "values" (list .Values.persist.persistence.annotations .Values.commonAnnotations) "context" .) }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" $annotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  accessModes:
+  {{- range .Values.persist.persistence.accessModes }}
+    - {{ . | quote }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.persist.persistence.size | quote }}
+  {{- if .Values.persist.persistence.selector }}
+  selector: {{- include "common.tplvalues.render" (dict "value" .Values.persist.persistence.selector "context" $) | nindent 4 }}
+  {{- end }}
+  {{- if .Values.persist.persistence.dataSource }}
+  dataSource: {{- include "common.tplvalues.render" (dict "value" .Values.persist.persistence.dataSource "context" $) | nindent 4 }}
+  {{- end }}
+  {{- include "common.storage.class" (dict "persistence" .Values.persist.persistence "global" .Values.global) | nindent 2 }}
+{{- end -}}

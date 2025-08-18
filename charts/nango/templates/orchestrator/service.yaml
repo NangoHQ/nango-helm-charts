@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "orchestrator.names.fullname" . }}
+  namespace: {{ include "orchestrator.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: {{ include "orchestrator.names.component" . }}
+  {{- if or .Values.orchestrator.service.annotations .Values.commonAnnotations }}
+  {{- $annotations := include "common.tplvalues.merge" (dict "values" (list .Values.orchestrator.service.annotations .Values.commonAnnotations) "context" .) }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" $annotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.orchestrator.service.type }}
+  {{- if and .Values.orchestrator.service.clusterIP (eq .Values.orchestrator.service.type "ClusterIP") }}
+  clusterIP: {{ .Values.orchestrator.service.clusterIP }}
+  {{- end }}
+  {{- if .Values.orchestrator.service.sessionAffinity }}
+  sessionAffinity: {{ .Values.orchestrator.service.sessionAffinity }}
+  {{- end }}
+  {{- if .Values.orchestrator.service.sessionAffinityConfig }}
+  sessionAffinityConfig: {{- include "common.tplvalues.render" (dict "value" .Values.orchestrator.service.sessionAffinityConfig "context" $) | nindent 4 }}
+  {{- end }}
+  {{- if or (eq .Values.orchestrator.service.type "LoadBalancer") (eq .Values.orchestrator.service.type "NodePort") }}
+  externalTrafficPolicy: {{ .Values.orchestrator.service.externalTrafficPolicy | quote }}
+  {{- end }}
+  {{- if and (eq .Values.orchestrator.service.type "LoadBalancer") (not (empty .Values.orchestrator.service.loadBalancerSourceRanges)) }}
+  loadBalancerSourceRanges: {{ .Values.orchestrator.service.loadBalancerSourceRanges }}
+  {{- end }}
+  {{- if and (eq .Values.orchestrator.service.type "LoadBalancer") (not (empty .Values.orchestrator.service.loadBalancerIP)) }}
+  loadBalancerIP: {{ .Values.orchestrator.service.loadBalancerIP }}
+  {{- end }}
+  ports:
+    - name: server
+      port: {{ .Values.orchestrator.service.ports.http }}
+      {{- if not (eq .Values.orchestrator.service.ports.http .Values.orchestrator.containerPorts.http) }}
+      targetPort: {{ .Values.orchestrator.containerPorts.http }}
+      {{- end }}
+      protocol: TCP
+      {{- if and (or (eq .Values.orchestrator.service.type "NodePort") (eq .Values.orchestrator.service.type "LoadBalancer")) (not (empty .Values.orchestrator.service.nodePorts.http)) }}
+      nodePort: {{ .Values.orchestrator.service.nodePorts.http }}
+      {{- else if eq .Values.orchestrator.service.type "ClusterIP" }}
+      nodePort: null
+      {{- end }}
+    {{- if .Values.orchestrator.service.extraPorts }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.orchestrator.service.extraPorts "context" $) | nindent 4 }}
+    {{- end }}
+  {{- $podLabels := include "common.tplvalues.merge" (dict "values" (list .Values.orchestrator.podLabels .Values.commonLabels) "context" .) | fromYaml }}
+  selector: {{- include "common.labels.matchLabels" ( dict "customLabels" $podLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: {{ include "orchestrator.names.component" . }}

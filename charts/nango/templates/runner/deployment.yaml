@@ -1,0 +1,149 @@
+apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
+kind: Deployment
+metadata:
+  name: {{ include "runner.names.fullname" . }}
+  namespace: {{ include "runner.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: {{ include "runner.names.component" . }}
+  {{- if or .Values.runner.deploymentAnnotations .Values.commonAnnotations }}
+  {{- $annotations := include "common.tplvalues.merge" (dict "values" (list .Values.runner.deploymentAnnotations .Values.commonAnnotations) "context" .) }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" $annotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if not .Values.runner.autoscaling.hpa.enabled }}
+  replicas: {{ .Values.runner.replicaCount }}
+  {{- end -}}
+  {{- if .Values.runner.updateStrategy }}
+  strategy: {{- toYaml .Values.runner.updateStrategy | nindent 4 }}
+  {{- end }}
+  {{- $podLabels := include "common.tplvalues.merge" (dict "values" (list .Values.runner.podLabels .Values.commonLabels) "context" .) }}
+  selector: 
+    matchLabels:
+      app.kubernetes.io/component: {{ include "runner.names.component" . }}
+  template:
+    metadata:
+      {{- if .Values.runner.podAnnotations }}
+      annotations: {{- include "common.tplvalues.render" (dict "value" .Values.runner.podAnnotations "context" $) | nindent 8 }}
+      {{- end }}
+      labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 8 }}
+        app.kubernetes.io/component: {{ include "runner.names.component" . }}
+    spec:
+      {{- if .Values.runner.imagePullSecrets }}
+      imagePullSecrets: {{- include "common.tplvalues.render" ( dict "value" .Values.runner.imagePullSecrets "context" $) | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ template "runner.names.serviceAccountName" . }}
+      {{- if .Values.runner.hostAliases }}
+      hostAliases: {{- include "common.tplvalues.render" (dict "value" .Values.runner.hostAliases "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.runner.nodeSelector }}
+      nodeSelector: {{- include "common.tplvalues.render" ( dict "value" .Values.runner.nodeSelector "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.runner.tolerations }}
+      tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.runner.tolerations "context" .) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.runner.priorityClassName }}
+      priorityClassName: {{ .Values.runner.priorityClassName | quote }}
+      {{- end }}
+      {{- if .Values.runner.schedulerName }}
+      schedulerName: {{ .Values.runner.schedulerName | quote }}
+      {{- end }}
+      {{- if .Values.runner.topologySpreadConstraints }}
+      topologySpreadConstraints: {{- include "common.tplvalues.render" (dict "value" .Values.runner.topologySpreadConstraints "context" .) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.runner.podSecurityContext.enabled }}
+      securityContext: {{- omit .Values.runner.podSecurityContext "enabled" | toYaml | nindent 8 }}
+      {{- end }}
+      {{- if .Values.runner.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ .Values.runner.terminationGracePeriodSeconds }}
+      {{- end }}
+      containers:
+        - name: {{ include "runner.names.component" . }}
+          image: {{ template "runner.image" . }}
+          imagePullPolicy: {{ include "runner.images.pullPolicy" . }}
+          {{- if .Values.runner.command }}
+          command: {{- include "common.tplvalues.render" (dict "value" .Values.runner.command "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.runner.args }}
+          args: {{- include "common.tplvalues.render" (dict "value" .Values.runner.args "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.runner.resources }}
+          resources: {{- toYaml .Values.runner.resources | nindent 12 }}
+          {{- else if ne .Values.runner.resourcesPreset "none" }}
+          resources: {{- include "common.resources.preset" (dict "type" .Values.runner.resourcesPreset) | nindent 12 }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.runner.containerPorts.http }}
+            - name: https
+              containerPort: {{ .Values.runner.containerPorts.https }}
+            {{- if .Values.runner.extraContainerPorts }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.runner.extraContainerPorts "context" $) | nindent 12 }}
+            {{- end }}
+          {{- if .Values.runner.customLivenessProbe }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.runner.customLivenessProbe "context" $) | nindent 12 }}
+          {{- else if .Values.runner.livenessProbe.enabled }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.runner.livenessProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+          {{- end }}
+          {{- if .Values.runner.customReadinessProbe }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.runner.customReadinessProbe "context" $) | nindent 12 }}
+          {{- else if .Values.runner.readinessProbe.enabled }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.runner.readinessProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+          {{- end }}
+          {{- if .Values.runner.customStartupProbe }}
+          startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.runner.customStartupProbe "context" $) | nindent 12 }}
+          {{- else if .Values.runner.startupProbe.enabled }}
+          startupProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.runner.startupProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+          {{- end }}
+          {{- if .Values.runner.sidecars }}
+          sidecars: {{- include "common.tplvalues.render" ( dict "value" .Values.runner.sidecars "context" $) | nindent 12 }}
+          {{- end }}
+          env:
+            {{- if .Values.runner.extraEnvVars }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.runner.extraEnvVars "context" $) | nindent 12 }}
+            {{- end }}
+          envFrom:
+            {{- if .Values.runner.extraEnvVarsCM }}
+            - configMapRef:
+                name: {{ include "common.tplvalues.render" (dict "value" .Values.runner.extraEnvVarsCM "context" $) }}
+            {{- end }}
+            {{- if .Values.runner.extraEnvVarsSecret }}
+            - secretRef:
+                name: {{ include "common.tplvalues.render" (dict "value" .Values.runner.extraEnvVarsSecret "context" $) }}
+            {{- end }}
+          volumeMounts:
+            - name: data
+              mountPath: {{ .Values.runner.persistence.mountPath }}
+              {{- if .Values.runner.persistence.subPath }}
+              subPath: {{ .Values.runner.persistence.subPath }}
+              {{- end }}
+            - name: empty-dir
+              mountPath: /tmp
+              subPath: tmp-dir
+          {{- if .Values.runner.extraVolumeMounts }}
+          {{- include "common.tplvalues.render" (dict "value" .Values.runner.extraVolumeMounts "context" $) | nindent 12 }}
+          {{- end }}
+      volumes:
+        - name: empty-dir
+          emptyDir: {}
+        - name: data
+        {{- if .Values.runner.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ default (include "runner.names.fullname" .) .Values.runner.persistence.existingClaim }}
+        {{- else }}
+          emptyDir: {}
+        {{- end }}
+        {{- if .Values.runner.extraVolumes }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.runner.extraVolumes "context" $) | nindent 8 }}
+        {{- end }}
