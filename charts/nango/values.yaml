@@ -29,7 +29,8 @@ server:
   name: server
   image: {}
   args:
-    - "packages/server/entrypoint.sh"
+    - "node"
+    - "packages/server/dist/server.js"
   ## ServiceAccount configuration
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
   ##
