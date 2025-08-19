@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "orchestrator.names.fullname" . }}
+  name: {{ include "orchestrator.names.service" . }}
   namespace: {{ include "orchestrator.names.namespace" . | quote }}
   labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
     app.kubernetes.io/component: {{ include "orchestrator.names.component" . }}

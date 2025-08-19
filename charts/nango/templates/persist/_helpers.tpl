@@ -13,6 +13,10 @@ Expand the name of the chart.
 {{- default "persist" .Values.persist.name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
+{{- define "persist.names.service" -}}
+{{- printf "%s-svc" (include "persist.names.fullname" .)  -}}
+{{- end -}}
+
 {{/*
 Component URL helpers
 */}}

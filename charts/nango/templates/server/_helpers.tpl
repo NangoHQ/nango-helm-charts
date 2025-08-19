@@ -13,6 +13,10 @@ Expand the name of the chart.
 {{- default "server" .Values.server.name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
+{{- define "server.names.service" -}}
+{{- printf "%s-svc" (include "server.names.fullname" .)  -}}
+{{- end -}}
+
 {{/*
 Component URL helpers
 */}}

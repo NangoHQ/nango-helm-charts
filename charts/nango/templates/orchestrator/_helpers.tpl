@@ -13,6 +13,10 @@ Expand the name of the chart.
 {{- default "orchestrator" .Values.orchestrator.name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
+{{- define "orchestrator.names.service" -}}
+{{- printf "%s-svc" (include "orchestrator.names.fullname" .)  -}}
+{{- end -}}
+
 {{/*
 Component URL helpers
 */}}

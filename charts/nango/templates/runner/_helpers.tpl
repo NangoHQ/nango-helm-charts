@@ -13,6 +13,10 @@ Expand the name of the chart.
 {{- default "runner" .Values.runner.name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
+{{- define "runner.names.service" -}}
+{{- printf "%s-svc" (include "runner.names.fullname" .)  -}}
+{{- end -}}
+
 {{/*
 Component URL helpers
 */}}
