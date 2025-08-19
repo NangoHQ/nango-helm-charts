@@ -32,7 +32,7 @@ Create the name of the service account to use
 */}}
 {{- define "persist.names.serviceAccountName" -}}
 {{- if .Values.persist.serviceAccount.create -}}
-    {{ default (include "common.names.fullname" .) .Values.persist.serviceAccount.name }}
+    {{ default (include "persist.names.fullname" .) .Values.persist.serviceAccount.name }}
 {{- else -}}
     {{ default "default" .Values.persist.serviceAccount.name }}
 {{- end -}}

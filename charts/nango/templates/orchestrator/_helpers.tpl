@@ -32,7 +32,7 @@ Create the name of the service account to use
 */}}
 {{- define "orchestrator.names.serviceAccountName" -}}
 {{- if .Values.orchestrator.serviceAccount.create -}}
-    {{ default (include "common.names.fullname" .) .Values.orchestrator.serviceAccount.name }}
+    {{ default (include "orchestrator.names.fullname" .) .Values.orchestrator.serviceAccount.name }}
 {{- else -}}
     {{ default "default" .Values.orchestrator.serviceAccount.name }}
 {{- end -}}
