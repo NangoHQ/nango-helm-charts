@@ -1,3 +1,4 @@
+{{- if .Values.runner.enabled }}
 {{- if .Values.runner.pdb.create }}
 apiVersion: {{ include "common.capabilities.policy.apiVersion" . }}
 kind: PodDisruptionBudget
@@ -20,4 +21,5 @@ spec:
   selector:
     matchLabels: {{- include "common.labels.matchLabels" ( dict "customLabels" $podLabels "context" $ ) | nindent 6 }}
       app.kubernetes.io/component: {{ include "runner.names.component" . }}
+{{- end }}
 {{- end }}

@@ -1,3 +1,4 @@
+{{- if .Values.runner.enabled }}
 {{- if .Values.runner.networkPolicy.enabled }}
 apiVersion: {{ include "common.capabilities.networkPolicy.apiVersion" . }}
 kind: NetworkPolicy
@@ -64,4 +65,5 @@ spec:
     {{- if .Values.runner.networkPolicy.extraIngress }}
     {{- include "common.tplvalues.render" ( dict "value" .Values.runner.networkPolicy.extraIngress "context" $ ) | nindent 4 }}
     {{- end }}
+{{- end }}
 {{- end }}

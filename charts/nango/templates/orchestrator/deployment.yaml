@@ -18,7 +18,7 @@ spec:
   {{- end }}
   {{- $podLabels := include "common.tplvalues.merge" (dict "values" (list .Values.orchestrator.podLabels .Values.commonLabels) "context" .) }}
   selector: 
-    matchLabels:
+    matchLabels: {{- include "common.labels.matchLabels" ( dict "customLabels" $podLabels "context" $ ) | nindent 6 }}
       app.kubernetes.io/component: {{ include "orchestrator.names.component" . }}
   template:
     metadata:

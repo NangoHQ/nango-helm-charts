@@ -32,7 +32,7 @@ Create the name of the service account to use
 */}}
 {{- define "jobs.names.serviceAccountName" -}}
 {{- if .Values.jobs.serviceAccount.create -}}
-    {{ default (include "common.names.fullname" .) .Values.jobs.serviceAccount.name }}
+    {{ default (include "jobs.names.fullname" .) .Values.jobs.serviceAccount.name }}
 {{- else -}}
     {{ default "default" .Values.jobs.serviceAccount.name }}
 {{- end -}}

@@ -1,3 +1,4 @@
+{{- if .Values.runner.enabled }}
 apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
 kind: Deployment
 metadata:
@@ -18,7 +19,7 @@ spec:
   {{- end }}
   {{- $podLabels := include "common.tplvalues.merge" (dict "values" (list .Values.runner.podLabels .Values.commonLabels) "context" .) }}
   selector: 
-    matchLabels:
+    matchLabels: {{- include "common.labels.matchLabels" ( dict "customLabels" $podLabels "context" $ ) | nindent 6 }}
       app.kubernetes.io/component: {{ include "runner.names.component" . }}
   template:
     metadata:
@@ -147,3 +148,4 @@ spec:
         {{- if .Values.runner.extraVolumes }}
         {{- include "common.tplvalues.render" (dict "value" .Values.runner.extraVolumes "context" $) | nindent 8 }}
         {{- end }}
+{{- end }}
