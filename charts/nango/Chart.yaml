@@ -15,7 +15,6 @@ dependencies:
     name: redis
     repository: https://charts.bitnami.com/bitnami
     version: ~21.0.0
-deprecated: false
 description: Nango - A single API for all your integrations
 home: https://nango.dev
 icon: https://app.nango.dev/logo-dark-background-vertical.svg
@@ -27,8 +26,7 @@ keywords:
   - apps
   - open-source
 maintainers:
-  - email: khaliq@nango.dev
-    name: nango
-    url: https://app.nango.dev
+  - name: nango
+    url: https://github.com/NangoHQ/nango-helm-charts
 sources:
-  - https://github.com/nango/nango-helm-charts.git
+  - https://github.com/NangoHQ/nango-helm-charts/tree/main/charts/nango
