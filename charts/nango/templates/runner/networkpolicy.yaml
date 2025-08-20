@@ -1,0 +1,69 @@
+{{- if .Values.runner.enabled }}
+{{- if .Values.runner.networkPolicy.enabled }}
+apiVersion: {{ include "common.capabilities.networkPolicy.apiVersion" . }}
+kind: NetworkPolicy
+metadata:
+  name: {{ template "runner.names.fullname" . }}
+  namespace: {{ include "runner.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component:  {{ include "runner.names.component" . }}
+  {{- if .Values.commonAnnotations }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  {{- $podLabels := include "common.tplvalues.merge" ( dict "values" ( list .Values.runner.podLabels .Values.commonLabels ) "context" . ) }}
+  podSelector:
+    matchLabels: {{- include "common.labels.matchLabels" ( dict "customLabels" $podLabels "context" $ ) | nindent 6 }}
+      app.kubernetes.io/component: {{ include "runner.names.component" . }}
+  policyTypes:
+    - Ingress
+    - Egress
+  egress:
+    {{- if .Values.runner.networkPolicy.allowExternalEgress }}
+    - {}
+    {{- else }}
+    - ports:
+        # Allow dns resolution
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+    {{- if .Values.runner.networkPolicy.extraEgress }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.runner.networkPolicy.extraEgress "context" $ ) | nindent 4 }}
+    {{- end }}
+    {{- end }}
+  ingress:
+    - ports:
+        - port: {{ .Values.runner.containerPorts.http }}
+        - port: {{ .Values.runner.containerPorts.https }}
+        {{- range .Values.runner.extraContainerPorts }}
+        - port: {{ .containerPort }}
+        {{- end }}
+      {{- if not .Values.runner.networkPolicy.allowExternal }}
+      from:
+        - podSelector:
+            matchLabels: {{- include "common.labels.matchLabels" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 14 }}
+        {{- if .Values.runner.networkPolicy.addExternalClientAccess }}
+        - podSelector:
+            matchLabels:
+              {{ template "runner.names.fullname" . }}-client: "true"
+        {{- end }}
+        {{- if .Values.runner.networkPolicy.ingressPodMatchLabels }}
+        - podSelector:
+            matchLabels: {{- include "common.tplvalues.render" (dict "value" .Values.runner.networkPolicy.ingressPodMatchLabels "context" $ ) | nindent 14 }}
+        {{- end }}
+        {{- if .Values.runner.networkPolicy.ingressNSMatchLabels }}
+        - namespaceSelector:
+            matchLabels: {{- include "common.tplvalues.render" (dict "value" .Values.runner.networkPolicy.ingressNSMatchLabels "context" $ ) | nindent 14 }}
+          {{- if .Values.runner.networkPolicy.ingressNSPodMatchLabels }}
+          podSelector:
+            matchLabels:
+              matchLabels: {{- include "common.tplvalues.render" (dict "value" .Values.runner.networkPolicy.ingressNSPodMatchLabels "context" $ ) | nindent 14 }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
+    {{- if .Values.runner.networkPolicy.extraIngress }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.runner.networkPolicy.extraIngress "context" $ ) | nindent 4 }}
+    {{- end }}
+{{- end }}
+{{- end }}

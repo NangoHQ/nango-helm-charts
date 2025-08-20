@@ -1,0 +1,149 @@
+apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
+kind: Deployment
+metadata:
+  name: {{ include "orchestrator.names.fullname" . }}
+  namespace: {{ include "orchestrator.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: {{ include "orchestrator.names.component" . }}
+  {{- if or .Values.orchestrator.deploymentAnnotations .Values.commonAnnotations }}
+  {{- $annotations := include "common.tplvalues.merge" (dict "values" (list .Values.orchestrator.deploymentAnnotations .Values.commonAnnotations) "context" .) }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" $annotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if not .Values.orchestrator.autoscaling.hpa.enabled }}
+  replicas: {{ .Values.orchestrator.replicaCount }}
+  {{- end -}}
+  {{- if .Values.orchestrator.updateStrategy }}
+  strategy: {{- toYaml .Values.orchestrator.updateStrategy | nindent 4 }}
+  {{- end }}
+  {{- $podLabels := include "common.tplvalues.merge" (dict "values" (list .Values.orchestrator.podLabels .Values.commonLabels) "context" .) }}
+  selector: 
+    matchLabels: {{- include "common.labels.matchLabels" ( dict "customLabels" $podLabels "context" $ ) | nindent 6 }}
+      app.kubernetes.io/component: {{ include "orchestrator.names.component" . }}
+  template:
+    metadata:
+      {{- if .Values.orchestrator.podAnnotations }}
+      annotations: {{- include "common.tplvalues.render" (dict "value" .Values.orchestrator.podAnnotations "context" $) | nindent 8 }}
+      {{- end }}
+      labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 8 }}
+        app.kubernetes.io/component: {{ include "orchestrator.names.component" . }}
+    spec:
+      {{- if .Values.orchestrator.imagePullSecrets }}
+      imagePullSecrets: {{- include "common.tplvalues.render" ( dict "value" .Values.orchestrator.imagePullSecrets "context" $) | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ template "orchestrator.names.serviceAccountName" . }}
+      {{- if .Values.orchestrator.hostAliases }}
+      hostAliases: {{- include "common.tplvalues.render" (dict "value" .Values.orchestrator.hostAliases "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.orchestrator.nodeSelector }}
+      nodeSelector: {{- include "common.tplvalues.render" ( dict "value" .Values.orchestrator.nodeSelector "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.orchestrator.tolerations }}
+      tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.orchestrator.tolerations "context" .) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.orchestrator.priorityClassName }}
+      priorityClassName: {{ .Values.orchestrator.priorityClassName | quote }}
+      {{- end }}
+      {{- if .Values.orchestrator.schedulerName }}
+      schedulerName: {{ .Values.orchestrator.schedulerName | quote }}
+      {{- end }}
+      {{- if .Values.orchestrator.topologySpreadConstraints }}
+      topologySpreadConstraints: {{- include "common.tplvalues.render" (dict "value" .Values.orchestrator.topologySpreadConstraints "context" .) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.orchestrator.podSecurityContext.enabled }}
+      securityContext: {{- omit .Values.orchestrator.podSecurityContext "enabled" | toYaml | nindent 8 }}
+      {{- end }}
+      {{- if .Values.orchestrator.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ .Values.orchestrator.terminationGracePeriodSeconds }}
+      {{- end }}
+      containers:
+        - name: {{ include "orchestrator.names.component" . }}
+          image: {{ template "orchestrator.image" . }}
+          imagePullPolicy: {{ include "orchestrator.images.pullPolicy" . }}
+          {{- if .Values.orchestrator.command }}
+          command: {{- include "common.tplvalues.render" (dict "value" .Values.orchestrator.command "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.orchestrator.args }}
+          args: {{- include "common.tplvalues.render" (dict "value" .Values.orchestrator.args "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.orchestrator.resources }}
+          resources: {{- toYaml .Values.orchestrator.resources | nindent 12 }}
+          {{- else if ne .Values.orchestrator.resourcesPreset "none" }}
+          resources: {{- include "common.resources.preset" (dict "type" .Values.orchestrator.resourcesPreset) | nindent 12 }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.orchestrator.containerPorts.http }}
+            - name: https
+              containerPort: {{ .Values.orchestrator.containerPorts.https }}
+            {{- if .Values.orchestrator.extraContainerPorts }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.orchestrator.extraContainerPorts "context" $) | nindent 12 }}
+            {{- end }}
+          {{- if .Values.orchestrator.customLivenessProbe }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.orchestrator.customLivenessProbe "context" $) | nindent 12 }}
+          {{- else if .Values.orchestrator.livenessProbe.enabled }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.orchestrator.livenessProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+          {{- end }}
+          {{- if .Values.orchestrator.customReadinessProbe }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.orchestrator.customReadinessProbe "context" $) | nindent 12 }}
+          {{- else if .Values.orchestrator.readinessProbe.enabled }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.orchestrator.readinessProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+          {{- end }}
+          {{- if .Values.orchestrator.customStartupProbe }}
+          startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.orchestrator.customStartupProbe "context" $) | nindent 12 }}
+          {{- else if .Values.orchestrator.startupProbe.enabled }}
+          startupProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.orchestrator.startupProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+          {{- end }}
+          {{- if .Values.orchestrator.sidecars }}
+          sidecars: {{- include "common.tplvalues.render" ( dict "value" .Values.orchestrator.sidecars "context" $) | nindent 12 }}
+          {{- end }}
+          env:
+            {{- if .Values.orchestrator.extraEnvVars }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.orchestrator.extraEnvVars "context" $) | nindent 12 }}
+            {{- end }}
+          envFrom:
+            {{- if .Values.orchestrator.extraEnvVarsCM }}
+            - configMapRef:
+                name: {{ include "common.tplvalues.render" (dict "value" .Values.orchestrator.extraEnvVarsCM "context" $) }}
+            {{- end }}
+            {{- if .Values.orchestrator.extraEnvVarsSecret }}
+            - secretRef:
+                name: {{ include "common.tplvalues.render" (dict "value" .Values.orchestrator.extraEnvVarsSecret "context" $) }}
+            {{- end }}
+          volumeMounts:
+            - name: data
+              mountPath: {{ .Values.orchestrator.persistence.mountPath }}
+              {{- if .Values.orchestrator.persistence.subPath }}
+              subPath: {{ .Values.orchestrator.persistence.subPath }}
+              {{- end }}
+            - name: empty-dir
+              mountPath: /tmp
+              subPath: tmp-dir
+          {{- if .Values.orchestrator.extraVolumeMounts }}
+          {{- include "common.tplvalues.render" (dict "value" .Values.orchestrator.extraVolumeMounts "context" $) | nindent 12 }}
+          {{- end }}
+      volumes:
+        - name: empty-dir
+          emptyDir: {}
+        - name: data
+        {{- if .Values.orchestrator.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ default (include "orchestrator.names.fullname" .) .Values.orchestrator.persistence.existingClaim }}
+        {{- else }}
+          emptyDir: {}
+        {{- end }}
+        {{- if .Values.orchestrator.extraVolumes }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.orchestrator.extraVolumes "context" $) | nindent 8 }}
+        {{- end }}

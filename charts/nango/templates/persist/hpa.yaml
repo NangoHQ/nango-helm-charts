@@ -1,0 +1,36 @@
+{{- if .Values.persist.autoscaling.hpa.enabled }}
+apiVersion: {{ include "common.capabilities.hpa.apiVersion" ( dict "context" $ ) }}
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "persist.names.fullname" . }}
+  namespace: {{ include "persist.names.namespace" . | quote}}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: {{ include "persist.names.component" . }}
+  {{- if .Values.commonAnnotations }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  scaleTargetRef:
+    apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
+    kind: Deployment
+    name: {{ include "persist.names.fullname" . }}
+  minReplicas: {{ .Values.persist.autoscaling.hpa.minReplicas }}
+  maxReplicas: {{ .Values.persist.autoscaling.hpa.maxReplicas }}
+  metrics:
+    {{- if .Values.persist.autoscaling.hpa.targetMemory }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.persist.autoscaling.hpa.targetMemory }}
+    {{- end }}
+    {{- if .Values.persist.autoscaling.hpa.targetCPU }}
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.persist.autoscaling.hpa.targetCPU }}
+    {{- end }}
+{{- end }}

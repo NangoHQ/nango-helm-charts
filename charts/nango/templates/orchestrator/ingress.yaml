@@ -1,0 +1,51 @@
+{{- if .Values.orchestrator.ingress.enabled }}
+apiVersion: {{ include "common.capabilities.ingress.apiVersion" . }}
+kind: Ingress
+metadata:
+  name: {{ include "orchestrator.names.fullname" . }}
+  namespace: {{ include "orchestrator.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: {{ include "orchestrator.names.component" . }}
+  {{- if or .Values.orchestrator.ingress.annotations .Values.commonAnnotations }}
+  {{- $annotations := include "common.tplvalues.merge" (dict "values" (list .Values.orchestrator.ingress.annotations .Values.commonAnnotations) "context" .) }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" $annotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if .Values.orchestrator.ingress.ingressClassName }}
+  ingressClassName: {{ .Values.orchestrator.ingress.ingressClassName | quote }}
+  {{- end }}
+  rules:
+    {{- if .Values.orchestrator.ingress.hostname }}
+    - host: {{ .Values.orchestrator.ingress.hostname }}
+      http:
+        paths:
+          {{- if .Values.orchestrator.ingress.extraPaths }}
+          {{- toYaml .Values.orchestrator.ingress.extraPaths | nindent 10 }}
+          {{- end }}
+          - path: {{ .Values.orchestrator.ingress.path }}
+            pathType: {{ .Values.orchestrator.ingress.pathType }}
+            backend: {{- include "common.ingress.backend" (dict "serviceName" (include "orchestrator.names.fullname" .) "servicePort" "http" "context" $)  | nindent 14 }}
+    {{- end }}
+    {{- range .Values.orchestrator.ingress.extraHosts }}
+    - host: {{ .name | quote }}
+      http:
+        paths:
+          - path: {{ default "/" .path }}
+            pathType: {{ default "ImplementationSpecific" .pathType }}
+            backend: {{- include "common.ingress.backend" (dict "serviceName" (include "orchestrator.names.fullname" $) "servicePort" "http" "context" $) | nindent 14 }}
+    {{- end }}
+    {{- if .Values.orchestrator.ingress.extraRules }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.orchestrator.ingress.extraRules "context" $) | nindent 4 }}
+    {{- end }}
+  {{- if or (and .Values.orchestrator.ingress.tls (or (include "common.ingress.certManagerRequest" ( dict "annotations" .Values.orchestrator.ingress.annotations )) .Values.orchestrator.ingress.selfSigned)) .Values.orchestrator.ingress.extraTls }}
+  tls:
+    {{- if and .Values.orchestrator.ingress.tls (or (include "common.ingress.certManagerRequest" ( dict "annotations" .Values.orchestrator.ingress.annotations )) .Values.orchestrator.ingress.selfSigned) }}
+    - hosts:
+        - {{ .Values.orchestrator.ingress.hostname | quote }}
+      secretName: {{ printf "%s-tls" .Values.orchestrator.ingress.hostname }}
+    {{- end }}
+    {{- if .Values.orchestrator.ingress.extraTls }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.orchestrator.ingress.extraTls "context" $) | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end }}

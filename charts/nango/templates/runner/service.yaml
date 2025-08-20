@@ -1,0 +1,51 @@
+{{- if .Values.runner.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "runner.names.service" . }}
+  namespace: {{ include "runner.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: {{ include "runner.names.component" . }}
+  {{- if or .Values.runner.service.annotations .Values.commonAnnotations }}
+  {{- $annotations := include "common.tplvalues.merge" (dict "values" (list .Values.runner.service.annotations .Values.commonAnnotations) "context" .) }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" $annotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.runner.service.type }}
+  {{- if and .Values.runner.service.clusterIP (eq .Values.runner.service.type "ClusterIP") }}
+  clusterIP: {{ .Values.runner.service.clusterIP }}
+  {{- end }}
+  {{- if .Values.runner.service.sessionAffinity }}
+  sessionAffinity: {{ .Values.runner.service.sessionAffinity }}
+  {{- end }}
+  {{- if .Values.runner.service.sessionAffinityConfig }}
+  sessionAffinityConfig: {{- include "common.tplvalues.render" (dict "value" .Values.runner.service.sessionAffinityConfig "context" $) | nindent 4 }}
+  {{- end }}
+  {{- if or (eq .Values.runner.service.type "LoadBalancer") (eq .Values.runner.service.type "NodePort") }}
+  externalTrafficPolicy: {{ .Values.runner.service.externalTrafficPolicy | quote }}
+  {{- end }}
+  {{- if and (eq .Values.runner.service.type "LoadBalancer") (not (empty .Values.runner.service.loadBalancerSourceRanges)) }}
+  loadBalancerSourceRanges: {{ .Values.runner.service.loadBalancerSourceRanges }}
+  {{- end }}
+  {{- if and (eq .Values.runner.service.type "LoadBalancer") (not (empty .Values.runner.service.loadBalancerIP)) }}
+  loadBalancerIP: {{ .Values.runner.service.loadBalancerIP }}
+  {{- end }}
+  ports:
+    - name: runner
+      port: {{ .Values.runner.service.ports.http }}
+      {{- if not (eq .Values.runner.service.ports.http .Values.runner.containerPorts.http) }}
+      targetPort: {{ .Values.runner.containerPorts.http }}
+      {{- end }}
+      protocol: TCP
+      {{- if and (or (eq .Values.runner.service.type "NodePort") (eq .Values.runner.service.type "LoadBalancer")) (not (empty .Values.runner.service.nodePorts.http)) }}
+      nodePort: {{ .Values.runner.service.nodePorts.http }}
+      {{- else if eq .Values.runner.service.type "ClusterIP" }}
+      nodePort: null
+      {{- end }}
+    {{- if .Values.runner.service.extraPorts }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.runner.service.extraPorts "context" $) | nindent 4 }}
+    {{- end }}
+  {{- $podLabels := include "common.tplvalues.merge" (dict "values" (list .Values.runner.podLabels .Values.commonLabels) "context" .) | fromYaml }}
+  selector: {{- include "common.labels.matchLabels" ( dict "customLabels" $podLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: {{ include "runner.names.component" . }}
+{{- end }}

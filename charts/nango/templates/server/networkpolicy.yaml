@@ -1,0 +1,67 @@
+{{- if .Values.server.networkPolicy.enabled }}
+apiVersion: {{ include "common.capabilities.networkPolicy.apiVersion" . }}
+kind: NetworkPolicy
+metadata:
+  name: {{ template "server.names.fullname" . }}
+  namespace: {{ include "server.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component:  {{ include "server.names.component" . }}
+  {{- if .Values.commonAnnotations }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  {{- $podLabels := include "common.tplvalues.merge" ( dict "values" ( list .Values.server.podLabels .Values.commonLabels ) "context" . ) }}
+  podSelector:
+    matchLabels: {{- include "common.labels.matchLabels" ( dict "customLabels" $podLabels "context" $ ) | nindent 6 }}
+      app.kubernetes.io/component: {{ include "server.names.component" . }}
+  policyTypes:
+    - Ingress
+    - Egress
+  egress:
+    {{- if .Values.server.networkPolicy.allowExternalEgress }}
+    - {}
+    {{- else }}
+    - ports:
+        # Allow dns resolution
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+    {{- if .Values.server.networkPolicy.extraEgress }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.server.networkPolicy.extraEgress "context" $ ) | nindent 4 }}
+    {{- end }}
+    {{- end }}
+  ingress:
+    - ports:
+        - port: {{ .Values.server.containerPorts.http }}
+        - port: {{ .Values.server.containerPorts.https }}
+        {{- range .Values.server.extraContainerPorts }}
+        - port: {{ .containerPort }}
+        {{- end }}
+      {{- if not .Values.server.networkPolicy.allowExternal }}
+      from:
+        - podSelector:
+            matchLabels: {{- include "common.labels.matchLabels" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 14 }}
+        {{- if .Values.server.networkPolicy.addExternalClientAccess }}
+        - podSelector:
+            matchLabels:
+              {{ template "server.names.fullname" . }}-client: "true"
+        {{- end }}
+        {{- if .Values.server.networkPolicy.ingressPodMatchLabels }}
+        - podSelector:
+            matchLabels: {{- include "common.tplvalues.render" (dict "value" .Values.server.networkPolicy.ingressPodMatchLabels "context" $ ) | nindent 14 }}
+        {{- end }}
+        {{- if .Values.server.networkPolicy.ingressNSMatchLabels }}
+        - namespaceSelector:
+            matchLabels: {{- include "common.tplvalues.render" (dict "value" .Values.server.networkPolicy.ingressNSMatchLabels "context" $ ) | nindent 14 }}
+          {{- if .Values.server.networkPolicy.ingressNSPodMatchLabels }}
+          podSelector:
+            matchLabels:
+              matchLabels: {{- include "common.tplvalues.render" (dict "value" .Values.server.networkPolicy.ingressNSPodMatchLabels "context" $ ) | nindent 14 }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
+    {{- if .Values.server.networkPolicy.extraIngress }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.server.networkPolicy.extraIngress "context" $ ) | nindent 4 }}
+    {{- end }}
+{{- end }}

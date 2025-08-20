@@ -1,0 +1,149 @@
+apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
+kind: Deployment
+metadata:
+  name: {{ include "jobs.names.fullname" . }}
+  namespace: {{ include "jobs.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: {{ include "jobs.names.component" . }}
+  {{- if or .Values.jobs.deploymentAnnotations .Values.commonAnnotations }}
+  {{- $annotations := include "common.tplvalues.merge" (dict "values" (list .Values.jobs.deploymentAnnotations .Values.commonAnnotations) "context" .) }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" $annotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if not .Values.jobs.autoscaling.hpa.enabled }}
+  replicas: {{ .Values.jobs.replicaCount }}
+  {{- end -}}
+  {{- if .Values.jobs.updateStrategy }}
+  strategy: {{- toYaml .Values.jobs.updateStrategy | nindent 4 }}
+  {{- end }}
+  {{- $podLabels := include "common.tplvalues.merge" (dict "values" (list .Values.jobs.podLabels .Values.commonLabels) "context" .) }}
+  selector: 
+    matchLabels: {{- include "common.labels.matchLabels" ( dict "customLabels" $podLabels "context" $ ) | nindent 6 }}
+      app.kubernetes.io/component: {{ include "jobs.names.component" . }}
+  template:
+    metadata:
+      {{- if .Values.jobs.podAnnotations }}
+      annotations: {{- include "common.tplvalues.render" (dict "value" .Values.jobs.podAnnotations "context" $) | nindent 8 }}
+      {{- end }}
+      labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 8 }}
+        app.kubernetes.io/component: {{ include "jobs.names.component" . }}
+    spec:
+      {{- if .Values.jobs.imagePullSecrets }}
+      imagePullSecrets: {{- include "common.tplvalues.render" ( dict "value" .Values.jobs.imagePullSecrets "context" $) | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ template "jobs.names.serviceAccountName" . }}
+      {{- if .Values.jobs.hostAliases }}
+      hostAliases: {{- include "common.tplvalues.render" (dict "value" .Values.jobs.hostAliases "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.jobs.nodeSelector }}
+      nodeSelector: {{- include "common.tplvalues.render" ( dict "value" .Values.jobs.nodeSelector "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.jobs.tolerations }}
+      tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.jobs.tolerations "context" .) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.jobs.priorityClassName }}
+      priorityClassName: {{ .Values.jobs.priorityClassName | quote }}
+      {{- end }}
+      {{- if .Values.jobs.schedulerName }}
+      schedulerName: {{ .Values.jobs.schedulerName | quote }}
+      {{- end }}
+      {{- if .Values.jobs.topologySpreadConstraints }}
+      topologySpreadConstraints: {{- include "common.tplvalues.render" (dict "value" .Values.jobs.topologySpreadConstraints "context" .) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.jobs.podSecurityContext.enabled }}
+      securityContext: {{- omit .Values.jobs.podSecurityContext "enabled" | toYaml | nindent 8 }}
+      {{- end }}
+      {{- if .Values.jobs.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ .Values.jobs.terminationGracePeriodSeconds }}
+      {{- end }}
+      containers:
+        - name: {{ include "jobs.names.component" . }}
+          image: {{ template "jobs.image" . }}
+          imagePullPolicy: {{ include "jobs.images.pullPolicy" . }}
+          {{- if .Values.jobs.command }}
+          command: {{- include "common.tplvalues.render" (dict "value" .Values.jobs.command "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.jobs.args }}
+          args: {{- include "common.tplvalues.render" (dict "value" .Values.jobs.args "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.jobs.resources }}
+          resources: {{- toYaml .Values.jobs.resources | nindent 12 }}
+          {{- else if ne .Values.jobs.resourcesPreset "none" }}
+          resources: {{- include "common.resources.preset" (dict "type" .Values.jobs.resourcesPreset) | nindent 12 }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.jobs.containerPorts.http }}
+            - name: https
+              containerPort: {{ .Values.jobs.containerPorts.https }}
+            {{- if .Values.jobs.extraContainerPorts }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.jobs.extraContainerPorts "context" $) | nindent 12 }}
+            {{- end }}
+          {{- if .Values.jobs.customLivenessProbe }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.jobs.customLivenessProbe "context" $) | nindent 12 }}
+          {{- else if .Values.jobs.livenessProbe.enabled }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.jobs.livenessProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+          {{- end }}
+          {{- if .Values.jobs.customReadinessProbe }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.jobs.customReadinessProbe "context" $) | nindent 12 }}
+          {{- else if .Values.jobs.readinessProbe.enabled }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.jobs.readinessProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+          {{- end }}
+          {{- if .Values.jobs.customStartupProbe }}
+          startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.jobs.customStartupProbe "context" $) | nindent 12 }}
+          {{- else if .Values.jobs.startupProbe.enabled }}
+          startupProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.jobs.startupProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+          {{- end }}
+          {{- if .Values.jobs.sidecars }}
+          sidecars: {{- include "common.tplvalues.render" ( dict "value" .Values.jobs.sidecars "context" $) | nindent 12 }}
+          {{- end }}
+          env:
+            {{- if .Values.jobs.extraEnvVars }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.jobs.extraEnvVars "context" $) | nindent 12 }}
+            {{- end }}
+          envFrom:
+            {{- if .Values.jobs.extraEnvVarsCM }}
+            - configMapRef:
+                name: {{ include "common.tplvalues.render" (dict "value" .Values.jobs.extraEnvVarsCM "context" $) }}
+            {{- end }}
+            {{- if .Values.jobs.extraEnvVarsSecret }}
+            - secretRef:
+                name: {{ include "common.tplvalues.render" (dict "value" .Values.jobs.extraEnvVarsSecret "context" $) }}
+            {{- end }}
+          volumeMounts:
+            - name: data
+              mountPath: {{ .Values.jobs.persistence.mountPath }}
+              {{- if .Values.jobs.persistence.subPath }}
+              subPath: {{ .Values.jobs.persistence.subPath }}
+              {{- end }}
+            - name: empty-dir
+              mountPath: /tmp
+              subPath: tmp-dir
+          {{- if .Values.jobs.extraVolumeMounts }}
+          {{- include "common.tplvalues.render" (dict "value" .Values.jobs.extraVolumeMounts "context" $) | nindent 12 }}
+          {{- end }}
+      volumes:
+        - name: empty-dir
+          emptyDir: {}
+        - name: data
+        {{- if .Values.jobs.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ default (include "jobs.names.fullname" .) .Values.jobs.persistence.existingClaim }}
+        {{- else }}
+          emptyDir: {}
+        {{- end }}
+        {{- if .Values.jobs.extraVolumes }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.jobs.extraVolumes "context" $) | nindent 8 }}
+        {{- end }}

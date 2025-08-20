@@ -1,0 +1,51 @@
+{{- if .Values.jobs.ingress.enabled }}
+apiVersion: {{ include "common.capabilities.ingress.apiVersion" . }}
+kind: Ingress
+metadata:
+  name: {{ include "jobs.names.fullname" . }}
+  namespace: {{ include "jobs.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: {{ include "jobs.names.component" . }}
+  {{- if or .Values.jobs.ingress.annotations .Values.commonAnnotations }}
+  {{- $annotations := include "common.tplvalues.merge" (dict "values" (list .Values.jobs.ingress.annotations .Values.commonAnnotations) "context" .) }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" $annotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if .Values.jobs.ingress.ingressClassName }}
+  ingressClassName: {{ .Values.jobs.ingress.ingressClassName | quote }}
+  {{- end }}
+  rules:
+    {{- if .Values.jobs.ingress.hostname }}
+    - host: {{ .Values.jobs.ingress.hostname }}
+      http:
+        paths:
+          {{- if .Values.jobs.ingress.extraPaths }}
+          {{- toYaml .Values.jobs.ingress.extraPaths | nindent 10 }}
+          {{- end }}
+          - path: {{ .Values.jobs.ingress.path }}
+            pathType: {{ .Values.jobs.ingress.pathType }}
+            backend: {{- include "common.ingress.backend" (dict "serviceName" (include "jobs.names.fullname" .) "servicePort" "http" "context" $)  | nindent 14 }}
+    {{- end }}
+    {{- range .Values.jobs.ingress.extraHosts }}
+    - host: {{ .name | quote }}
+      http:
+        paths:
+          - path: {{ default "/" .path }}
+            pathType: {{ default "ImplementationSpecific" .pathType }}
+            backend: {{- include "common.ingress.backend" (dict "serviceName" (include "jobs.names.fullname" $) "servicePort" "http" "context" $) | nindent 14 }}
+    {{- end }}
+    {{- if .Values.jobs.ingress.extraRules }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.jobs.ingress.extraRules "context" $) | nindent 4 }}
+    {{- end }}
+  {{- if or (and .Values.jobs.ingress.tls (or (include "common.ingress.certManagerRequest" ( dict "annotations" .Values.jobs.ingress.annotations )) .Values.jobs.ingress.selfSigned)) .Values.jobs.ingress.extraTls }}
+  tls:
+    {{- if and .Values.jobs.ingress.tls (or (include "common.ingress.certManagerRequest" ( dict "annotations" .Values.jobs.ingress.annotations )) .Values.jobs.ingress.selfSigned) }}
+    - hosts:
+        - {{ .Values.jobs.ingress.hostname | quote }}
+      secretName: {{ printf "%s-tls" .Values.jobs.ingress.hostname }}
+    {{- end }}
+    {{- if .Values.jobs.ingress.extraTls }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.jobs.ingress.extraTls "context" $) | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end }}

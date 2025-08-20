@@ -1,0 +1,28 @@
+{{- if and .Values.orchestrator.persistence.enabled (not .Values.orchestrator.persistence.existingClaim) -}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "orchestrator.names.fullname" . }}
+  namespace: {{ include "orchestrator.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: {{ include "orchestrator.names.component" . }}
+  {{- if or .Values.orchestrator.persistence.annotations .Values.commonAnnotations }}
+  {{- $annotations := include "common.tplvalues.merge" (dict "values" (list .Values.orchestrator.persistence.annotations .Values.commonAnnotations) "context" .) }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" $annotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  accessModes:
+  {{- range .Values.orchestrator.persistence.accessModes }}
+    - {{ . | quote }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.orchestrator.persistence.size | quote }}
+  {{- if .Values.orchestrator.persistence.selector }}
+  selector: {{- include "common.tplvalues.render" (dict "value" .Values.orchestrator.persistence.selector "context" $) | nindent 4 }}
+  {{- end }}
+  {{- if .Values.orchestrator.persistence.dataSource }}
+  dataSource: {{- include "common.tplvalues.render" (dict "value" .Values.orchestrator.persistence.dataSource "context" $) | nindent 4 }}
+  {{- end }}
+  {{- include "common.storage.class" (dict "persistence" .Values.orchestrator.persistence "global" .Values.global) | nindent 2 }}
+{{- end -}}

@@ -5,3 +5,5 @@ nango-data/*
 .idea/*
 .env
 nango-integrations/*
+charts/nango/charts
+template.generated.yaml

@@ -1,0 +1,39 @@
+{{- if and (include "common.capabilities.apiVersions.has" ( dict "version" "autoscaling.k8s.io/v1/VerticalPodAutoscaler" "context" . )) .Values.orchestrator.autoscaling.vpa.enabled }}
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: {{ include "orchestrator.names.fullname" . }}
+  namespace: {{ include "orchestrator.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: {{ include "orchestrator.names.component" . }}
+  {{- if or .Values.orchestrator.autoscaling.vpa.annotations .Values.commonAnnotations }}
+  {{- $annotations := include "common.tplvalues.merge" ( dict "values" ( list .Values.orchestrator.autoscaling.vpa.annotations .Values.commonAnnotations ) "context" . ) }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" $annotations "context" $) | nindent 4 }}
+  {{- end }}
+spec:
+  resourcePolicy:
+    containerPolicies:
+    - containerName: server
+      {{- with .Values.orchestrator.autoscaling.vpa.controlledResources }}
+      controlledResources:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.orchestrator.autoscaling.vpa.maxAllowed }}
+      maxAllowed:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.orchestrator.autoscaling.vpa.minAllowed }}
+      minAllowed:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+  targetRef:
+    apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
+    kind: Deployment
+    name: {{ include "orchestrator.names.fullname" . }}
+  {{- if .Values.orchestrator.autoscaling.vpa.updatePolicy }}
+  updatePolicy:
+    {{- with .Values.orchestrator.autoscaling.vpa.updatePolicy.updateMode }}
+    updateMode: {{ . }}
+    {{- end }}
+  {{- end }}
+{{- end }}
