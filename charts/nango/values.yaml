@@ -1,3 +1,5 @@
+## @section Common parameters
+
 ## @param nameOverride String to partially override common.names.name
 ##
 nameOverride: ""
@@ -14,8 +16,18 @@ commonLabels: {}
 ##
 commonAnnotations: {}
 
+## @section Global Parameters
+##
+
 global:
-  #Global ontainer image values
+  ## global image
+  ## @param global.image.registry [default: nangohq] global image registry
+  ## @param global.image.repository [default: nango] global image repository
+  ## @skip global.image.tag global image tag (immutable tags are recommended)
+  ## @param global.image.digest global image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended)
+  ## @param global.image.pullPolicy global image pull policy
+  ## @param global.image.pullSecrets global image pull secrets
+  ##
   image:
     registry: "nangohq"
     repository: "nango"
@@ -23,11 +35,40 @@ global:
     digest: ""
     pullPolicy: "IfNotPresent"
     pullSecrets: []
+  ## @param global.defaultStorageClass Global default StorageClass for Persistent Volume(s)
+  ##
   defaultStorageClass: ""
+
+## @section Server Parameters
+##
   
 server:
+  ## @param server.name server name
+  ##
   name: server
-  image: {}
+  ## server image
+  ## @param server.image.registry [default: nangohq] server image registry
+  ## @param server.image.repository [default: nango] server image repository
+  ## @skip server.image.tag server image tag (immutable tags are recommended)
+  ## @param server.image.digest server image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended)
+  ## @param server.image.pullPolicy server image pull policy
+  ## @param server.image.pullSecrets server image pull secrets
+  ##
+  image:
+    registry: ""
+    repository: ""
+    tag: ""
+    digest: ""
+    pullPolicy: ""
+    pullSecrets: []
+  ## @param server.replicaCount Number of server replicas to deploy
+  ##
+  replicaCount: 1
+  ## @param server.command Override default server container command (useful when using custom images)
+  ##
+  command: []
+  ## @param server.args Override default server container args (useful when using custom images)
+  ##
   args:
     - "node"
     - "packages/server/dist/server.js"
@@ -35,40 +76,40 @@ server:
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
   ##
   serviceAccount:
-    ## @param serviceAccount.create Specifies whether a ServiceAccount should be created
+    ## @param server.serviceAccount.create Specifies whether a ServiceAccount should be created
     ##
     create: true
-    ## @param serviceAccount.name The name of the ServiceAccount to use.
+    ## @param server.serviceAccount.name The name of the ServiceAccount to use.
     ## If not set and create is true, a name is generated using the server.names.fullname template
     ##
     name: ""
-    ## @param serviceAccount.annotations Additional Service Account annotations (evaluated as a template)
+    ## @param server.serviceAccount.annotations Additional Service Account annotations (evaluated as a template)
     ##
     annotations: {}
-    ## @param serviceAccount.automountServiceAccountToken Automount service account token for the server service account
+    ## @param server.serviceAccount.automountServiceAccountToken Automount service account token for the server service account
     ##
     automountServiceAccountToken: true
   ## Network Policies
   ## Ref: https://kubernetes.io/docs/concepts/services-networking/network-policies/
   ##
   networkPolicy:
-    ## @param networkPolicy.enabled Specifies whether a NetworkPolicy should be created
+    ## @param server.networkPolicy.enabled Specifies whether a NetworkPolicy should be created
     ##
     enabled: true
-    ## @param networkPolicy.allowExternal Don't require server label for connections
+    ## @param server.networkPolicy.allowExternal Don't require server label for connections
     ## The Policy model to apply. When set to false, only pods with the correct
     ## server label will have network access to the ports server is listening
     ## on. When true, server will accept connections from any source
     ## (with the correct destination port).
     ##
     allowExternal: true
-    ## @param networkPolicy.allowExternalEgress Allow the pod to access any range of port and all destinations.
+    ## @param server.networkPolicy.allowExternalEgress Allow the pod to access any range of port and all destinations.
     ##
     allowExternalEgress: true
-    ## @param networkPolicy.addExternalClientAccess Allow access from pods with client label set to "true". Ignored if `networkPolicy.allowExternal` is true.
+    ## @param server.networkPolicy.addExternalClientAccess Allow access from pods with client label set to "true". Ignored if `server.networkPolicy.allowExternal` is true.
     ##
     addExternalClientAccess: true
-    ## @param networkPolicy.extraIngress [array] Add extra ingress rules to the NetworkPolicy
+    ## @param server.networkPolicy.extraIngress [array] Add extra ingress rules to the NetworkPolicy
     ## e.g:
     ## extraIngress:
     ##   - ports:
@@ -84,7 +125,7 @@ server:
     ##                 values:
     ##                   - frontend
     extraIngress: []
-    ## @param networkPolicy.extraEgress [array] Add extra ingress rules to the NetworkPolicy (ignored if allowExternalEgress=true)
+    ## @param server.networkPolicy.extraEgress [array] Add extra ingress rules to the NetworkPolicy (ignored if allowExternalEgress=true)
     ## e.g:
     ## extraEgress:
     ##   - ports:
@@ -101,43 +142,44 @@ server:
     ##                   - frontend
     ##
     extraEgress: []
-    ## @param networkPolicy.ingressPodMatchLabels [object] Labels to match to allow traffic from other pods. Ignored if `networkPolicy.allowExternal` is true.
+    ## @param server.networkPolicy.ingressPodMatchLabels [object] Labels to match to allow traffic from other pods. Ignored if `server.networkPolicy.allowExternal` is true.
     ## e.g:
     ## ingressPodMatchLabels:
     ##   my-client: "true"
     #
     ingressPodMatchLabels: {}
-    ## @param networkPolicy.ingressNSMatchLabels [object] Labels to match to allow traffic from other namespaces. Ignored if `networkPolicy.allowExternal` is true.
-    ## @param networkPolicy.ingressNSPodMatchLabels [object] Pod labels to match to allow traffic from other namespaces. Ignored if `networkPolicy.allowExternal` is true.
+    ## @param server.networkPolicy.ingressNSMatchLabels [object] Labels to match to allow traffic from other namespaces. Ignored if `server.networkPolicy.allowExternal` is true.
     ##
     ingressNSMatchLabels: {}
+    ## @param server.networkPolicy.ingressNSPodMatchLabels [object] Pod labels to match to allow traffic from other namespaces. Ignored if `server.networkPolicy.allowExternal` is true.
+    ##
     ingressNSPodMatchLabels: {}
   ## server ingress parameters
   ## ref: http://kubernetes.io/docs/concepts/services-networking/ingress/
   ##
   ingress:
-    ## @param ingress.enabled Enable ingress record generation for server
+    ## @param server.ingress.enabled Enable ingress record generation for server
     ##
     enabled: true
-    ## @param ingress.pathType Ingress path type
+    ## @param server.ingress.pathType Ingress path type
     ##
     pathType: ImplementationSpecific
-    ## @param ingress.apiVersion Force Ingress API version (automatically detected if not set)
+    ## @param server.ingress.apiVersion Force Ingress API version (automatically detected if not set)
     ##
     apiVersion: ""
-    ## @param ingress.hostname Default host for the ingress record
+    ## @param server.ingress.hostname Default host for the ingress record
     ##
     hostname: example-app.nango.dev
-    ## @param ingress.ingressClassName IngressClass that will be be used to implement the Ingress (Kubernetes 1.18+)
+    ## @param server.ingress.ingressClassName IngressClass that will be be used to implement the Ingress (Kubernetes 1.18+)
     ## This is supported in Kubernetes 1.18+ and required if you have more than one IngressClass marked as the default for your cluster .
     ## ref: https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/
     ##
     ingressClassName: ""
-    ## @param ingress.path Default path for the ingress record
+    ## @param server.ingress.path Default path for the ingress record
     ## NOTE: You may need to set this to '/*' in order to use this with ALB ingress controllers
     ##
     path: /
-    ## @param ingress.annotations Additional annotations for the Ingress resource. To enable certificate autogeneration, place here your cert-manager annotations.
+    ## @param server.ingress.annotations Additional annotations for the Ingress resource. To enable certificate autogeneration, place here your cert-manager annotations.
     ## Use this parameter to set the required annotations for cert-manager, see
     ## ref: https://cert-manager.io/docs/usage/ingress/#supported-annotations
     ## e.g:
@@ -146,25 +188,25 @@ server:
     ##   cert-manager.io/cluster-issuer: cluster-issuer-name
     ##
     annotations: {}
-    ## @param ingress.tls Enable TLS configuration for the host defined at `ingress.hostname` parameter
-    ## TLS certificates will be retrieved from a TLS secret with name: `{{- printf "%s-tls" .Values.ingress.hostname }}`
+    ## @param server.ingress.tls Enable TLS configuration for the host defined at `server.ingress.hostname` parameter
+    ## TLS certificates will be retrieved from a TLS secret with name: `{{- printf "%s-tls" .Values.server.ingress.hostname }}`
     ## You can:
-    ##   - Use the `ingress.secrets` parameter to create this TLS secret
+    ##   - Use the `server.ingress.secrets` parameter to create this TLS secret
     ##   - Rely on cert-manager to create it by setting the corresponding annotations
-    ##   - Rely on Helm to create self-signed certificates by setting `ingress.selfSigned=true`
+    ##   - Rely on Helm to create self-signed certificates by setting `server.ingress.selfSigned=true`
     ##
     tls: false
-    ## @param ingress.selfSigned Create a TLS secret for this ingress record using self-signed certificates generated by Helm
+    ## @param server.ingress.selfSigned Create a TLS secret for this ingress record using self-signed certificates generated by Helm
     ##
     selfSigned: false
-    ## @param ingress.extraHosts An array with additional hostname(s) to be covered with the ingress record
+    ## @param server.ingress.extraHosts An array with additional hostname(s) to be covered with the ingress record
     ## e.g:
     ## extraHosts:
     ##   - name: server.local
     ##     path: /
     ##
     extraHosts: []
-    ## @param ingress.extraPaths An array with additional arbitrary paths that may need to be added to the ingress under the main host
+    ## @param server.ingress.extraPaths An array with additional arbitrary paths that may need to be added to the ingress under the main host
     ## e.g:
     ## extraPaths:
     ## - path: /*
@@ -173,7 +215,7 @@ server:
     ##     servicePort: use-annotation
     ##
     extraPaths: []
-    ## @param ingress.extraTls TLS configuration for additional hostname(s) to be covered with this ingress record
+    ## @param server.ingress.extraTls TLS configuration for additional hostname(s) to be covered with this ingress record
     ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/#tls
     ## e.g:
     ## extraTls:
@@ -182,7 +224,7 @@ server:
     ##   secretName: server.local-tls
     ##
     extraTls: []
-    ## @param ingress.secrets Custom TLS certificates as secrets
+    ## @param server.ingress.secrets Custom TLS certificates as secrets
     ## NOTE: 'key' and 'certificate' are expected in PEM format
     ## NOTE: 'name' should line up with a 'secretName' set further up
     ## If it is not set and you're using cert-manager, this is unneeded, as it will create a secret for you with valid certificates
@@ -202,7 +244,7 @@ server:
     ##       -----END CERTIFICATE-----
     ##
     secrets: []
-    ## @param ingress.extraRules Additional rules to be covered with this ingress record
+    ## @param server.ingress.extraRules Additional rules to be covered with this ingress record
     ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-rules
     ## e.g:
     ## extraRules:
@@ -217,63 +259,63 @@ server:
     ##
     extraRules: []
   service:
-    ## @param service.type server service type
+    ## @param server.service.type server service type
     ##
     type: LoadBalancer
-    ## @param service.ports.http server service HTTP port
-    ## @param service.ports.https server service HTTPS port
+    ## @param server.service.ports.http server service HTTP port
+    ## @param server.service.ports.https server service HTTPS port
     ##
     ports:
       http: 80
       https: 443
     ## Node ports to expose
-    ## @param service.nodePorts.http Node port for HTTP
-    ## @param service.nodePorts.https Node port for HTTPS
+    ## @param server.service.nodePorts.http Node port for HTTP
+    ## @param server.service.nodePorts.https Node port for HTTPS
     ## NOTE: choose port between <30000-32767>
     ##
     nodePorts:
       http: ""
       https: ""
-    ## @param service.clusterIP server service Cluster IP
+    ## @param server.service.clusterIP server service Cluster IP
     ## e.g.:
     ## clusterIP: None
     ##
     clusterIP: ""
-    ## @param service.loadBalancerIP server service Load Balancer IP
+    ## @param server.service.loadBalancerIP server service Load Balancer IP
     ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-loadbalancer
     ##
     loadBalancerIP: ""
-    ## @param service.loadBalancerSourceRanges server service Load Balancer sources
+    ## @param server.service.loadBalancerSourceRanges server service Load Balancer sources
     ## ref: https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service
     ## e.g:
     ## loadBalancerSourceRanges:
     ##   - 10.10.10.0/24
     ##
     loadBalancerSourceRanges: []
-    ## @param service.externalTrafficPolicy server service external traffic policy
+    ## @param server.service.externalTrafficPolicy server service external traffic policy
     ## ref http://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
     ##
     externalTrafficPolicy: Cluster
-    ## @param service.annotations Additional custom annotations for server service
+    ## @param server.service.annotations Additional custom annotations for server service
     ##
     annotations: {}
-    ## @param service.extraPorts Extra ports to expose in server service (normally used with the `sidecars` value)
+    ## @param server.service.extraPorts Extra ports to expose in server service (normally used with the `sidecars` value)
     ##
     extraPorts: []
-    ## @param service.sessionAffinity Control where client requests go, to the same pod or round-robin
+    ## @param server.service.sessionAffinity Control where client requests go, to the same pod or round-robin
     ## Values: ClientIP or None
     ## ref: https://kubernetes.io/docs/concepts/services-networking/service/
     ##
     sessionAffinity: None
-    ## @param service.sessionAffinityConfig Additional settings for the sessionAffinity
+    ## @param server.service.sessionAffinityConfig Additional settings for the sessionAffinity
     ## sessionAffinityConfig:
     ##   clientIP:
     ##     timeoutSeconds: 300
     ##
     sessionAffinityConfig: {}
-    ## @param server.containerPorts.http server HTTP container port
-    ## @param server.containerPorts.https server HTTPS container port
-    ##
+  ## @param server.containerPorts.http server HTTP container port
+  ## @param server.containerPorts.https server HTTPS container port
+  ##
   containerPorts:
     http: 8080
     https: 8080
@@ -441,16 +483,16 @@ server:
   ## ref: https://kubernetes.io/docs/concepts/storage/persistent-volumes/
   ##
   persistence:
-    ## @param persistence.enabled Enable persistence using Persistent Volume Claims
+    ## @param server.persistence.enabled Enable persistence using Persistent Volume Claims
     ##
     enabled: true
-    ## @param persistence.mountPath Path to mount the volume at.
+    ## @param server.persistence.mountPath Path to mount the volume at.
     ##
     mountPath: /nango/server/data
-    ## @param persistence.subPath The subdirectory of the volume to mount to, useful in dev environments and one PV for multiple services
+    ## @param server.persistence.subPath The subdirectory of the volume to mount to, useful in dev environments and one PV for multiple services
     ##
     subPath: ""
-    ## @param persistence.storageClass Storage class of backing PVC
+    ## @param server.persistence.storageClass Storage class of backing PVC
     ## If defined, storageClassName: <storageClass>
     ## If set to "-", storageClassName: "", which disables dynamic provisioning
     ## If undefined (the default) or set to null, no storageClassName spec is
@@ -458,23 +500,23 @@ server:
     ##   GKE, AWS & OpenStack)
     ##
     storageClass: ""
-    ## @param persistence.annotations Persistent Volume Claim annotations
+    ## @param server.persistence.annotations Persistent Volume Claim annotations
     ##
     annotations: {}
-    ## @param persistence.accessModes Persistent Volume Access Modes
+    ## @param server.persistence.accessModes Persistent Volume Access Modes
     ##
     accessModes:
       - ReadWriteOnce
-    ## @param persistence.size Size of data volume
+    ## @param server.persistence.size Size of data volume
     ##
     size: 8Gi
-    ## @param persistence.dataSource Custom PVC data source
+    ## @param server.persistence.dataSource Custom PVC data source
     ##
     dataSource: {}
-    ## @param persistence.existingClaim The name of an existing PVC to use for persistence
+    ## @param server.persistence.existingClaim The name of an existing PVC to use for persistence
     ##
     existingClaim: "nango-jobs"
-    ## @param persistence.selector Selector to match an existing Persistent Volume 
+    ## @param server.persistence.selector Selector to match an existing Persistent Volume 
     ## If set, the PVC can't have a PV dynamically provisioned for it
     ## E.g.
     ## selector:
@@ -485,10 +527,10 @@ server:
   ## RBAC configuration
   ##
   rbac:
-    ## @param rbac.create Specifies whether RBAC resources should be created
+    ## @param server.rbac.create Specifies whether RBAC resources should be created
     ##
     create: false
-    ## @param rbac.rules Custom RBAC rules to set
+    ## @param server.rbac.rules Custom RBAC rules to set
     ## e.g:
     ## rules:
     ##   - apiGroups:
@@ -501,9 +543,37 @@ server:
     ##
     rules: []
 
+## @section Persist Parameters
+##
+
 persist:
+  ## @param persist.name persist name
+  ##
   name: persist
-  image: {}
+  ## persist image
+  ## @param persist.image.registry [default: nangohq] persist image registry
+  ## @param persist.image.repository [default: nango] persist image repository
+  ## @skip persist.image.tag persist image tag (immutable tags are recommended)
+  ## @param persist.image.digest persist image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended)
+  ## @param persist.image.pullPolicy persist image pull policy
+  ## @param persist.image.pullSecrets persist image pull secrets
+  ##
+  image:
+    registry: ""
+    repository: ""
+    tag: ""
+    digest: ""
+    pullPolicy: ""
+    pullSecrets: []
+  
+  ## @param persist.replicaCount Number of persist replicas to deploy
+  ##
+  replicaCount: 1
+  ## @param persist.command Override default persist container command (useful when using custom images)
+  ##
+  command: []
+  ## @param persist.args Override default persist container args (useful when using custom images)
+  ##
   args:
     - node
     - "packages/persist/dist/app.js"
@@ -511,40 +581,40 @@ persist:
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
   ##
   serviceAccount:
-    ## @param serviceAccount.create Specifies whether a ServiceAccount should be created
+    ## @param persist.serviceAccount.create Specifies whether a ServiceAccount should be created
     ##
     create: true
-    ## @param serviceAccount.name The name of the ServiceAccount to use.
+    ## @param persist.serviceAccount.name The name of the ServiceAccount to use.
     ## If not set and create is true, a name is generated using the common.names.fullname template
     ##
     name: ""
-    ## @param serviceAccount.annotations Additional Service Account annotations (evaluated as a template)
+    ## @param persist.serviceAccount.annotations Additional Service Account annotations (evaluated as a template)
     ##
     annotations: {}
-    ## @param serviceAccount.automountServiceAccountToken Automount service account token for the server service account
+    ## @param persist.serviceAccount.automountServiceAccountToken Automount service account token for the server service account
     ##
     automountServiceAccountToken: true
   ## Network Policies
   ## Ref: https://kubernetes.io/docs/concepts/services-networking/network-policies/
   ##
   networkPolicy:
-    ## @param networkPolicy.enabled Specifies whether a NetworkPolicy should be created
+    ## @param persist.networkPolicy.enabled Specifies whether a NetworkPolicy should be created
     ##
     enabled: true
-    ## @param networkPolicy.allowExternal Don't require server label for connections
+    ## @param persist.networkPolicy.allowExternal Don't require server label for connections
     ## The Policy model to apply. When set to false, only pods with the correct
     ## server label will have network access to the ports server is listening
     ## on. When true, server will accept connections from any source
     ## (with the correct destination port).
     ##
     allowExternal: false
-    ## @param networkPolicy.allowExternalEgress Allow the pod to access any range of port and all destinations.
+    ## @param persist.networkPolicy.allowExternalEgress Allow the pod to access any range of port and all destinations.
     ##
     allowExternalEgress: true
-    ## @param networkPolicy.addExternalClientAccess Allow access from pods with client label set to "true". Ignored if `networkPolicy.allowExternal` is true.
+    ## @param persist.networkPolicy.addExternalClientAccess Allow access from pods with client label set to "true". Ignored if `persist.networkPolicy.allowExternal` is true.
     ##
     addExternalClientAccess: true
-    ## @param networkPolicy.extraIngress [array] Add extra ingress rules to the NetworkPolicy
+    ## @param persist.networkPolicy.extraIngress [array] Add extra ingress rules to the NetworkPolicy
     ## e.g:
     ## extraIngress:
     ##   - ports:
@@ -560,7 +630,7 @@ persist:
     ##                 values:
     ##                   - frontend
     extraIngress: []
-    ## @param networkPolicy.extraEgress [array] Add extra ingress rules to the NetworkPolicy (ignored if allowExternalEgress=true)
+    ## @param persist.networkPolicy.extraEgress [array] Add extra ingress rules to the NetworkPolicy (ignored if allowExternalEgress=true)
     ## e.g:
     ## extraEgress:
     ##   - ports:
@@ -577,45 +647,45 @@ persist:
     ##                   - frontend
     ##
     extraEgress: []
-    ## @param networkPolicy.ingressPodMatchLabels [object] Labels to match to allow traffic from other pods. Ignored if `networkPolicy.allowExternal` is true.
+    ## @param persist.networkPolicy.ingressPodMatchLabels [object] Labels to match to allow traffic from other pods. Ignored if `persist.networkPolicy.allowExternal` is true.
     ## e.g:
     ## ingressPodMatchLabels:
     ##   my-client: "true"
     #
     ingressPodMatchLabels:
       app.kubernetes.io/component: runner
-    ## @param networkPolicy.ingressNSMatchLabels [object] Labels to match to allow traffic from other namespaces. Ignored if `networkPolicy.allowExternal` is true.
+    ## @param persist.networkPolicy.ingressNSMatchLabels [object] Labels to match to allow traffic from other namespaces. Ignored if `persist.networkPolicy.allowExternal` is true.
     ##
     ingressNSMatchLabels: {}
-    ## @param networkPolicy.ingressNSPodMatchLabels [object] Pod labels to match to allow traffic from other namespaces. Ignored if `networkPolicy.allowExternal` is true.
+    ## @param persist.networkPolicy.ingressNSPodMatchLabels [object] Pod labels to match to allow traffic from other namespaces. Ignored if `persist.networkPolicy.allowExternal` is true.
     ##
     ingressNSPodMatchLabels: {}
   ## persist ingress parameters
   ## ref: http://kubernetes.io/docs/concepts/services-networking/ingress/
   ##
   ingress:
-    ## @param ingress.enabled Enable ingress record generation for persist
+    ## @param persist.ingress.enabled Enable ingress record generation for persist
     ##
     enabled: false
-    ## @param ingress.pathType Ingress path type
+    ## @param persist.ingress.pathType Ingress path type
     ##
     pathType: ImplementationSpecific
-    ## @param ingress.apiVersion Force Ingress API version (automatically detected if not set)
+    ## @param persist.ingress.apiVersion Force Ingress API version (automatically detected if not set)
     ##
     apiVersion: ""
-    ## @param ingress.hostname Default host for the ingress record
+    ## @param persist.ingress.hostname Default host for the ingress record
     ##
     hostname: nango-server-default.dev
-    ## @param ingress.ingressClassName IngressClass that will be be used to implement the Ingress (Kubernetes 1.18+)
+    ## @param persist.ingress.ingressClassName IngressClass that will be be used to implement the Ingress (Kubernetes 1.18+)
     ## This is supported in Kubernetes 1.18+ and required if you have more than one IngressClass marked as the default for your cluster .
     ## ref: https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/
     ##
     ingressClassName: ""
-    ## @param ingress.path Default path for the ingress record
+    ## @param persist.ingress.path Default path for the ingress record
     ## NOTE: You may need to set this to '/*' in order to use this with ALB ingress controllers
     ##
     path: /
-    ## @param ingress.annotations Additional annotations for the Ingress resource. To enable certificate autogeneration, place here your cert-manager annotations.
+    ## @param persist.ingress.annotations Additional annotations for the Ingress resource. To enable certificate autogeneration, place here your cert-manager annotations.
     ## Use this parameter to set the required annotations for cert-manager, see
     ## ref: https://cert-manager.io/docs/usage/ingress/#supported-annotations
     ## e.g:
@@ -624,25 +694,25 @@ persist:
     ##   cert-manager.io/cluster-issuer: cluster-issuer-name
     ##
     annotations: {}
-    ## @param ingress.tls Enable TLS configuration for the host defined at `ingress.hostname` parameter
-    ## TLS certificates will be retrieved from a TLS secret with name: `{{- printf "%s-tls" .Values.ingress.hostname }}`
+    ## @param persist.ingress.tls Enable TLS configuration for the host defined at `persist.ingress.hostname` parameter
+    ## TLS certificates will be retrieved from a TLS secret with name: `{{- printf "%s-tls" .Values.persist.ingress.hostname }}`
     ## You can:
-    ##   - Use the `ingress.secrets` parameter to create this TLS secret
+    ##   - Use the `persist.ingress.secrets` parameter to create this TLS secret
     ##   - Rely on cert-manager to create it by setting the corresponding annotations
-    ##   - Rely on Helm to create self-signed certificates by setting `ingress.selfSigned=true`
+    ##   - Rely on Helm to create self-signed certificates by setting `persist.ingress.selfSigned=true`
     ##
     tls: false
-    ## @param ingress.selfSigned Create a TLS secret for this ingress record using self-signed certificates generated by Helm
+    ## @param persist.ingress.selfSigned Create a TLS secret for this ingress record using self-signed certificates generated by Helm
     ##
     selfSigned: false
-    ## @param ingress.extraHosts An array with additional hostname(s) to be covered with the ingress record
+    ## @param persist.ingress.extraHosts An array with additional hostname(s) to be covered with the ingress record
     ## e.g:
     ## extraHosts:
     ##   - name: persist.local
     ##     path: /
     ##
     extraHosts: []
-    ## @param ingress.extraPaths An array with additional arbitrary paths that may need to be added to the ingress under the main host
+    ## @param persist.ingress.extraPaths An array with additional arbitrary paths that may need to be added to the ingress under the main host
     ## e.g:
     ## extraPaths:
     ## - path: /*
@@ -651,7 +721,7 @@ persist:
     ##     servicePort: use-annotation
     ##
     extraPaths: []
-    ## @param ingress.extraTls TLS configuration for additional hostname(s) to be covered with this ingress record
+    ## @param persist.ingress.extraTls TLS configuration for additional hostname(s) to be covered with this ingress record
     ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/#tls
     ## e.g:
     ## extraTls:
@@ -660,7 +730,7 @@ persist:
     ##   secretName: persist.local-tls
     ##
     extraTls: []
-    ## @param ingress.secrets Custom TLS certificates as secrets
+    ## @param persist.ingress.secrets Custom TLS certificates as secrets
     ## NOTE: 'key' and 'certificate' are expected in PEM format
     ## NOTE: 'name' should line up with a 'secretName' set further up
     ## If it is not set and you're using cert-manager, this is unneeded, as it will create a secret for you with valid certificates
@@ -680,7 +750,7 @@ persist:
     ##       -----END CERTIFICATE-----
     ##
     secrets: []
-    ## @param ingress.extraRules Additional rules to be covered with this ingress record
+    ## @param persist.ingress.extraRules Additional rules to be covered with this ingress record
     ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-rules
     ## e.g:
     ## extraRules:
@@ -695,73 +765,78 @@ persist:
     ##
     extraRules: []
   service:
-    ## @param service.type persist service type
+    ## @param persist.service.type persist service type
     ##
     type: LoadBalancer
-    ## @param service.ports.http persist service HTTP port
-    ## @param service.ports.https persist service HTTPS port
+    ## @param persist.service.ports.http persist service HTTP port
+    ## @param persist.service.ports.https persist service HTTPS port
     ##
     ports:
       http: 80
       https: 443
     ## Node ports to expose
-    ## @param service.nodePorts.http Node port for HTTP
-    ## @param service.nodePorts.https Node port for HTTPS
+    ## @param persist.service.nodePorts.http Node port for HTTP
+    ## @param persist.service.nodePorts.https Node port for HTTPS
     ## NOTE: choose port between <30000-32767>
     ##
     nodePorts:
       http: ""
       https: ""
-    ## @param service.clusterIP persist service Cluster IP
+    ## @param persist.service.clusterIP persist service Cluster IP
     ## e.g.:
     ## clusterIP: None
     ##
     clusterIP: ""
-    ## @param service.loadBalancerIP persist service Load Balancer IP
+    ## @param persist.service.loadBalancerIP persist service Load Balancer IP
     ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-loadbalancer
     ##
     loadBalancerIP: ""
-    ## @param service.loadBalancerSourceRanges persist service Load Balancer sources
+    ## @param persist.service.loadBalancerSourceRanges persist service Load Balancer sources
     ## ref: https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service
     ## e.g:
     ## loadBalancerSourceRanges:
     ##   - 10.10.10.0/24
     ##
     loadBalancerSourceRanges: []
-    ## @param service.externalTrafficPolicy persist service external traffic policy
+    ## @param persist.service.externalTrafficPolicy persist service external traffic policy
     ## ref http://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
     ##
     externalTrafficPolicy: Cluster
-    ## @param service.annotations Additional custom annotations for persist service
+    ## @param persist.service.annotations Additional custom annotations for persist service
     ##
     annotations: {}
-    ## @param service.extraPorts Extra ports to expose in persist service (normally used with the `sidecars` value)
+    ## @param persist.service.extraPorts Extra ports to expose in persist service (normally used with the `sidecars` value)
     ##
     extraPorts: []
-    ## @param service.sessionAffinity Control where client requests go, to the same pod or round-robin
+    ## @param persist.service.sessionAffinity Control where client requests go, to the same pod or round-robin
     ## Values: ClientIP or None
     ## ref: https://kubernetes.io/docs/concepts/services-networking/service/
     ##
     sessionAffinity: None
-    ## @param service.sessionAffinityConfig Additional settings for the sessionAffinity
+    ## @param persist.service.sessionAffinityConfig Additional settings for the sessionAffinity
     ## sessionAffinityConfig:
     ##   clientIP:
     ##     timeoutSeconds: 300
     ##
     sessionAffinityConfig: {}
-    ## @param persist.containerPorts.http persist HTTP container port
-    ## @param persist.containerPorts.https persist HTTPS container port
-    ##
+  ## @param persist.containerPorts.http persist HTTP container port
+  ## @param persist.containerPorts.https persist HTTPS container port
+  ##
   containerPorts:
     http: 3007
     https: 3007
-  ## @param server.extraContainerPorts Optionally specify extra list of additional ports for server containers
+  ## @param persist.extraContainerPorts Optionally specify extra list of additional ports for persist containers
   ## e.g:
   ## extraContainerPorts:
   ##   - name: myservice
   ##     containerPort: 9090
   ##
   extraContainerPorts: []
+  ## @param persist.updateStrategy.type persist deployment strategy type
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
+  ## @param persist.updateStrategy.type persist statefulset strategy type
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
+  ##
   updateStrategy:
     type: "RollingUpdate"
   ## Pod Disruption Budget configuration
@@ -851,6 +926,7 @@ persist:
   ## Configure extra options for persist containers' liveness and readiness probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
 
+  ## @param persist.livenessProbe.enabled Enable readinessProbe on persist containers
   ## @param persist.livenessProbe.initialDelaySeconds Initial delay seconds for livenessProbe
   ## @param persist.livenessProbe.periodSeconds Period seconds for livenessProbe
   ## @param persist.livenessProbe.timeoutSeconds Timeout seconds for livenessProbe
@@ -914,16 +990,16 @@ persist:
   ## ref: https://kubernetes.io/docs/concepts/storage/persistent-volumes/
   ##
   persistence:
-    ## @param persistence.enabled Enable persistence using Persistent Volume Claims
+    ## @param persist.persistence.enabled Enable persistence using Persistent Volume Claims
     ##
     enabled: false
-    ## @param persistence.mountPath Path to mount the volume at.
+    ## @param persist.persistence.mountPath Path to mount the volume at.
     ##
     mountPath: /nango/server/data
-    ## @param persistence.subPath The subdirectory of the volume to mount to, useful in dev environments and one PV for multiple services
+    ## @param persist.persistence.subPath The subdirectory of the volume to mount to, useful in dev environments and one PV for multiple services
     ##
     subPath: ""
-    ## @param persistence.storageClass Storage class of backing PVC
+    ## @param persist.persistence.storageClass Storage class of backing PVC
     ## If defined, storageClassName: <storageClass>
     ## If set to "-", storageClassName: "", which disables dynamic provisioning
     ## If undefined (the default) or set to null, no storageClassName spec is
@@ -931,23 +1007,23 @@ persist:
     ##   GKE, AWS & OpenStack)
     ##
     storageClass: ""
-    ## @param persistence.annotations Persistent Volume Claim annotations
+    ## @param persist.persistence.annotations Persistent Volume Claim annotations
     ##
     annotations: {}
-    ## @param persistence.accessModes Persistent Volume Access Modes
+    ## @param persist.persistence.accessModes Persistent Volume Access Modes
     ##
     accessModes:
       - ReadWriteOnce
-    ## @param persistence.size Size of data volume
+    ## @param persist.persistence.size Size of data volume
     ##
     size: 8Gi
-    ## @param persistence.dataSource Custom PVC data source
+    ## @param persist.persistence.dataSource Custom PVC data source
     ##
     dataSource: {}
-    ## @param persistence.existingClaim The name of an existing PVC to use for persistence
+    ## @param persist.persistence.existingClaim The name of an existing PVC to use for persistence
     ##
     existingClaim: ""
-    ## @param persistence.selector Selector to match an existing Persistent Volume 
+    ## @param persist.persistence.selector Selector to match an existing Persistent Volume 
     ## If set, the PVC can't have a PV dynamically provisioned for it
     ## E.g.
     ## selector:
@@ -958,10 +1034,10 @@ persist:
   ## RBAC configuration
   ##
   rbac:
-    ## @param rbac.create Specifies whether RBAC resources should be created
+    ## @param persist.rbac.create Specifies whether RBAC resources should be created
     ##
     create: false
-    ## @param rbac.rules Custom RBAC rules to set
+    ## @param persist.rbac.rules Custom RBAC rules to set
     ## e.g:
     ## rules:
     ##   - apiGroups:
@@ -974,9 +1050,37 @@ persist:
     ##
     rules: []
 
+## @section Orchestrator Parameters
+##
+
 orchestrator:
+  ## @param orchestrator.name orchestrator name
+  ##
   name: orchestrator
-  image: {}
+  ## orchestrator image
+  ## @param orchestrator.image.registry [default: nangohq] orchestrator image registry
+  ## @param orchestrator.image.repository [default: nango] orchestrator image repository
+  ## @skip orchestrator.image.tag orchestrator image tag (immutable tags are recommended)
+  ## @param orchestrator.image.digest orchestrator image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended)
+  ## @param orchestrator.image.pullPolicy orchestrator image pull policy
+  ## @param orchestrator.image.pullSecrets orchestrator image pull secrets
+  ##
+  image:
+    registry: ""
+    repository: ""
+    tag: ""
+    digest: ""
+    pullPolicy: ""
+    pullSecrets: []
+  
+  ## @param orchestrator.replicaCount Number of orchestrator replicas to deploy
+  ##
+  replicaCount: 1
+  ## @param orchestrator.command Override default orchestrator container command (useful when using custom images)
+  ##
+  command: []
+  ## @param orchestrator.args Override default orchestrator container args (useful when using custom images)
+  ##
   args: 
     - node
     - "packages/orchestrator/dist/app.js"
@@ -984,40 +1088,40 @@ orchestrator:
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
   ##
   serviceAccount:
-    ## @param serviceAccount.create Specifies whether a ServiceAccount should be created
+    ## @param orchestrator.serviceAccount.create Specifies whether a ServiceAccount should be created
     ##
     create: true
-    ## @param serviceAccount.name The name of the ServiceAccount to use.
+    ## @param orchestrator.serviceAccount.name The name of the ServiceAccount to use.
     ## If not set and create is true, a name is generated using the common.names.fullname template
     ##
     name: ""
-    ## @param serviceAccount.annotations Additional Service Account annotations (evaluated as a template)
+    ## @param orchestrator.serviceAccount.annotations Additional Service Account annotations (evaluated as a template)
     ##
     annotations: {}
-    ## @param serviceAccount.automountServiceAccountToken Automount service account token for the orchestrator service account
+    ## @param orchestrator.serviceAccount.automountServiceAccountToken Automount service account token for the orchestrator service account
     ##
     automountServiceAccountToken: true
   ## Network Policies
   ## Ref: https://kubernetes.io/docs/concepts/services-networking/network-policies/
   ##
   networkPolicy:
-    ## @param networkPolicy.enabled Specifies whether a NetworkPolicy should be created
+    ## @param orchestrator.networkPolicy.enabled Specifies whether a NetworkPolicy should be created
     ##
     enabled: true
-    ## @param networkPolicy.allowExternal Don't require orchestrator label for connections
+    ## @param orchestrator.networkPolicy.allowExternal Don't require orchestrator label for connections
     ## The Policy model to apply. When set to false, only pods with the correct
     ## orchestrator label will have network access to the ports orchestrator is listening
     ## on. When true, orchestrator will accept connections from any source
     ## (with the correct destination port).
     ##
     allowExternal: false
-    ## @param networkPolicy.allowExternalEgress Allow the pod to access any range of port and all destinations.
+    ## @param orchestrator.networkPolicy.allowExternalEgress Allow the pod to access any range of port and all destinations.
     ##
     allowExternalEgress: true
-    ## @param networkPolicy.addExternalClientAccess Allow access from pods with client label set to "true". Ignored if `networkPolicy.allowExternal` is true.
+    ## @param orchestrator.networkPolicy.addExternalClientAccess Allow access from pods with client label set to "true". Ignored if `networkPolicy.allowExternal` is true.
     ##
     addExternalClientAccess: true
-    ## @param networkPolicy.extraIngress [array] Add extra ingress rules to the NetworkPolicy
+    ## @param orchestrator.networkPolicy.extraIngress [array] Add extra ingress rules to the NetworkPolicy
     ## e.g:
     ## extraIngress:
     ##   - ports:
@@ -1041,7 +1145,7 @@ orchestrator:
                 values:
                   - jobs
                   - server
-    ## @param networkPolicy.extraEgress [array] Add extra ingress rules to the NetworkPolicy (ignored if allowExternalEgress=true)
+    ## @param orchestrator.networkPolicy.extraEgress [array] Add extra ingress rules to the NetworkPolicy (ignored if allowExternalEgress=true)
     ## e.g:
     ## extraEgress:
     ##   - ports:
@@ -1058,44 +1162,44 @@ orchestrator:
     ##                   - frontend
     ##
     extraEgress: []
-    ## @param networkPolicy.ingressPodMatchLabels [object] Labels to match to allow traffic from other pods. Ignored if `networkPolicy.allowExternal` is true.
+    ## @param orchestrator.networkPolicy.ingressPodMatchLabels [object] Labels to match to allow traffic from other pods. Ignored if `orchestrator.networkPolicy.allowExternal` is true.
     ## e.g:
     ## ingressPodMatchLabels:
     ##   my-client: "true"
     #
     ingressPodMatchLabels: {}
-    ## @param networkPolicy.ingressNSMatchLabels [object] Labels to match to allow traffic from other namespaces. Ignored if `networkPolicy.allowExternal` is true.
+    ## @param orchestrator.networkPolicy.ingressNSMatchLabels [object] Labels to match to allow traffic from other namespaces. Ignored if `orchestrator.networkPolicy.allowExternal` is true.
     ##
     ingressNSMatchLabels: {}
-    ## @param networkPolicy.ingressNSPodMatchLabels [object] Pod labels to match to allow traffic from other namespaces. Ignored if `networkPolicy.allowExternal` is true.
+    ## @param orchestrator.networkPolicy.ingressNSPodMatchLabels [object] Pod labels to match to allow traffic from other namespaces. Ignored if `orchestrator.networkPolicy.allowExternal` is true.
     ##
     ingressNSPodMatchLabels: {}
   ## orchestrator ingress parameters
   ## ref: http://kubernetes.io/docs/concepts/services-networking/ingress/
   ##
   ingress:
-    ## @param ingress.enabled Enable ingress record generation for orchestrator
+    ## @param orchestrator.ingress.enabled Enable ingress record generation for orchestrator
     ##
     enabled: false
-    ## @param ingress.pathType Ingress path type
+    ## @param orchestrator.ingress.pathType Ingress path type
     ##
     pathType: ImplementationSpecific
-    ## @param ingress.apiVersion Force Ingress API version (automatically detected if not set)
+    ## @param orchestrator.ingress.apiVersion Force Ingress API version (automatically detected if not set)
     ##
     apiVersion: ""
-    ## @param ingress.hostname Default host for the ingress record
+    ## @param orchestrator.ingress.hostname Default host for the ingress record
     ##
     hostname: nango-orchestrator-default.dev
-    ## @param ingress.ingressClassName IngressClass that will be be used to implement the Ingress (Kubernetes 1.18+)
+    ## @param orchestrator.ingress.ingressClassName IngressClass that will be be used to implement the Ingress (Kubernetes 1.18+)
     ## This is supported in Kubernetes 1.18+ and required if you have more than one IngressClass marked as the default for your cluster .
     ## ref: https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/
     ##
     ingressClassName: ""
-    ## @param ingress.path Default path for the ingress record
+    ## @param orchestrator.ingress.path Default path for the ingress record
     ## NOTE: You may need to set this to '/*' in order to use this with ALB ingress controllers
     ##
     path: /
-    ## @param ingress.annotations Additional annotations for the Ingress resource. To enable certificate autogeneration, place here your cert-manager annotations.
+    ## @param orchestrator.ingress.annotations Additional annotations for the Ingress resource. To enable certificate autogeneration, place here your cert-manager annotations.
     ## Use this parameter to set the required annotations for cert-manager, see
     ## ref: https://cert-manager.io/docs/usage/ingress/#supported-annotations
     ## e.g:
@@ -1104,25 +1208,25 @@ orchestrator:
     ##   cert-manager.io/cluster-issuer: cluster-issuer-name
     ##
     annotations: {}
-    ## @param ingress.tls Enable TLS configuration for the host defined at `ingress.hostname` parameter
+    ## @param orchestrator.ingress.tls Enable TLS configuration for the host defined at `ingress.hostname` parameter
     ## TLS certificates will be retrieved from a TLS secret with name: `{{- printf "%s-tls" .Values.ingress.hostname }}`
     ## You can:
-    ##   - Use the `ingress.secrets` parameter to create this TLS secret
+    ##   - Use the `orchestrator.ingress.secrets` parameter to create this TLS secret
     ##   - Rely on cert-manager to create it by setting the corresponding annotations
-    ##   - Rely on Helm to create self-signed certificates by setting `ingress.selfSigned=true`
+    ##   - Rely on Helm to create self-signed certificates by setting `orchestrator.ingress.selfSigned=true`
     ##
     tls: false
-    ## @param ingress.selfSigned Create a TLS secret for this ingress record using self-signed certificates generated by Helm
+    ## @param orchestrator.ingress.selfSigned Create a TLS secret for this ingress record using self-signed certificates generated by Helm
     ##
     selfSigned: false
-    ## @param ingress.extraHosts An array with additional hostname(s) to be covered with the ingress record
+    ## @param orchestrator.ingress.extraHosts An array with additional hostname(s) to be covered with the ingress record
     ## e.g:
     ## extraHosts:
     ##   - name: orchestrator.local
     ##     path: /
     ##
     extraHosts: []
-    ## @param ingress.extraPaths An array with additional arbitrary paths that may need to be added to the ingress under the main host
+    ## @param orchestrator.ingress.extraPaths An array with additional arbitrary paths that may need to be added to the ingress under the main host
     ## e.g:
     ## extraPaths:
     ## - path: /*
@@ -1131,7 +1235,7 @@ orchestrator:
     ##     servicePort: use-annotation
     ##
     extraPaths: []
-    ## @param ingress.extraTls TLS configuration for additional hostname(s) to be covered with this ingress record
+    ## @param orchestrator.ingress.extraTls TLS configuration for additional hostname(s) to be covered with this ingress record
     ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/#tls
     ## e.g:
     ## extraTls:
@@ -1140,7 +1244,7 @@ orchestrator:
     ##   secretName: orchestrator.local-tls
     ##
     extraTls: []
-    ## @param ingress.secrets Custom TLS certificates as secrets
+    ## @param orchestrator.ingress.secrets Custom TLS certificates as secrets
     ## NOTE: 'key' and 'certificate' are expected in PEM format
     ## NOTE: 'name' should line up with a 'secretName' set further up
     ## If it is not set and you're using cert-manager, this is unneeded, as it will create a secret for you with valid certificates
@@ -1160,7 +1264,7 @@ orchestrator:
     ##       -----END CERTIFICATE-----
     ##
     secrets: []
-    ## @param ingress.extraRules Additional rules to be covered with this ingress record
+    ## @param orchestrator.ingress.extraRules Additional rules to be covered with this ingress record
     ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-rules
     ## e.g:
     ## extraRules:
@@ -1175,63 +1279,63 @@ orchestrator:
     ##
     extraRules: []
   service:
-    ## @param service.type orchestrator service type
+    ## @param orchestrator.service.type orchestrator service type
     ##
     type: LoadBalancer
-    ## @param service.ports.http orchestrator service HTTP port
-    ## @param service.ports.https orchestrator service HTTPS port
+    ## @param orchestrator.service.ports.http orchestrator service HTTP port
+    ## @param orchestrator.service.ports.https orchestrator service HTTPS port
     ##
     ports:
       http: 80
       https: 443
     ## Node ports to expose
-    ## @param service.nodePorts.http Node port for HTTP
-    ## @param service.nodePorts.https Node port for HTTPS
+    ## @param orchestrator.service.nodePorts.http Node port for HTTP
+    ## @param orchestrator.service.nodePorts.https Node port for HTTPS
     ## NOTE: choose port between <30000-32767>
     ##
     nodePorts:
       http: ""
       https: ""
-    ## @param service.clusterIP orchestrator service Cluster IP
+    ## @param orchestrator.service.clusterIP orchestrator service Cluster IP
     ## e.g.:
     ## clusterIP: None
     ##
     clusterIP: ""
-    ## @param service.loadBalancerIP orchestrator service Load Balancer IP
+    ## @param orchestrator.service.loadBalancerIP orchestrator service Load Balancer IP
     ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-loadbalancer
     ##
     loadBalancerIP: ""
-    ## @param service.loadBalancerSourceRanges orchestrator service Load Balancer sources
+    ## @param orchestrator.service.loadBalancerSourceRanges orchestrator service Load Balancer sources
     ## ref: https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service
     ## e.g:
     ## loadBalancerSourceRanges:
     ##   - 10.10.10.0/24
     ##
     loadBalancerSourceRanges: []
-    ## @param service.externalTrafficPolicy orchestrator service external traffic policy
+    ## @param orchestrator.service.externalTrafficPolicy orchestrator service external traffic policy
     ## ref http://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
     ##
     externalTrafficPolicy: Cluster
-    ## @param service.annotations Additional custom annotations for orchestrator service
+    ## @param orchestrator.service.annotations Additional custom annotations for orchestrator service
     ##
     annotations: {}
-    ## @param service.extraPorts Extra ports to expose in orchestrator service (normally used with the `sidecars` value)
+    ## @param orchestrator.service.extraPorts Extra ports to expose in orchestrator service (normally used with the `sidecars` value)
     ##
     extraPorts: []
-    ## @param service.sessionAffinity Control where client requests go, to the same pod or round-robin
+    ## @param orchestrator.service.sessionAffinity Control where client requests go, to the same pod or round-robin
     ## Values: ClientIP or None
     ## ref: https://kubernetes.io/docs/concepts/services-networking/service/
     ##
     sessionAffinity: None
-    ## @param service.sessionAffinityConfig Additional settings for the sessionAffinity
+    ## @param orchestrator.service.sessionAffinityConfig Additional settings for the sessionAffinity
     ## sessionAffinityConfig:
     ##   clientIP:
     ##     timeoutSeconds: 300
     ##
     sessionAffinityConfig: {}
-    ## @param orchestrator.containerPorts.http orchestrator HTTP container port
-    ## @param orchestrator.containerPorts.https orchestrator HTTPS container port
-    ##
+  ## @param orchestrator.containerPorts.http orchestrator HTTP container port
+  ## @param orchestrator.containerPorts.https orchestrator HTTPS container port
+  ##
   containerPorts:
     http: 3008
     https: 3008
@@ -1242,6 +1346,11 @@ orchestrator:
   ##     containerPort: 9090
   ##
   extraContainerPorts: []
+  ## @param orchestrator.updateStrategy.type orchestrator deployment strategy type
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
+  ## @param orchestrator.updateStrategy.type orchestrator statefulset strategy type
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
+  ##
   updateStrategy:
     type: "RollingUpdate"
   ## Pod Disruption Budget configuration
@@ -1331,11 +1440,11 @@ orchestrator:
   ## Configure extra options for orchestrator containers' liveness and readiness probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
   ## @param orchestrator.livenessProbe.enabled Enable livenessProbe on orchestrator containers
-  ## @param jobs.livenessProbe.initialDelaySeconds Initial delay seconds for livenessProbe
-  ## @param jobs.livenessProbe.periodSeconds Period seconds for livenessProbe
-  ## @param jobs.livenessProbe.timeoutSeconds Timeout seconds for livenessProbe
-  ## @param jobs.livenessProbe.failureThreshold Failure threshold for livenessProbe
-  ## @param jobs.livenessProbe.successThreshold Success threshold for livenessProbe
+  ## @param orchestrator.livenessProbe.initialDelaySeconds Initial delay seconds for livenessProbe
+  ## @param orchestrator.livenessProbe.periodSeconds Period seconds for livenessProbe
+  ## @param orchestrator.livenessProbe.timeoutSeconds Timeout seconds for livenessProbe
+  ## @param orchestrator.livenessProbe.failureThreshold Failure threshold for livenessProbe
+  ## @param orchestrator.livenessProbe.successThreshold Success threshold for livenessProbe
   ##
   livenessProbe:
     enabled: true
@@ -1394,16 +1503,16 @@ orchestrator:
   ## ref: https://kubernetes.io/docs/concepts/storage/persistent-volumes/
   ##
   persistence:
-    ## @param persistence.enabled Enable persistence using Persistent Volume Claims
+    ## @param orchestrator.persistence.enabled Enable persistence using Persistent Volume Claims
     ##
     enabled: false
-    ## @param persistence.mountPath Path to mount the volume at.
+    ## @param orchestrator.persistence.mountPath Path to mount the volume at.
     ##
     mountPath: /nango/orchestrator/data
-    ## @param persistence.subPath The subdirectory of the volume to mount to, useful in dev environments and one PV for multiple services
+    ## @param orchestrator.persistence.subPath The subdirectory of the volume to mount to, useful in dev environments and one PV for multiple services
     ##
     subPath: ""
-    ## @param persistence.storageClass Storage class of backing PVC
+    ## @param orchestrator.persistence.storageClass Storage class of backing PVC
     ## If defined, storageClassName: <storageClass>
     ## If set to "-", storageClassName: "", which disables dynamic provisioning
     ## If undefined (the default) or set to null, no storageClassName spec is
@@ -1411,23 +1520,23 @@ orchestrator:
     ##   GKE, AWS & OpenStack)
     ##
     storageClass: ""
-    ## @param persistence.annotations Persistent Volume Claim annotations
+    ## @param orchestrator.persistence.annotations Persistent Volume Claim annotations
     ##
     annotations: {}
-    ## @param persistence.accessModes Persistent Volume Access Modes
+    ## @param orchestrator.persistence.accessModes Persistent Volume Access Modes
     ##
     accessModes:
       - ReadWriteOnce
-    ## @param persistence.size Size of data volume
+    ## @param orchestrator.persistence.size Size of data volume
     ##
     size: 1Gi
-    ## @param persistence.dataSource Custom PVC data source
+    ## @param orchestrator.persistence.dataSource Custom PVC data source
     ##
     dataSource: {}
-    ## @param persistence.existingClaim The name of an existing PVC to use for persistence
+    ## @param orchestrator.persistence.existingClaim The name of an existing PVC to use for persistence
     ##
     existingClaim: ""
-    ## @param persistence.selector Selector to match an existing Persistent Volume 
+    ## @param orchestrator.persistence.selector Selector to match an existing Persistent Volume 
     ## If set, the PVC can't have a PV dynamically provisioned for it
     ## E.g.
     ## selector:
@@ -1438,10 +1547,10 @@ orchestrator:
   ## RBAC configuration
   ##
   rbac:
-    ## @param rbac.create Specifies whether RBAC resources should be created
+    ## @param orchestrator.rbac.create Specifies whether RBAC resources should be created
     ##
     create: false
-    ## @param rbac.rules Custom RBAC rules to set
+    ## @param orchestrator.rbac.rules Custom RBAC rules to set
     ## e.g:
     ## rules:
     ##   - apiGroups:
@@ -1454,9 +1563,37 @@ orchestrator:
     ##
     rules: []
 
+## @section Jobs Parameters
+##
+
 jobs:
+  ## @param jobs.name jobs name
+  ##
   name: jobs
-  image: {}
+  ## jobs image
+  ## @param jobs.image.registry [default: nangohq] jobs image registry
+  ## @param jobs.image.repository [default: nango] jobs image repository
+  ## @skip jobs.image.tag jobs image tag (immutable tags are recommended)
+  ## @param jobs.image.digest jobs image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended)
+  ## @param jobs.image.pullPolicy jobs image pull policy
+  ## @param jobs.image.pullSecrets jobs image pull secrets
+  ##
+  image: 
+    registry: ""
+    repository: ""
+    tag: ""
+    digest: ""
+    pullPolicy: ""
+    pullSecrets: []
+  
+  ## @param jobs.replicaCount Number of jobs replicas to deploy
+  ##
+  replicaCount: 1
+  ## @param jobs.command Override default jobs container command (useful when using custom images)
+  ##
+  command: []
+  ## @param jobs.args Override default jobs container args (useful when using custom images)
+  ##
   args: 
     - node
     - "packages/jobs/dist/app.js"
@@ -1464,40 +1601,40 @@ jobs:
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
   ##
   serviceAccount:
-    ## @param serviceAccount.create Specifies whether a ServiceAccount should be created
+    ## @param jobs.serviceAccount.create Specifies whether a ServiceAccount should be created
     ##
     create: true
-    ## @param serviceAccount.name The name of the ServiceAccount to use.
+    ## @param jobs.serviceAccount.name The name of the ServiceAccount to use.
     ## If not set and create is true, a name is generated using the jobs.names.fullname template
     ##
     name: ""
-    ## @param serviceAccount.annotations Additional Service Account annotations (evaluated as a template)
+    ## @param jobs.serviceAccount.annotations Additional Service Account annotations (evaluated as a template)
     ##
     annotations: {}
-    ## @param serviceAccount.automountServiceAccountToken Automount service account token for the jobs service account
+    ## @param jobs.serviceAccount.automountServiceAccountToken Automount service account token for the jobs service account
     ##
     automountServiceAccountToken: true
   ## Network Policies
   ## Ref: https://kubernetes.io/docs/concepts/services-networking/network-policies/
   ##
   networkPolicy:
-    ## @param networkPolicy.enabled Specifies whether a NetworkPolicy should be created
+    ## @param jobs.networkPolicy.enabled Specifies whether a NetworkPolicy should be created
     ##
     enabled: true
-    ## @param networkPolicy.allowExternal Don't require server label for connections
+    ## @param jobs.networkPolicy.allowExternal Don't require server label for connections
     ## The Policy model to apply. When set to false, only pods with the correct
     ## server label will have network access to the ports server is listening
     ## on. When true, server will accept connections from any source
     ## (with the correct destination port).
     ##
     allowExternal: true
-    ## @param networkPolicy.allowExternalEgress Allow the pod to access any range of port and all destinations.
+    ## @param jobs.networkPolicy.allowExternalEgress Allow the pod to access any range of port and all destinations.
     ##
     allowExternalEgress: true
-    ## @param networkPolicy.addExternalClientAccess Allow access from pods with client label set to "true". Ignored if `networkPolicy.allowExternal` is true.
+    ## @param jobs.networkPolicy.addExternalClientAccess Allow access from pods with client label set to "true". Ignored if `networkPolicy.allowExternal` is true.
     ##
     addExternalClientAccess: true
-    ## @param networkPolicy.extraIngress [array] Add extra ingress rules to the NetworkPolicy
+    ## @param jobs.networkPolicy.extraIngress [array] Add extra ingress rules to the NetworkPolicy
     ## e.g:
     ## extraIngress:
     ##   - ports:
@@ -1513,7 +1650,7 @@ jobs:
     ##                 values:
     ##                   - frontend
     extraIngress: []
-    ## @param networkPolicy.extraEgress [array] Add extra ingress rules to the NetworkPolicy (ignored if allowExternalEgress=true)
+    ## @param jobs.networkPolicy.extraEgress [array] Add extra ingress rules to the NetworkPolicy (ignored if allowExternalEgress=true)
     ## e.g:
     ## extraEgress:
     ##   - ports:
@@ -1530,45 +1667,45 @@ jobs:
     ##                   - frontend
     ##
     extraEgress: []
-    ## @param networkPolicy.ingressPodMatchLabels [object] Labels to match to allow traffic from other pods. Ignored if `networkPolicy.allowExternal` is true.
+    ## @param jobs.networkPolicy.ingressPodMatchLabels [object] Labels to match to allow traffic from other pods. Ignored if `jobs.networkPolicy.allowExternal` is true.
     ## e.g:
     ## ingressPodMatchLabels:
     ##   my-client: "true"
     #
     ingressPodMatchLabels:
       app.kubernetes.io/component: runner
-    ## @param networkPolicy.ingressNSMatchLabels [object] Labels to match to allow traffic from other namespaces. Ignored if `networkPolicy.allowExternal` is true.
+    ## @param jobs.networkPolicy.ingressNSMatchLabels [object] Labels to match to allow traffic from other namespaces. Ignored if `jobs.networkPolicy.allowExternal` is true.
     ##
     ingressNSMatchLabels: {}
-    ## @param networkPolicy.ingressNSPodMatchLabels [object] Pod labels to match to allow traffic from other namespaces. Ignored if `networkPolicy.allowExternal` is true.
+    ## @param jobs.networkPolicy.ingressNSPodMatchLabels [object] Pod labels to match to allow traffic from other namespaces. Ignored if `jobs.networkPolicy.allowExternal` is true.
     ##
     ingressNSPodMatchLabels:
   ## jobs ingress parameters
   ## ref: http://kubernetes.io/docs/concepts/services-networking/ingress/
   ##
   ingress:
-    ## @param ingress.enabled Enable ingress record generation for jobs
+    ## @param jobs.ingress.enabled Enable ingress record generation for jobs
     ##
     enabled: false
-    ## @param ingress.pathType Ingress path type
+    ## @param jobs.ingress.pathType Ingress path type
     ##
     pathType: ImplementationSpecific
-    ## @param ingress.apiVersion Force Ingress API version (automatically detected if not set)
+    ## @param jobs.ingress.apiVersion Force Ingress API version (automatically detected if not set)
     ##
     apiVersion: ""
-    ## @param ingress.hostname Default host for the ingress record
+    ## @param jobs.ingress.hostname Default host for the ingress record
     ##
     hostname: ""
-    ## @param ingress.ingressClassName IngressClass that will be be used to implement the Ingress (Kubernetes 1.18+)
+    ## @param jobs.ingress.ingressClassName IngressClass that will be be used to implement the Ingress (Kubernetes 1.18+)
     ## This is supported in Kubernetes 1.18+ and required if you have more than one IngressClass marked as the default for your cluster .
     ## ref: https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/
     ##
     ingressClassName: ""
-    ## @param ingress.path Default path for the ingress record
+    ## @param jobs.ingress.path Default path for the ingress record
     ## NOTE: You may need to set this to '/*' in order to use this with ALB ingress controllers
     ##
     path: /
-    ## @param ingress.annotations Additional annotations for the Ingress resource. To enable certificate autogeneration, place here your cert-manager annotations.
+    ## @param jobs.ingress.annotations Additional annotations for the Ingress resource. To enable certificate autogeneration, place here your cert-manager annotations.
     ## Use this parameter to set the required annotations for cert-manager, see
     ## ref: https://cert-manager.io/docs/usage/ingress/#supported-annotations
     ## e.g:
@@ -1577,25 +1714,25 @@ jobs:
     ##   cert-manager.io/cluster-issuer: cluster-issuer-name
     ##
     annotations: {}
-    ## @param ingress.tls Enable TLS configuration for the host defined at `ingress.hostname` parameter
+    ## @param jobs.ingress.tls Enable TLS configuration for the host defined at `ingress.hostname` parameter
     ## TLS certificates will be retrieved from a TLS secret with name: `{{- printf "%s-tls" .Values.ingress.hostname }}`
     ## You can:
-    ##   - Use the `ingress.secrets` parameter to create this TLS secret
+    ##   - Use the `jobs.ingress.secrets` parameter to create this TLS secret
     ##   - Rely on cert-manager to create it by setting the corresponding annotations
-    ##   - Rely on Helm to create self-signed certificates by setting `ingress.selfSigned=true`
+    ##   - Rely on Helm to create self-signed certificates by setting `jobs.ingress.selfSigned=true`
     ##
     tls: false
-    ## @param ingress.selfSigned Create a TLS secret for this ingress record using self-signed certificates generated by Helm
+    ## @param jobs.ingress.selfSigned Create a TLS secret for this ingress record using self-signed certificates generated by Helm
     ##
     selfSigned: false
-    ## @param ingress.extraHosts An array with additional hostname(s) to be covered with the ingress record
+    ## @param jobs.ingress.extraHosts An array with additional hostname(s) to be covered with the ingress record
     ## e.g:
     ## extraHosts:
     ##   - name: jobs.local
     ##     path: /
     ##
     extraHosts: []
-    ## @param ingress.extraPaths An array with additional arbitrary paths that may need to be added to the ingress under the main host
+    ## @param jobs.ingress.extraPaths An array with additional arbitrary paths that may need to be added to the ingress under the main host
     ## e.g:
     ## extraPaths:
     ## - path: /*
@@ -1604,7 +1741,7 @@ jobs:
     ##     servicePort: use-annotation
     ##
     extraPaths: []
-    ## @param ingress.extraTls TLS configuration for additional hostname(s) to be covered with this ingress record
+    ## @param jobs.ingress.extraTls TLS configuration for additional hostname(s) to be covered with this ingress record
     ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/#tls
     ## e.g:
     ## extraTls:
@@ -1613,7 +1750,7 @@ jobs:
     ##   secretName: jobs.local-tls
     ##
     extraTls: []
-    ## @param ingress.secrets Custom TLS certificates as secrets
+    ## @param jobs.ingress.secrets Custom TLS certificates as secrets
     ## NOTE: 'key' and 'certificate' are expected in PEM format
     ## NOTE: 'name' should line up with a 'secretName' set further up
     ## If it is not set and you're using cert-manager, this is unneeded, as it will create a secret for you with valid certificates
@@ -1633,7 +1770,7 @@ jobs:
     ##       -----END CERTIFICATE-----
     ##
     secrets: []
-    ## @param ingress.extraRules Additional rules to be covered with this ingress record
+    ## @param jobs.ingress.extraRules Additional rules to be covered with this ingress record
     ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-rules
     ## e.g:
     ## extraRules:
@@ -1648,63 +1785,63 @@ jobs:
     ##
     extraRules: []
   service:
-    ## @param service.type jobs service type
+    ## @param jobs.service.type jobs service type
     ##
     type: LoadBalancer
-    ## @param service.ports.http jobs service HTTP port
-    ## @param service.ports.https jobs service HTTPS port
+    ## @param jobs.service.ports.http jobs service HTTP port
+    ## @param jobs.service.ports.https jobs service HTTPS port
     ##
     ports:
       http: 80
       https: 443
     ## Node ports to expose
-    ## @param service.nodePorts.http Node port for HTTP
-    ## @param service.nodePorts.https Node port for HTTPS
+    ## @param jobs.service.nodePorts.http Node port for HTTP
+    ## @param jobs.service.nodePorts.https Node port for HTTPS
     ## NOTE: choose port between <30000-32767>
     ##
     nodePorts:
       http: ""
       https: ""
-    ## @param service.clusterIP jobs service Cluster IP
+    ## @param jobs.service.clusterIP jobs service Cluster IP
     ## e.g.:
     ## clusterIP: None
     ##
     clusterIP: ""
-    ## @param service.loadBalancerIP jobs service Load Balancer IP
+    ## @param jobs.service.loadBalancerIP jobs service Load Balancer IP
     ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-loadbalancer
     ##
     loadBalancerIP: ""
-    ## @param service.loadBalancerSourceRanges jobs service Load Balancer sources
+    ## @param jobs.service.loadBalancerSourceRanges jobs service Load Balancer sources
     ## ref: https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service
     ## e.g:
     ## loadBalancerSourceRanges:
     ##   - 10.10.10.0/24
     ##
     loadBalancerSourceRanges: []
-    ## @param service.externalTrafficPolicy jobs service external traffic policy
+    ## @param jobs.service.externalTrafficPolicy jobs service external traffic policy
     ## ref http://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
     ##
     externalTrafficPolicy: Cluster
-    ## @param service.annotations Additional custom annotations for jobs service
+    ## @param jobs.service.annotations Additional custom annotations for jobs service
     ##
     annotations: {}
-    ## @param service.extraPorts Extra ports to expose in jobs service (normally used with the `sidecars` value)
+    ## @param jobs.service.extraPorts Extra ports to expose in jobs service (normally used with the `sidecars` value)
     ##
     extraPorts: []
-    ## @param service.sessionAffinity Control where client requests go, to the same pod or round-robin
+    ## @param jobs.service.sessionAffinity Control where client requests go, to the same pod or round-robin
     ## Values: ClientIP or None
     ## ref: https://kubernetes.io/docs/concepts/services-networking/service/
     ##
     sessionAffinity: None
-    ## @param service.sessionAffinityConfig Additional settings for the sessionAffinity
+    ## @param jobs.service.sessionAffinityConfig Additional settings for the sessionAffinity
     ## sessionAffinityConfig:
     ##   clientIP:
     ##     timeoutSeconds: 300
     ##
     sessionAffinityConfig: {}
-    ## @param jobs.containerPorts.http jobs HTTP container port
-    ## @param jobs.containerPorts.https jobs HTTPS container port
-    ##
+  ## @param jobs.containerPorts.http jobs HTTP container port
+  ## @param jobs.containerPorts.https jobs HTTPS container port
+  ##
   containerPorts:
     http: 3005
     https: 3005
@@ -1715,6 +1852,11 @@ jobs:
   ##     containerPort: 9090
   ##
   extraContainerPorts: []
+  ## @param jobs.updateStrategy.type jobs deployment strategy type
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
+  ## @param jobs.updateStrategy.type jobs statefulset strategy type
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
+  ##
   updateStrategy:
     type: "RollingUpdate"
   ## Pod Disruption Budget configuration
@@ -1867,16 +2009,16 @@ jobs:
   ## ref: https://kubernetes.io/docs/concepts/storage/persistent-volumes/
   ##
   persistence:
-    ## @param persistence.enabled Enable persistence using Persistent Volume Claims
+    ## @param jobs.persistence.enabled Enable persistence using Persistent Volume Claims
     ##
     enabled: true
-    ## @param persistence.mountPath Path to mount the volume at.
+    ## @param jobs.persistence.mountPath Path to mount the volume at.
     ##
     mountPath: /nango/jobs/data
-    ## @param persistence.subPath The subdirectory of the volume to mount to, useful in dev environments and one PV for multiple services
+    ## @param jobs.persistence.subPath The subdirectory of the volume to mount to, useful in dev environments and one PV for multiple services
     ##
     subPath: ""
-    ## @param persistence.storageClass Storage class of backing PVC
+    ## @param jobs.persistence.storageClass Storage class of backing PVC
     ## If defined, storageClassName: <storageClass>
     ## If set to "-", storageClassName: "", which disables dynamic provisioning
     ## If undefined (the default) or set to null, no storageClassName spec is
@@ -1884,23 +2026,23 @@ jobs:
     ##   GKE, AWS & OpenStack)
     ##
     storageClass: ""
-    ## @param persistence.annotations Persistent Volume Claim annotations
+    ## @param jobs.persistence.annotations Persistent Volume Claim annotations
     ##
     annotations: {}
-    ## @param persistence.accessModes Persistent Volume Access Modes
+    ## @param jobs.persistence.accessModes Persistent Volume Access Modes
     ##
     accessModes:
       - ReadWriteOnce
-    ## @param persistence.size Size of data volume
+    ## @param jobs.persistence.size Size of data volume
     ##
     size: 1Gi
-    ## @param persistence.dataSource Custom PVC data source
+    ## @param jobs.persistence.dataSource Custom PVC data source
     ##
     dataSource: {}
-    ## @param persistence.existingClaim The name of an existing PVC to use for persistence
+    ## @param jobs.persistence.existingClaim The name of an existing PVC to use for persistence
     ##
     existingClaim: ""
-    ## @param persistence.selector Selector to match an existing Persistent Volume 
+    ## @param jobs.persistence.selector Selector to match an existing Persistent Volume 
     ## If set, the PVC can't have a PV dynamically provisioned for it
     ## E.g.
     ## selector:
@@ -1911,10 +2053,12 @@ jobs:
   ## RBAC configuration
   ##
   rbac:
-    ## @param rbac.create Specifies whether RBAC resources should be created
+    ## @param jobs.rbac.create Specifies whether RBAC resources should be created
     ##
     create: true
-    ## @param rbac.rules Custom RBAC rules to set
+    ## @skip jobs.rbac.rules[0]
+    ## @skip jobs.rbac.rules[1]
+    ## @skip jobs.rbac.rules[2]
     ## e.g:
     ## rules:
     ##   - apiGroups:
@@ -1946,7 +2090,15 @@ jobs:
         - "persistentvolumeclaims"
         - "namespaces"
         verbs: 
-        - apiGroups: ["networking.k8s.io"]
+        - "get"
+        - "list"
+        - "watch"
+        - "create"
+        - "update"
+        - "patch"
+        - "delete"
+      - apiGroups: 
+        - "networking.k8s.io"
         resources: 
         - "networkpolicies"
         verbs: 
@@ -1958,10 +2110,40 @@ jobs:
         - "patch"
         - "delete"
   
+## @section Runner Parameters
+##
+
 runner:
+  ## @param runner.enabled Enable runner deployment
+  ##
   enabled: false
+  ## @param runner.name runner name
+  ##
   name: runner
-  image: {}
+  ## runner image
+  ## @param runner.image.registry [default: nangohq] runner image registry
+  ## @param runner.image.repository [default: nango] runner image repository
+  ## @skip runner.image.tag runner image tag (immutable tags are recommended)
+  ## @param runner.image.digest runner image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended)
+  ## @param runner.image.pullPolicy runner image pull policy
+  ## @param runner.image.pullSecrets runner image pull secrets
+  ##
+  image: 
+    registry: ""
+    repository: ""
+    tag: ""
+    digest: ""
+    pullPolicy: ""
+    pullSecrets: []
+  
+  ## @param runner.replicaCount Number of runner replicas to deploy
+  ##
+  replicaCount: 1
+  ## @param runner.command Override default runner container command (useful when using custom images)
+  ##
+  command: []
+  ## @param runner.args Override default runner container args (useful when using custom images)
+  ##
   args:
     - node
     - "packages/runner/dist/app.js"
@@ -1969,40 +2151,40 @@ runner:
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
   ##
   serviceAccount:
-    ## @param serviceAccount.create Specifies whether a ServiceAccount should be created
+    ## @param runner.serviceAccount.create Specifies whether a ServiceAccount should be created
     ##
     create: false
-    ## @param serviceAccount.name The name of the ServiceAccount to use.
+    ## @param runner.serviceAccount.name The name of the ServiceAccount to use.
     ## If not set and create is true, a name is generated using the common.names.fullname template
     ##
     name: ""
-    ## @param serviceAccount.annotations Additional Service Account annotations (evaluated as a template)
+    ## @param runner.serviceAccount.annotations Additional Service Account annotations (evaluated as a template)
     ##
     annotations: {}
-    ## @param serviceAccount.automountServiceAccountToken Automount service account token for the runner service account
+    ## @param runner.serviceAccount.automountServiceAccountToken Automount service account token for the runner service account
     ##
     automountServiceAccountToken: true
   ## Network Policies
   ## Ref: https://kubernetes.io/docs/concepts/services-networking/network-policies/
   ##
   networkPolicy:
-    ## @param networkPolicy.enabled Specifies whether a NetworkPolicy should be created
+    ## @param runner.networkPolicy.enabled Specifies whether a NetworkPolicy should be created
     ##
     enabled: true
-    ## @param networkPolicy.allowExternal Don't require runner label for connections
+    ## @param runner.networkPolicy.allowExternal Don't require runner label for connections
     ## The Policy model to apply. When set to false, only pods with the correct
     ## runner label will have network access to the ports runner is listening
     ## on. When true, runner will accept connections from any source
     ## (with the correct destination port).
     ##
     allowExternal: false
-    ## @param networkPolicy.allowExternalEgress Allow the pod to access any range of port and all destinations.
+    ## @param runner.networkPolicy.allowExternalEgress Allow the pod to access any range of port and all destinations.
     ##
     allowExternalEgress: false
-    ## @param networkPolicy.addExternalClientAccess Allow access from pods with client label set to "true". Ignored if `networkPolicy.allowExternal` is true.
+    ## @param runner.networkPolicy.addExternalClientAccess Allow access from pods with client label set to "true". Ignored if `networkPolicy.allowExternal` is true.
     ##
     addExternalClientAccess: true
-    ## @param networkPolicy.extraIngress [array] Add extra ingress rules to the NetworkPolicy
+    ## @param runner.networkPolicy.extraIngress [array] Add extra ingress rules to the NetworkPolicy
     ## e.g:
     ## extraIngress:
     ##   - ports:
@@ -2018,7 +2200,7 @@ runner:
     ##                 values:
     ##                   - frontend
     extraIngress: []
-    ## @param networkPolicy.extraEgress [array] Add extra ingress rules to the NetworkPolicy (ignored if allowExternalEgress=true)
+    ## @param runner.networkPolicy.extraEgress [array] Add extra ingress rules to the NetworkPolicy (ignored if allowExternalEgress=true)
     ## e.g:
     ## extraEgress:
     ##   - ports:
@@ -2043,15 +2225,15 @@ runner:
                   values:
                     - jobs
                     - persist
-    ## @param networkPolicy.ingressPodMatchLabels [object] Labels to match to allow traffic from other pods. Ignored if `networkPolicy.allowExternal` is true.
+    ## @param runner.networkPolicy.ingressPodMatchLabels [object] Labels to match to allow traffic from other pods. Ignored if `networkPolicy.allowExternal` is true.
     ## e.g:
     ## ingressPodMatchLabels:
     ##   my-client: "true"
     #
     ingressPodMatchLabels:
       app.kubernetes.io/component: jobs
-    ## @param networkPolicy.ingressNSMatchLabels [object] Labels to match to allow traffic from other namespaces. Ignored if `networkPolicy.allowExternal` is true.
-    ## @param networkPolicy.ingressNSPodMatchLabels [object] Pod labels to match to allow traffic from other namespaces. Ignored if `networkPolicy.allowExternal` is true.
+    ## @param runner.networkPolicy.ingressNSMatchLabels [object] Labels to match to allow traffic from other namespaces. Ignored if `networkPolicy.allowExternal` is true.
+    ## @param runner.networkPolicy.ingressNSPodMatchLabels [object] Pod labels to match to allow traffic from other namespaces. Ignored if `networkPolicy.allowExternal` is true.
     ##
     ingressNSMatchLabels: {}
     ingressNSPodMatchLabels: {}
@@ -2059,28 +2241,28 @@ runner:
   ## ref: http://kubernetes.io/docs/concepts/services-networking/ingress/
   ##
   ingress:
-    ## @param ingress.enabled Enable ingress record generation for runner
+    ## @param runner.ingress.enabled Enable ingress record generation for runner
     ##
     enabled: false
-    ## @param ingress.pathType Ingress path type
+    ## @param runner.ingress.pathType Ingress path type
     ##
     pathType: ImplementationSpecific
-    ## @param ingress.apiVersion Force Ingress API version (automatically detected if not set)
+    ## @param runner.ingress.apiVersion Force Ingress API version (automatically detected if not set)
     ##
     apiVersion: ""
-    ## @param ingress.hostname Default host for the ingress record
+    ## @param runner.ingress.hostname Default host for the ingress record
     ##
     hostname: nango-server-default.dev
-    ## @param ingress.ingressClassName IngressClass that will be be used to implement the Ingress (Kubernetes 1.18+)
+    ## @param runner.ingress.ingressClassName IngressClass that will be be used to implement the Ingress (Kubernetes 1.18+)
     ## This is supported in Kubernetes 1.18+ and required if you have more than one IngressClass marked as the default for your cluster .
     ## ref: https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/
     ##
     ingressClassName: ""
-    ## @param ingress.path Default path for the ingress record
+    ## @param runner.ingress.path Default path for the ingress record
     ## NOTE: You may need to set this to '/*' in order to use this with ALB ingress controllers
     ##
     path: /
-    ## @param ingress.annotations Additional annotations for the Ingress resource. To enable certificate autogeneration, place here your cert-manager annotations.
+    ## @param runner.ingress.annotations Additional annotations for the Ingress resource. To enable certificate autogeneration, place here your cert-manager annotations.
     ## Use this parameter to set the required annotations for cert-manager, see
     ## ref: https://cert-manager.io/docs/usage/ingress/#supported-annotations
     ## e.g:
@@ -2089,25 +2271,25 @@ runner:
     ##   cert-manager.io/cluster-issuer: cluster-issuer-name
     ##
     annotations: {}
-    ## @param ingress.tls Enable TLS configuration for the host defined at `ingress.hostname` parameter
-    ## TLS certificates will be retrieved from a TLS secret with name: `{{- printf "%s-tls" .Values.ingress.hostname }}`
+    ## @param runner.ingress.tls Enable TLS configuration for the host defined at `runner.ingress.hostname` parameter
+    ## TLS certificates will be retrieved from a TLS secret with name: `{{- printf "%s-tls" .Values.runner.ingress.hostname }}`
     ## You can:
-    ##   - Use the `ingress.secrets` parameter to create this TLS secret
+    ##   - Use the `runner.ingress.secrets` parameter to create this TLS secret
     ##   - Rely on cert-manager to create it by setting the corresponding annotations
-    ##   - Rely on Helm to create self-signed certificates by setting `ingress.selfSigned=true`
+    ##   - Rely on Helm to create self-signed certificates by setting `runner.ingress.selfSigned=true`
     ##
     tls: false
-    ## @param ingress.selfSigned Create a TLS secret for this ingress record using self-signed certificates generated by Helm
+    ## @param runner.ingress.selfSigned Create a TLS secret for this ingress record using self-signed certificates generated by Helm
     ##
     selfSigned: false
-    ## @param ingress.extraHosts An array with additional hostname(s) to be covered with the ingress record
+    ## @param runner.ingress.extraHosts An array with additional hostname(s) to be covered with the ingress record
     ## e.g:
     ## extraHosts:
     ##   - name: runner.local
     ##     path: /
     ##
     extraHosts: []
-    ## @param ingress.extraPaths An array with additional arbitrary paths that may need to be added to the ingress under the main host
+    ## @param runner.ingress.extraPaths An array with additional arbitrary paths that may need to be added to the ingress under the main host
     ## e.g:
     ## extraPaths:
     ## - path: /*
@@ -2116,7 +2298,7 @@ runner:
     ##     servicePort: use-annotation
     ##
     extraPaths: []
-    ## @param ingress.extraTls TLS configuration for additional hostname(s) to be covered with this ingress record
+    ## @param runner.ingress.extraTls TLS configuration for additional hostname(s) to be covered with this ingress record
     ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/#tls
     ## e.g:
     ## extraTls:
@@ -2125,7 +2307,7 @@ runner:
     ##   secretName: runner.local-tls
     ##
     extraTls: []
-    ## @param ingress.secrets Custom TLS certificates as secrets
+    ## @param runner.ingress.secrets Custom TLS certificates as secrets
     ## NOTE: 'key' and 'certificate' are expected in PEM format
     ## NOTE: 'name' should line up with a 'secretName' set further up
     ## If it is not set and you're using cert-manager, this is unneeded, as it will create a secret for you with valid certificates
@@ -2145,7 +2327,7 @@ runner:
     ##       -----END CERTIFICATE-----
     ##
     secrets: []
-    ## @param ingress.extraRules Additional rules to be covered with this ingress record
+    ## @param runner.ingress.extraRules Additional rules to be covered with this ingress record
     ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-rules
     ## e.g:
     ## extraRules:
@@ -2160,63 +2342,63 @@ runner:
     ##
     extraRules: []
   service:
-    ## @param service.type runner service type
+    ## @param runner.service.type runner service type
     ##
     type: LoadBalancer
-    ## @param service.ports.http runner service HTTP port
-    ## @param service.ports.https runner service HTTPS port
+    ## @param runner.service.ports.http runner service HTTP port
+    ## @param runner.service.ports.https runner service HTTPS port
     ##
     ports:
       http: 80
       https: 443
     ## Node ports to expose
-    ## @param service.nodePorts.http Node port for HTTP
-    ## @param service.nodePorts.https Node port for HTTPS
+    ## @param runner.service.nodePorts.http Node port for HTTP
+    ## @param runner.service.nodePorts.https Node port for HTTPS
     ## NOTE: choose port between <30000-32767>
     ##
     nodePorts:
       http: ""
       https: ""
-    ## @param service.clusterIP runner service Cluster IP
+    ## @param runner.service.clusterIP runner service Cluster IP
     ## e.g.:
     ## clusterIP: None
     ##
     clusterIP: ""
-    ## @param service.loadBalancerIP runner service Load Balancer IP
+    ## @param runner.service.loadBalancerIP runner service Load Balancer IP
     ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-loadbalancer
     ##
     loadBalancerIP: ""
-    ## @param service.loadBalancerSourceRanges runner service Load Balancer sources
+    ## @param runner.service.loadBalancerSourceRanges runner service Load Balancer sources
     ## ref: https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service
     ## e.g:
     ## loadBalancerSourceRanges:
     ##   - 10.10.10.0/24
     ##
     loadBalancerSourceRanges: []
-    ## @param service.externalTrafficPolicy runner service external traffic policy
+    ## @param runner.service.externalTrafficPolicy runner service external traffic policy
     ## ref http://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
     ##
     externalTrafficPolicy: Cluster
-    ## @param service.annotations Additional custom annotations for runner service
+    ## @param runner.service.annotations Additional custom annotations for runner service
     ##
     annotations: {}
-    ## @param service.extraPorts Extra ports to expose in runner service (normally used with the `sidecars` value)
+    ## @param runner.service.extraPorts Extra ports to expose in runner service (normally used with the `sidecars` value)
     ##
     extraPorts: []
-    ## @param service.sessionAffinity Control where client requests go, to the same pod or round-robin
+    ## @param runner.service.sessionAffinity Control where client requests go, to the same pod or round-robin
     ## Values: ClientIP or None
     ## ref: https://kubernetes.io/docs/concepts/services-networking/service/
     ##
     sessionAffinity: None
-    ## @param service.sessionAffinityConfig Additional settings for the sessionAffinity
+    ## @param runner.service.sessionAffinityConfig Additional settings for the sessionAffinity
     ## sessionAffinityConfig:
     ##   clientIP:
     ##     timeoutSeconds: 300
     ##
     sessionAffinityConfig: {}
-    ## @param runner.containerPorts.http runner HTTP container port
-    ## @param runner.containerPorts.https runner HTTPS container port
-    ##
+  ## @param runner.containerPorts.http runner HTTP container port
+  ## @param runner.containerPorts.https runner HTTPS container port
+  ##
   containerPorts:
     http: 3006
     https: 3006
@@ -2227,6 +2409,11 @@ runner:
   ##     containerPort: 9090
   ##
   extraContainerPorts: []
+  ## @param runner.updateStrategy.type runner deployment strategy type
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
+  ## @param runner.updateStrategy.type runner statefulset strategy type
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
+  ##
   updateStrategy:
     type: "RollingUpdate"
   ## Pod Disruption Budget configuration
@@ -2379,16 +2566,16 @@ runner:
   ## ref: https://kubernetes.io/docs/concepts/storage/persistent-volumes/
   ##
   persistence:
-    ## @param persistence.enabled Enable persistence using Persistent Volume Claims
+    ## @param runner.persistence.enabled Enable persistence using Persistent Volume Claims
     ##
     enabled: false
-    ## @param persistence.mountPath Path to mount the volume at.
+    ## @param runner.persistence.mountPath Path to mount the volume at.
     ##
     mountPath: /nango/runner/data
-    ## @param persistence.subPath The subdirectory of the volume to mount to, useful in dev environments and one PV for multiple services
+    ## @param runner.persistence.subPath The subdirectory of the volume to mount to, useful in dev environments and one PV for multiple services
     ##
     subPath: ""
-    ## @param persistence.storageClass Storage class of backing PVC
+    ## @param runner.persistence.storageClass Storage class of backing PVC
     ## If defined, storageClassName: <storageClass>
     ## If set to "-", storageClassName: "", which disables dynamic provisioning
     ## If undefined (the default) or set to null, no storageClassName spec is
@@ -2396,23 +2583,23 @@ runner:
     ##   GKE, AWS & OpenStack)
     ##
     storageClass: ""
-    ## @param persistence.annotations Persistent Volume Claim annotations
+    ## @param runner.persistence.annotations Persistent Volume Claim annotations
     ##
     annotations: {}
-    ## @param persistence.accessModes Persistent Volume Access Modes
+    ## @param runner.persistence.accessModes Persistent Volume Access Modes
     ##
     accessModes:
       - ReadWriteOnce
-    ## @param persistence.size Size of data volume
+    ## @param runner.persistence.size Size of data volume
     ##
     size: 8Gi
-    ## @param persistence.dataSource Custom PVC data source
+    ## @param runner.persistence.dataSource Custom PVC data source
     ##
     dataSource: {}
-    ## @param persistence.existingClaim The name of an existing PVC to use for persistence
+    ## @param runner.persistence.existingClaim The name of an existing PVC to use for persistence
     ##
     existingClaim: ""
-    ## @param persistence.selector Selector to match an existing Persistent Volume 
+    ## @param runner.persistence.selector Selector to match an existing Persistent Volume 
     ## If set, the PVC can't have a PV dynamically provisioned for it
     ## E.g.
     ## selector:
@@ -2423,10 +2610,10 @@ runner:
   ## RBAC configuration
   ##
   rbac:
-    ## @param rbac.create Specifies whether RBAC resources should be created
+    ## @param runner.rbac.create Specifies whether RBAC resources should be created
     ##
     create: false
-    ## @param rbac.rules Custom RBAC rules to set
+    ## @param runner.rbac.rules Custom RBAC rules to set
     ## e.g:
     ## rules:
     ##   - apiGroups:
@@ -2439,6 +2626,7 @@ runner:
     ##
     rules: []
 
+## @skip redis
 redis:  
   enabled: true
   primary:
@@ -2452,6 +2640,7 @@ redis:
         cpu: "250m"
         memory: "1024Mi"
 
+## @skip postgresql
 postgresql:
   namespace: nango
   enabled: true
@@ -2470,6 +2659,7 @@ postgresql:
     postgresPassword: nango123
     database: nango
 
+## @skip elasticsearch 
 elasticsearch:
   namespace: nango
   enabled: false

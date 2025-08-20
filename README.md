@@ -1,150 +1,46 @@
-# Overview
+# Nango Helm Charts
 
-Nango requires specific components and configurations to operate correctly within a Kubernetes cluster. Key dependencies include:
+This repository contains Helm charts for deploying [Nango](https://nango.dev) on Kubernetes.
 
-- **[Elasticsearch](https://www.elastic.co/)**: Nango relies on Elasticsearch for logging.
-Nango can operate without running Elasticsearch and the environment variable `NANGO_LOGS_ENABLED`
-determines if logs are ingested and displayed in the Nango UI. If you are running Elasticsearch you
-need to set:
-```
-NANGO_LOGS_ENABLED
-NANGO_LOGS_ES_PWD
-NANGO_LOGS_ES_URL
-NANGO_LOGS_ES_USER
-```
-Note that these helm charts include a self hosted Elasticsearch version but 
-using that for production workloads is **not recommended**.
-- **Required Values**: Obtain the following values from a Nango developer:
+## What is Nango?
 
-```
-MAILGUN_API_KEY
-```
+Nango is a single API for all your integrations. It provides OAuth handling, webhook management, and unified API access to hundreds of third-party services.
 
-# Setting Up Secrets
+## Available Charts
 
-Nango expects the following secrets:
+| Chart | Description | Version |
+|-------|-------------|---------|
+| [nango](./charts/nango) | Complete Nango deployment with all components | ![Version](https://img.shields.io/badge/version-2.0.0-blue.svg?style=flat-square) |
 
-## `nango-secrets`
+## Quick Start
 
-This secret should contain:
+### Prerequisites
 
-- `postgres-password`: Required if `postgresql.enabled` is set to `false` (i.e., using an external database).
-- `encryption-key`: Required if `shared.encryptionEnabled` is set to `true`.
-- `mailgun-api-key`.
+- Kubernetes 1.19+
+- Helm 3.0+
+- PV provisioner support in the underlying infrastructure
 
-Example command to create `nango-secrets`:
-
-```bash
-kubectl create secret generic nango-secrets \
-  --from-literal=postgres-password=secure-pw \
-  --from-literal=encryption-key=base64-encoded-256-bit-key \
-  --from-literal=mailgun-api-key=key-from-nango-dev
-  ```
-
-Then to create the secrets:
-
-```yaml
-apiVersion: v1
-kind: Secret
-metadata:
-  name: nango-secrets
-type: Opaque
-data:
-  postgres-password: [base64-encoded-password]
-  encryption-key: [base64-encoded-encryption-key-which-means-you-need-to-base64-encode-the-base64-256-bit-key]
-  mailgun-api-key: [base64-encoded-api-key]
-```
-
-# Persistent Volume Configuration
-
-To facilitate syncs and actions, Nango utilizes a persistent volume across services.
-The jobs-pvc.yaml and jobs-${aws|gcp}-storage-class.yaml in the jobs template
-are responsible for creating this volume, used by the jobs and server components.
-Reach out for assistance if you encounter issues with the volume attachment.
-
-# Exposing the Server
-
-The server component, crucial for OAuth handshake, needs to be publicly accessible.
-By default, on AWS, a LoadBalancer exposes the server. Set useLoadBalancer
-to false to use an alternate exposure method.
-
-Note for Porter Users: There's a known issue where the server might not be
-correctly exposed due to an internal-only load balancer. Please contact us for support.
-
-# Usage
-
-1. Install helm: Follow the [official Helm documentation](https://helm.sh/docs)
-
-2. Add the Nango Repository
+### Add the Helm Repository
 
 ```bash
 helm repo add nangohq https://nangohq.github.io/nango-helm-charts
+helm repo update
 ```
 
-3. Update the Repository (if previously added):
-
-```bash
-helm repo update nangohq
-helm search repo nangohq
-```
-
-4. Configure values.yaml: Refer to the configuration section below.
-5. Install Nango charts
+### Install Nango
 
 ```bash
 helm install nango nangohq/nango
 ```
 
-- To uninstall the chart
+### Uninstall Nango
 
-```sh
-helm delete nango
+```bash
+helm uninstall nango
 ```
 
-# Configuration
+## Documentation
 
-| Component                | Key                            | Default Value|
-|--------------------------|--------------------------------|--------------|
-| postgresql               | enabled                        | true         |
-|                          | fullnameOverride               | nango-postgresql |
-|                          | primary.persistence.enabled     | false        |
-|                          | primary.resources.limits.cpu    | "1000m"      |
-|                          | primary.resources.limits.memory | "2048Mi"     |
-|                          | primary.resources.requests.cpu  | "250m"       |
-|                          | primary.resources.requests.memory | "1024Mi"    |
-|                          | auth.postgresPassword           | nango        |
-|                          | auth.database                   | nango        |
-| elasticsearch            | enabled                        | false         |
-|                          | fullnameOverride               | nango-elasticsearch |
-|                          | clusterName                    | elastic      |
-|                          | security.enabled               | true         |
-|                          | security.elasticPassword       | nango        |
-| server                   | name                           | server       |
-|                          | tag                            | enterprise   |
-|                          | useLoadBalancer                | true         |
-|                          | replicas                       | 1            |
-| jobs                     | name                           | jobs         |
-|                          | tag                            | enterprise   |
-|                          | replicas                       | 1            |
-|                          | volume.name                    | flows-volume |
-|                          | volume.claimName               | flow-claim   |
-|                          | volume.aws                     | false        |
-|                          | volume.gcp                     | false        |
-| runner                   | name                           | runner       |
-|                          | tag                            | enterprise   |
-|                          | replicas                       | 1            |
-| persist                  | name                           | persist      |
-|                          | tag                            |    |
-|                          | replicas                       | 1            |
-|                          | url                            | `http://nango-persist` |
-| shared                   | namespace                      | default      |
-|                          | NODE_ENV                       | production   |
-|                          | NANGO_DB_HOST                  | nango-postgresql |
-|                          | NANGO_DB_USER                  | postgres     |
-|                          | NANGO_DB_PORT                  | "5432"       |
-|                          | NANGO_DB_NAME                  | nango        |
-|                          | NANGO_DB_SSL                   | false        |
-|                          | NANGO_SERVER_URL               | `https://your-hosted-instance.com` |
-|                          | NANGO_CALLBACK_URL             | `https://your-hosted-instance.com/oauth/callback` |
-|                          | flows_path                     | /flows       |
-|                          | useVolumeForFlows              | true         |
+- [Nango Chart Documentation](./charts/nango/README.md) - Detailed configuration and usage
+- [Nango Official Documentation](https://docs.nango.dev) - Application documentation
+- [Helm Documentation](https://helm.sh/docs) - Helm usage guide
