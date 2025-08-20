@@ -1114,7 +1114,7 @@ orchestrator:
     ## on. When true, orchestrator will accept connections from any source
     ## (with the correct destination port).
     ##
-    allowExternal: false
+    allowExternal: true
     ## @param orchestrator.networkPolicy.allowExternalEgress Allow the pod to access any range of port and all destinations.
     ##
     allowExternalEgress: true
@@ -1136,15 +1136,7 @@ orchestrator:
     ##                 operator: In
     ##                 values:
     ##                   - frontend
-    extraIngress:
-      - from: 
-        - podSelector:
-            matchExpressions:
-              - key: app.kubernetes.io/component
-                operator: In
-                values:
-                  - jobs
-                  - server
+    extraIngress: []
     ## @param orchestrator.networkPolicy.extraEgress [array] Add extra ingress rules to the NetworkPolicy (ignored if allowExternalEgress=true)
     ## e.g:
     ## extraEgress:
@@ -2177,10 +2169,10 @@ runner:
     ## on. When true, runner will accept connections from any source
     ## (with the correct destination port).
     ##
-    allowExternal: false
+    allowExternal: true
     ## @param runner.networkPolicy.allowExternalEgress Allow the pod to access any range of port and all destinations.
     ##
-    allowExternalEgress: false
+    allowExternalEgress: true
     ## @param runner.networkPolicy.addExternalClientAccess Allow access from pods with client label set to "true". Ignored if `networkPolicy.allowExternal` is true.
     ##
     addExternalClientAccess: true
@@ -2216,15 +2208,7 @@ runner:
     ##                 values:
     ##                   - frontend
     ##
-    extraEgress:
-      - to:
-          - podSelector:
-              matchExpressions:
-                - key: app.kubernetes.io/component
-                  operator: In
-                  values:
-                    - jobs
-                    - persist
+    extraEgress: []
     ## @param runner.networkPolicy.ingressPodMatchLabels [object] Labels to match to allow traffic from other pods. Ignored if `networkPolicy.allowExternal` is true.
     ## e.g:
     ## ingressPodMatchLabels:
