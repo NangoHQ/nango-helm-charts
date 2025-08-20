@@ -24,7 +24,7 @@ spec:
           {{- end }}
           - path: {{ .Values.orchestrator.ingress.path }}
             pathType: {{ .Values.orchestrator.ingress.pathType }}
-            backend: {{- include "common.ingress.backend" (dict "serviceName" (include "orchestrator.names.fullname" .) "servicePort" "http" "context" $)  | nindent 14 }}
+            backend: {{- include "common.ingress.backend" (dict "serviceName" (include "orchestrator.names.service" .) "servicePort" "http" "context" $)  | nindent 14 }}
     {{- end }}
     {{- range .Values.orchestrator.ingress.extraHosts }}
     - host: {{ .name | quote }}
@@ -32,7 +32,7 @@ spec:
         paths:
           - path: {{ default "/" .path }}
             pathType: {{ default "ImplementationSpecific" .pathType }}
-            backend: {{- include "common.ingress.backend" (dict "serviceName" (include "orchestrator.names.fullname" $) "servicePort" "http" "context" $) | nindent 14 }}
+            backend: {{- include "common.ingress.backend" (dict "serviceName" (include "orchestrator.names.service" $) "servicePort" "http" "context" $) | nindent 14 }}
     {{- end }}
     {{- if .Values.orchestrator.ingress.extraRules }}
     {{- include "common.tplvalues.render" (dict "value" .Values.orchestrator.ingress.extraRules "context" $) | nindent 4 }}
