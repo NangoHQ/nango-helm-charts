@@ -31,7 +31,7 @@ spec:
   loadBalancerIP: {{ .Values.runner.service.loadBalancerIP }}
   {{- end }}
   ports:
-    - name: runner
+    - name: http
       port: {{ .Values.runner.service.ports.http }}
       {{- if not (eq .Values.runner.service.ports.http .Values.runner.containerPorts.http) }}
       targetPort: {{ .Values.runner.containerPorts.http }}

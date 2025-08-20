@@ -30,7 +30,7 @@ spec:
   loadBalancerIP: {{ .Values.jobs.service.loadBalancerIP }}
   {{- end }}
   ports:
-    - name: server
+    - name: http
       port: {{ .Values.jobs.service.ports.http }}
       {{- if not (eq .Values.jobs.service.ports.http .Values.jobs.containerPorts.http) }}
       targetPort: {{ .Values.jobs.containerPorts.http }}

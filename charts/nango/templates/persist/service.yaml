@@ -30,7 +30,7 @@ spec:
   loadBalancerIP: {{ .Values.persist.service.loadBalancerIP }}
   {{- end }}
   ports:
-    - name: persist
+    - name: http
       port: {{ .Values.persist.service.ports.http }}
       {{- if not (eq .Values.persist.service.ports.http .Values.persist.containerPorts.http) }}
       targetPort: {{ .Values.persist.containerPorts.http }}
