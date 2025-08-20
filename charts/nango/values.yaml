@@ -163,7 +163,7 @@ server:
     enabled: true
     ## @param server.ingress.pathType Ingress path type
     ##
-    pathType: ImplementationSpecific
+    pathType: Prefix
     ## @param server.ingress.apiVersion Force Ingress API version (automatically detected if not set)
     ##
     apiVersion: ""
