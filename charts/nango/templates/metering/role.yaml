@@ -1,0 +1,25 @@
+{{- if .Values.metering.enabled }}
+{{- if .Values.metering.rbac.create }}
+apiVersion: {{ include "common.capabilities.rbac.apiVersion" . }}
+kind: Role
+metadata:
+  name: {{ include "metering.names.fullname" . }}
+  namespace: {{ include "metering.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: {{ include "metering.names.component" . }}
+  {{- if .Values.commonAnnotations }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+rules:
+  # TODO: Update resources and verbs to the proper values for the application cases
+  - apiGroups: [""]
+    resources: ["*"]
+    verbs: ["*"]
+  - apiGroups: [""]
+    resources: ["*"]
+    verbs: ["*"]
+  {{- if .Values.metering.rbac.rules }}
+  {{- include "common.tplvalues.render" ( dict "value" .Values.metering.rbac.rules "context" $ ) | nindent 2 }}
+  {{- end }}
+{{- end }}
+{{- end }}

@@ -1,0 +1,25 @@
+{{- if .Values.metering.enabled }}
+{{- if .Values.metering.pdb.create }}
+apiVersion: {{ include "common.capabilities.policy.apiVersion" . }}
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "metering.names.fullname" . }}
+  namespace: {{ include "metering.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: {{ include "metering.names.component" . }}
+  {{- if .Values.commonAnnotations }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if .Values.metering.pdb.minAvailable }}
+  minAvailable: {{ .Values.metering.pdb.minAvailable }}
+  {{- end  }}
+  {{- if or .Values.metering.pdb.maxUnavailable ( not .Values.metering.pdb.minAvailable ) }}
+  maxUnavailable: {{ .Values.metering.pdb.maxUnavailable | default 1 }}
+  {{- end  }}
+  {{- $podLabels := include "common.tplvalues.merge" ( dict "values" ( list .Values.metering.podLabels .Values.commonLabels ) "context" . ) }}
+  selector:
+    matchLabels: {{- include "common.labels.matchLabels" ( dict "customLabels" $podLabels "context" $ ) | nindent 6 }}
+      app.kubernetes.io/component: {{ include "metering.names.component" . }}
+{{- end }}
+{{- end }}

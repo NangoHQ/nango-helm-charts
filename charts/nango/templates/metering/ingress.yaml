@@ -1,0 +1,53 @@
+{{- if .Values.metering.enabled }}
+{{- if .Values.metering.ingress.enabled }}
+apiVersion: {{ include "common.capabilities.ingress.apiVersion" . }}
+kind: Ingress
+metadata:
+  name: {{ include "metering.names.fullname" . }}
+  namespace: {{ include "metering.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: {{ include "metering.names.component" . }}
+  {{- if or .Values.metering.ingress.annotations .Values.commonAnnotations }}
+  {{- $annotations := include "common.tplvalues.merge" (dict "values" (list .Values.metering.ingress.annotations .Values.commonAnnotations) "context" .) }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" $annotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if .Values.metering.ingress.ingressClassName }}
+  ingressClassName: {{ .Values.metering.ingress.ingressClassName | quote }}
+  {{- end }}
+  rules:
+    {{- if .Values.metering.ingress.hostname }}
+    - host: {{ .Values.metering.ingress.hostname }}
+      http:
+        paths:
+          {{- if .Values.metering.ingress.extraPaths }}
+          {{- toYaml .Values.metering.ingress.extraPaths | nindent 10 }}
+          {{- end }}
+          - path: {{ .Values.metering.ingress.path }}
+            pathType: {{ .Values.metering.ingress.pathType }}
+            backend: {{- include "common.ingress.backend" (dict "serviceName" (include "metering.names.service" .) "servicePort" "http" "context" $)  | nindent 14 }}
+    {{- end }}
+    {{- range .Values.metering.ingress.extraHosts }}
+    - host: {{ .name | quote }}
+      http:
+        paths:
+          - path: {{ default "/" .path }}
+            pathType: {{ default "ImplementationSpecific" .pathType }}
+            backend: {{- include "common.ingress.backend" (dict "serviceName" (include "metering.names.service" $) "servicePort" "http" "context" $) | nindent 14 }}
+    {{- end }}
+    {{- if .Values.metering.ingress.extraRules }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.metering.ingress.extraRules "context" $) | nindent 4 }}
+    {{- end }}
+  {{- if or (and .Values.metering.ingress.tls (or (include "common.ingress.certManagerRequest" ( dict "annotations" .Values.metering.ingress.annotations )) .Values.metering.ingress.selfSigned)) .Values.metering.ingress.extraTls }}
+  tls:
+    {{- if and .Values.metering.ingress.tls (or (include "common.ingress.certManagerRequest" ( dict "annotations" .Values.metering.ingress.annotations )) .Values.metering.ingress.selfSigned) }}
+    - hosts:
+        - {{ .Values.metering.ingress.hostname | quote }}
+      secretName: {{ printf "%s-tls" .Values.metering.ingress.hostname }}
+    {{- end }}
+    {{- if .Values.metering.ingress.extraTls }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.metering.ingress.extraTls "context" $) | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+{{- end }}

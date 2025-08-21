@@ -2610,6 +2610,518 @@ runner:
     ##
     rules: []
 
+## @section Metering Parameters
+##
+
+metering:
+  ## @param metering.enabled Enable/disable metering
+  enabled: false
+  ## @param metering.name metering name
+  ##
+  name: metering
+  ## metering image
+  ## @param metering.image.registry [default: nangohq] metering image registry
+  ## @param metering.image.repository [default: nango] metering image repository
+  ## @skip metering.image.tag metering image tag (immutable tags are recommended)
+  ## @param metering.image.digest metering image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended)
+  ## @param metering.image.pullPolicy metering image pull policy
+  ## @param metering.image.pullSecrets metering image pull secrets
+  ##
+  image:
+    registry: ""
+    repository: ""
+    tag: ""
+    digest: ""
+    pullPolicy: ""
+    pullSecrets: []
+  ## @param metering.replicaCount Number of metering replicas to deploy
+  ##
+  replicaCount: 1
+  ## @param metering.command Override default metering container command (useful when using custom images)
+  ##
+  command: []
+  ## @param metering.args Override default metering container args (useful when using custom images)
+  ##
+  args:
+    - "node"
+    - "packages/metering/dist/app.js"
+  ## ServiceAccount configuration
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+  ##
+  serviceAccount:
+    ## @param metering.serviceAccount.create Specifies whether a ServiceAccount should be created
+    ##
+    create: true
+    ## @param metering.serviceAccount.name The name of the ServiceAccount to use.
+    ## If not set and create is true, a name is generated using the metering.names.fullname template
+    ##
+    name: ""
+    ## @param metering.serviceAccount.annotations Additional Service Account annotations (evaluated as a template)
+    ##
+    annotations: {}
+    ## @param metering.serviceAccount.automountServiceAccountToken Automount service account token for the metering service account
+    ##
+    automountServiceAccountToken: true
+  ## Network Policies
+  ## Ref: https://kubernetes.io/docs/concepts/services-networking/network-policies/
+  ##
+  networkPolicy:
+    ## @param metering.networkPolicy.enabled Specifies whether a NetworkPolicy should be created
+    ##
+    enabled: true
+    ## @param metering.networkPolicy.allowExternal Don't require metering label for connections
+    ## The Policy model to apply. When set to false, only pods with the correct
+    ## metering label will have network access to the ports metering is listening
+    ## on. When true, metering will accept connections from any source
+    ## (with the correct destination port).
+    ##
+    allowExternal: true
+    ## @param metering.networkPolicy.allowExternalEgress Allow the pod to access any range of port and all destinations.
+    ##
+    allowExternalEgress: true
+    ## @param metering.networkPolicy.addExternalClientAccess Allow access from pods with client label set to "true". Ignored if `metering.networkPolicy.allowExternal` is true.
+    ##
+    addExternalClientAccess: true
+    ## @param metering.networkPolicy.extraIngress [array] Add extra ingress rules to the NetworkPolicy
+    ## e.g:
+    ## extraIngress:
+    ##   - ports:
+    ##       - port: 1234
+    ##     from:
+    ##       - podSelector:
+    ##           - matchLabels:
+    ##               - role: frontend
+    ##       - podSelector:
+    ##           - matchExpressions:
+    ##               - key: role
+    ##                 operator: In
+    ##                 values:
+    ##                   - frontend
+    extraIngress: []
+    ## @param metering.networkPolicy.extraEgress [array] Add extra ingress rules to the NetworkPolicy (ignored if allowExternalEgress=true)
+    ## e.g:
+    ## extraEgress:
+    ##   - ports:
+    ##       - port: 1234
+    ##     to:
+    ##       - podSelector:
+    ##           - matchLabels:
+    ##               - role: frontend
+    ##       - podSelector:
+    ##           - matchExpressions:
+    ##               - key: role
+    ##                 operator: In
+    ##                 values:
+    ##                   - frontend
+    ##
+    extraEgress: []
+    ## @param metering.networkPolicy.ingressPodMatchLabels [object] Labels to match to allow traffic from other pods. Ignored if `metering.networkPolicy.allowExternal` is true.
+    ## e.g:
+    ## ingressPodMatchLabels:
+    ##   my-client: "true"
+    #
+    ingressPodMatchLabels: {}
+    ## @param metering.networkPolicy.ingressNSMatchLabels [object] Labels to match to allow traffic from other namespaces. Ignored if `metering.networkPolicy.allowExternal` is true.
+    ##
+    ingressNSMatchLabels: {}
+    ## @param metering.networkPolicy.ingressNSPodMatchLabels [object] Pod labels to match to allow traffic from other namespaces. Ignored if `metering.networkPolicy.allowExternal` is true.
+    ##
+    ingressNSPodMatchLabels: {}
+  ## metering ingress parameters
+  ## ref: http://kubernetes.io/docs/concepts/services-networking/ingress/
+  ##
+  ingress:
+    ## @param metering.ingress.enabled Enable ingress record generation for metering
+    ##
+    enabled: false
+    ## @param metering.ingress.pathType Ingress path type
+    ##
+    pathType: Prefix
+    ## @param metering.ingress.apiVersion Force Ingress API version (automatically detected if not set)
+    ##
+    apiVersion: ""
+    ## @param metering.ingress.hostname Default host for the ingress record
+    ##
+    hostname: example-app.nango.dev
+    ## @param metering.ingress.ingressClassName IngressClass that will be be used to implement the Ingress (Kubernetes 1.18+)
+    ## This is supported in Kubernetes 1.18+ and required if you have more than one IngressClass marked as the default for your cluster .
+    ## ref: https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/
+    ##
+    ingressClassName: ""
+    ## @param metering.ingress.path Default path for the ingress record
+    ## NOTE: You may need to set this to '/*' in order to use this with ALB ingress controllers
+    ##
+    path: /
+    ## @param metering.ingress.annotations Additional annotations for the Ingress resource. To enable certificate autogeneration, place here your cert-manager annotations.
+    ## Use this parameter to set the required annotations for cert-manager, see
+    ## ref: https://cert-manager.io/docs/usage/ingress/#supported-annotations
+    ## e.g:
+    ## annotations:
+    ##   kubernetes.io/ingress.class: nginx
+    ##   cert-manager.io/cluster-issuer: cluster-issuer-name
+    ##
+    annotations: {}
+    ## @param metering.ingress.tls Enable TLS configuration for the host defined at `metering.ingress.hostname` parameter
+    ## TLS certificates will be retrieved from a TLS secret with name: `{{- printf "%s-tls" .Values.metering.ingress.hostname }}`
+    ## You can:
+    ##   - Use the `metering.ingress.secrets` parameter to create this TLS secret
+    ##   - Rely on cert-manager to create it by setting the corresponding annotations
+    ##   - Rely on Helm to create self-signed certificates by setting `metering.ingress.selfSigned=true`
+    ##
+    tls: false
+    ## @param metering.ingress.selfSigned Create a TLS secret for this ingress record using self-signed certificates generated by Helm
+    ##
+    selfSigned: false
+    ## @param metering.ingress.extraHosts An array with additional hostname(s) to be covered with the ingress record
+    ## e.g:
+    ## extraHosts:
+    ##   - name: metering.local
+    ##     path: /
+    ##
+    extraHosts: []
+    ## @param metering.ingress.extraPaths An array with additional arbitrary paths that may need to be added to the ingress under the main host
+    ## e.g:
+    ## extraPaths:
+    ## - path: /*
+    ##   backend:
+    ##     serviceName: ssl-redirect
+    ##     servicePort: use-annotation
+    ##
+    extraPaths: []
+    ## @param metering.ingress.extraTls TLS configuration for additional hostname(s) to be covered with this ingress record
+    ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/#tls
+    ## e.g:
+    ## extraTls:
+    ## - hosts:
+    ##     - metering.local
+    ##   secretName: metering.local-tls
+    ##
+    extraTls: []
+    ## @param metering.ingress.secrets Custom TLS certificates as secrets
+    ## NOTE: 'key' and 'certificate' are expected in PEM format
+    ## NOTE: 'name' should line up with a 'secretName' set further up
+    ## If it is not set and you're using cert-manager, this is unneeded, as it will create a secret for you with valid certificates
+    ## If it is not set and you're NOT using cert-manager either, self-signed certificates will be created valid for 365 days
+    ## It is also possible to create and manage the certificates outside of this helm chart
+    ## Please see README.md for more information
+    ## e.g:
+    ## secrets:
+    ##   - name: metering.local-tls
+    ##     key: |-
+    ##       -----BEGIN RSA PRIVATE KEY-----
+    ##       ...
+    ##       -----END RSA PRIVATE KEY-----
+    ##     certificate: |-
+    ##       -----BEGIN CERTIFICATE-----
+    ##       ...
+    ##       -----END CERTIFICATE-----
+    ##
+    secrets: []
+    ## @param metering.ingress.extraRules Additional rules to be covered with this ingress record
+    ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-rules
+    ## e.g:
+    ## extraRules:
+    ## - host: example.local
+    ##     http:
+    ##       path: /
+    ##       backend:
+    ##         service:
+    ##           name: example-svc
+    ##           port:
+    ##             name: http
+    ##
+    extraRules: []
+  service:
+    ## @param metering.service.create Create metering service
+    ##
+    create: false
+    ## @param metering.service.type metering service type
+    ##
+    type: LoadBalancer
+    ## @param metering.service.ports.http metering service HTTP port
+    ## @param metering.service.ports.https metering service HTTPS port
+    ##
+    ports:
+      http: 80
+      https: 443
+    ## Node ports to expose
+    ## @param metering.service.nodePorts.http Node port for HTTP
+    ## @param metering.service.nodePorts.https Node port for HTTPS
+    ## NOTE: choose port between <30000-32767>
+    ##
+    nodePorts:
+      http: ""
+      https: ""
+    ## @param metering.service.clusterIP metering service Cluster IP
+    ## e.g.:
+    ## clusterIP: None
+    ##
+    clusterIP: ""
+    ## @param metering.service.loadBalancerIP metering service Load Balancer IP
+    ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-loadbalancer
+    ##
+    loadBalancerIP: ""
+    ## @param metering.service.loadBalancerSourceRanges metering service Load Balancer sources
+    ## ref: https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service
+    ## e.g:
+    ## loadBalancerSourceRanges:
+    ##   - 10.10.10.0/24
+    ##
+    loadBalancerSourceRanges: []
+    ## @param metering.service.externalTrafficPolicy metering service external traffic policy
+    ## ref http://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
+    ##
+    externalTrafficPolicy: Cluster
+    ## @param metering.service.annotations Additional custom annotations for metering service
+    ##
+    annotations: {}
+    ## @param metering.service.extraPorts Extra ports to expose in metering service (normally used with the `sidecars` value)
+    ##
+    extraPorts: []
+    ## @param metering.service.sessionAffinity Control where client requests go, to the same pod or round-robin
+    ## Values: ClientIP or None
+    ## ref: https://kubernetes.io/docs/concepts/services-networking/service/
+    ##
+    sessionAffinity: None
+    ## @param metering.service.sessionAffinityConfig Additional settings for the sessionAffinity
+    ## sessionAffinityConfig:
+    ##   clientIP:
+    ##     timeoutSeconds: 300
+    ##
+    sessionAffinityConfig: {}
+  ## @param metering.containerPorts.enabled Enable/disable metering container ports
+  ## @param metering.containerPorts.http metering HTTP container port
+  ## @param metering.containerPorts.https metering HTTPS container port
+  ##
+  containerPorts:
+    enabled: false
+    http: ""
+    https: ""
+  ## @param metering.extraContainerPorts Optionally specify extra list of additional ports for metering containers
+  ## e.g:
+  ## extraContainerPorts:
+  ##   - name: myservice
+  ##     containerPort: 9090
+  ##
+  extraContainerPorts: []
+  ## @param metering.updateStrategy.type metering deployment strategy type
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
+  ## @param metering.updateStrategy.type metering statefulset strategy type
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
+  ##
+  updateStrategy:
+    type: "RollingUpdate"
+  ## Pod Disruption Budget configuration
+  ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb
+  ## @param metering.pdb.create Enable/disable a Pod Disruption Budget creation
+  ## @param metering.pdb.minAvailable Minimum number/percentage of pods that should remain scheduled
+  ## @param metering.pdb.maxUnavailable Maximum number/percentage of pods that may be made unavailable. Defaults to `1` if both `metering.pdb.minAvailable` and `metering.pdb.maxUnavailable` are empty.
+  ##
+  pdb:
+    create: true
+    minAvailable: 1
+    maxUnavailable: ""
+  ## Autoscaling configuration
+  ## ref: https://kubernetes.io/docs/concepts/workloads/autoscaling/
+  ##
+  autoscaling:
+    ## @param metering.autoscaling.hpa.enabled Enable HPA for metering pods
+    ## @param metering.autoscaling.hpa.minReplicas Minimum number of replicas
+    ## @param metering.autoscaling.hpa.maxReplicas Maximum number of replicas
+    ## @param metering.autoscaling.hpa.targetCPU Target CPU utilization percentage
+    ## @param metering.autoscaling.hpa.targetMemory Target Memory utilization percentage
+    ##
+    hpa:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 1
+      targetCPU: ""
+      targetMemory: ""
+    ## @param metering.autoscaling.vpa.enabled Enable VPA for metering pods
+    ## @param metering.autoscaling.vpa.annotations Annotations for VPA resource
+    ## @param metering.autoscaling.vpa.controlledResources VPA List of resources that the vertical pod autoscaler can control. Defaults to cpu and memory
+    ## @param metering.autoscaling.vpa.maxAllowed VPA Max allowed resources for the pod
+    ## @param metering.autoscaling.vpa.minAllowed VPA Min allowed resources for the pod
+    ##
+    vpa:
+      enabled: false
+      annotations: {}
+      controlledResources: []
+      maxAllowed: {}
+      minAllowed: {}
+      ## @param metering.autoscaling.vpa.updatePolicy.updateMode Autoscaling update policy
+      ## Specifies whether recommended updates are applied when a Pod is started and whether recommended updates are applied during the life of a Pod
+      ## Possible values are "Off", "Initial", "Recreate", and "Auto".
+      ##
+      updatePolicy:
+        updateMode: Auto
+  ## @param metering.sidecars Add additional sidecar containers to the metering pods
+  ## e.g:
+  ## sidecars:
+  ##   - name: your-image-name
+  ##     image: your-image
+  ##     imagePullPolicy: Always
+  ##     ports:
+  ##       - name: portname
+  ##         containerPort: 1234
+  ##
+  sidecars: []
+  ## metering resource requests and limits
+  ## ref: http://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/
+  ## @param metering.resourcesPreset Set metering container resources according to one common preset (allowed values: none, nano, micro, small, medium, large, xlarge, 2xlarge). This is ignored if metering.resources is set (metering.resources is recommended for production).
+  ##
+  resourcesPreset: "small"
+  ## @param metering.resources Set metering container requests and limits for different resources like CPU or memory (essential for production workloads)
+  ## Example:
+  ## resources:
+  ##   requests:
+  ##     cpu: 2
+  ##     memory: 512Mi
+  ##   limits:
+  ##     cpu: 3
+  ##     memory: 1024Mi
+  ##
+  resources: {}
+  ## @param metering.extraEnvVars Array with extra environment variables to add to metering containers
+  ## e.g:
+  ## extraEnvVars:
+  ##   - name: FOO
+  ##     value: "bar"
+  ##
+  extraEnvVars: []
+  ## @param metering.extraEnvVarsCM Name of existing ConfigMap containing extra env vars for metering containers
+  ##
+  extraEnvVarsCM: ""
+  ## @param metering.extraEnvVarsSecret Name of existing Secret containing extra env vars for metering containers
+  ##
+  extraEnvVarsSecret: ""
+  ## Configure extra options for metering containers' liveness and readiness probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
+  ## @param metering.livenessProbe.enabled Enable livenessProbe on metering containers
+  ## @param metering.livenessProbe.initialDelaySeconds Initial delay seconds for livenessProbe
+  ## @param metering.livenessProbe.periodSeconds Period seconds for livenessProbe
+  ## @param metering.livenessProbe.timeoutSeconds Timeout seconds for livenessProbe
+  ## @param metering.livenessProbe.failureThreshold Failure threshold for livenessProbe
+  ## @param metering.livenessProbe.successThreshold Success threshold for livenessProbe
+  ##
+  livenessProbe:
+    enabled: false
+    initialDelaySeconds: 20
+    periodSeconds: 10
+    timeoutSeconds: 3
+    failureThreshold: 6
+    successThreshold: 1
+  ## @param metering.readinessProbe.enabled Enable readinessProbe on metering containers
+  ## @param metering.readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
+  ## @param metering.readinessProbe.periodSeconds Period seconds for readinessProbe
+  ## @param metering.readinessProbe.timeoutSeconds Timeout seconds for readinessProbe
+  ## @param metering.readinessProbe.failureThreshold Failure threshold for readinessProbe
+  ## @param metering.readinessProbe.successThreshold Success threshold for readinessProbe
+  ##
+  readinessProbe:
+    enabled: false
+    initialDelaySeconds: 2
+    periodSeconds: 5
+    timeoutSeconds: 2
+    failureThreshold: 3
+    successThreshold: 1
+  ## @param metering.startupProbe.enabled Enable startupProbe on metering containers
+  ## @param metering.startupProbe.initialDelaySeconds Initial delay seconds for startupProbe
+  ## @param metering.startupProbe.periodSeconds Period seconds for startupProbe
+  ## @param metering.startupProbe.timeoutSeconds Timeout seconds for startupProbe
+  ## @param metering.startupProbe.failureThreshold Failure threshold for startupProbe
+  ## @param metering.startupProbe.successThreshold Success threshold for startupProbe
+  ##
+  startupProbe:
+    enabled: false
+    initialDelaySeconds: 0
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 24
+    successThreshold: 1
+  ## Configure Pods Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
+  ## @param metering.podSecurityContext.enabled Enable metering pods' Security Context
+  ## @param metering.podSecurityContext.fsGroupChangePolicy Set filesystem group change policy for metering pods
+  ## @param metering.podSecurityContext.sysctls Set kernel settings using the sysctl interface for metering pods
+  ## @param metering.podSecurityContext.supplementalGroups Set filesystem extra groups for metering pods
+  ## @param metering.podSecurityContext.fsGroup Set fsGroup in metering pods' Security Context
+  ##
+  podSecurityContext:
+    enabled: false
+    fsGroupChangePolicy: Always
+    sysctls: []
+    supplementalGroups: []
+    fsGroup: 1001
+  ## @param metering.deploymentAnnotations Annotations for metering deployment
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  ##
+  deploymentAnnotations: {}
+  ## Enable persistence using Persistent Volume Claims
+  ## ref: https://kubernetes.io/docs/concepts/storage/persistent-volumes/
+  ##
+  persistence:
+    ## @param metering.persistence.enabled Enable persistence using Persistent Volume Claims
+    ##
+    enabled: false
+    ## @param metering.persistence.mountPath Path to mount the volume at.
+    ##
+    mountPath: /nango/metering/data
+    ## @param metering.persistence.subPath The subdirectory of the volume to mount to, useful in dev environments and one PV for multiple services
+    ##
+    subPath: ""
+    ## @param metering.persistence.storageClass Storage class of backing PVC
+    ## If defined, storageClassName: <storageClass>
+    ## If set to "-", storageClassName: "", which disables dynamic provisioning
+    ## If undefined (the default) or set to null, no storageClassName spec is
+    ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+    ##   GKE, AWS & OpenStack)
+    ##
+    storageClass: ""
+    ## @param metering.persistence.annotations Persistent Volume Claim annotations
+    ##
+    annotations: {}
+    ## @param metering.persistence.accessModes Persistent Volume Access Modes
+    ##
+    accessModes:
+      - ReadWriteOnce
+    ## @param metering.persistence.size Size of data volume
+    ##
+    size: 8Gi
+    ## @param metering.persistence.dataSource Custom PVC data source
+    ##
+    dataSource: {}
+    ## @param metering.persistence.existingClaim The name of an existing PVC to use for persistence
+    ##
+    existingClaim: "nango-jobs"
+    ## @param metering.persistence.selector Selector to match an existing Persistent Volume 
+    ## If set, the PVC can't have a PV dynamically provisioned for it
+    ## E.g.
+    ## selector:
+    ##   matchLabels:
+    ##     app: my-app
+    ##
+    selector: {}
+  ## RBAC configuration
+  ##
+  rbac:
+    ## @param metering.rbac.create Specifies whether RBAC resources should be created
+    ##
+    create: false
+    ## @param metering.rbac.rules Custom RBAC rules to set
+    ## e.g:
+    ## rules:
+    ##   - apiGroups:
+    ##       - ""
+    ##     resources:
+    ##       - pods
+    ##     verbs:
+    ##       - get
+    ##       - list
+    ##
+    rules: []
+
+
 ## @skip redis
 redis:  
   enabled: false

@@ -1,0 +1,30 @@
+{{- if .Values.metering.enabled }}
+{{- if and .Values.metering.persistence.enabled (not .Values.metering.persistence.existingClaim) -}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "metering.names.fullname" . }}
+  namespace: {{ include "metering.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: {{ include "metering.names.component" . }}
+  {{- if or .Values.metering.persistence.annotations .Values.commonAnnotations }}
+  {{- $annotations := include "common.tplvalues.merge" (dict "values" (list .Values.metering.persistence.annotations .Values.commonAnnotations) "context" .) }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" $annotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  accessModes:
+  {{- range .Values.metering.persistence.accessModes }}
+    - {{ . | quote }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.metering.persistence.size | quote }}
+  {{- if .Values.metering.persistence.selector }}
+  selector: {{- include "common.tplvalues.render" (dict "value" .Values.metering.persistence.selector "context" $) | nindent 4 }}
+  {{- end }}
+  {{- if .Values.metering.persistence.dataSource }}
+  dataSource: {{- include "common.tplvalues.render" (dict "value" .Values.metering.persistence.dataSource "context" $) | nindent 4 }}
+  {{- end }}
+  {{- include "common.storage.class" (dict "persistence" .Values.metering.persistence "global" .Values.global) | nindent 2 }}
+{{- end -}}
+{{- end }}

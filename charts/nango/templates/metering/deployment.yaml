@@ -1,0 +1,153 @@
+{{- if .Values.metering.enabled }}
+apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
+kind: Deployment
+metadata:
+  name: {{ include "metering.names.fullname" . }}
+  namespace: {{ include "metering.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: {{ include "metering.names.component" . }}
+  {{- if or .Values.metering.deploymentAnnotations .Values.commonAnnotations }}
+  {{- $annotations := include "common.tplvalues.merge" (dict "values" (list .Values.metering.deploymentAnnotations .Values.commonAnnotations) "context" .) }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" $annotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if not .Values.metering.autoscaling.hpa.enabled }}
+  replicas: {{ .Values.metering.replicaCount }}
+  {{- end -}}
+  {{- if .Values.metering.updateStrategy }}
+  strategy: {{- toYaml .Values.metering.updateStrategy | nindent 4 }}
+  {{- end }}
+  {{- $podLabels := include "common.tplvalues.merge" (dict "values" (list .Values.metering.podLabels .Values.commonLabels) "context" .) }}
+  selector: 
+    matchLabels: {{- include "common.labels.matchLabels" ( dict "customLabels" $podLabels "context" $ ) | nindent 6 }}
+      app.kubernetes.io/component: {{ include "metering.names.component" . }}
+  template:
+    metadata:
+      {{- if .Values.metering.podAnnotations }}
+      annotations: {{- include "common.tplvalues.render" (dict "value" .Values.metering.podAnnotations "context" $) | nindent 8 }}
+      {{- end }}
+      labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 8 }}
+        app.kubernetes.io/component: {{ include "metering.names.component" . }}
+    spec:
+      {{- if .Values.metering.imagePullSecrets }}
+      imagePullSecrets: {{- include "common.tplvalues.render" ( dict "value" .Values.metering.imagePullSecrets "context" $) | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ template "metering.names.serviceAccountName" . }}
+      {{- if .Values.metering.hostAliases }}
+      hostAliases: {{- include "common.tplvalues.render" (dict "value" .Values.metering.hostAliases "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.metering.nodeSelector }}
+      nodeSelector: {{- include "common.tplvalues.render" ( dict "value" .Values.metering.nodeSelector "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.metering.tolerations }}
+      tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.metering.tolerations "context" .) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.metering.priorityClassName }}
+      priorityClassName: {{ .Values.metering.priorityClassName | quote }}
+      {{- end }}
+      {{- if .Values.metering.schedulerName }}
+      schedulerName: {{ .Values.metering.schedulerName | quote }}
+      {{- end }}
+      {{- if .Values.metering.topologySpreadConstraints }}
+      topologySpreadConstraints: {{- include "common.tplvalues.render" (dict "value" .Values.metering.topologySpreadConstraints "context" .) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.metering.podSecurityContext.enabled }}
+      securityContext: {{- omit .Values.metering.podSecurityContext "enabled" | toYaml | nindent 8 }}
+      {{- end }}
+      {{- if .Values.metering.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ .Values.metering.terminationGracePeriodSeconds }}
+      {{- end }}
+      containers:
+        - name: {{ include "metering.names.component" . }}
+          image: {{ template "metering.image" . }}
+          imagePullPolicy: {{ include "metering.images.pullPolicy" . }}
+          {{- if .Values.metering.command }}
+          command: {{- include "common.tplvalues.render" (dict "value" .Values.metering.command "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.metering.args }}
+          args: {{- include "common.tplvalues.render" (dict "value" .Values.metering.args "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.metering.resources }}
+          resources: {{- toYaml .Values.metering.resources | nindent 12 }}
+          {{- else if ne .Values.metering.resourcesPreset "none" }}
+          resources: {{- include "common.resources.preset" (dict "type" .Values.metering.resourcesPreset) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.metering.containerPorts.enabled }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.metering.containerPorts.http }}
+            - name: https
+              containerPort: {{ .Values.metering.containerPorts.https }}
+            {{- if .Values.metering.extraContainerPorts }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.metering.extraContainerPorts "context" $) | nindent 12 }}
+            {{- end }}
+          {{- end }}
+          {{- if .Values.metering.customLivenessProbe }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.metering.customLivenessProbe "context" $) | nindent 12 }}
+          {{- else if .Values.metering.livenessProbe.enabled }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.metering.livenessProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+          {{- end }}
+          {{- if .Values.metering.customReadinessProbe }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.metering.customReadinessProbe "context" $) | nindent 12 }}
+          {{- else if .Values.metering.readinessProbe.enabled }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.metering.readinessProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+          {{- end }}
+          {{- if .Values.metering.customStartupProbe }}
+          startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.metering.customStartupProbe "context" $) | nindent 12 }}
+          {{- else if .Values.metering.startupProbe.enabled }}
+          startupProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.metering.startupProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+          {{- end }}
+          {{- if .Values.metering.sidecars }}
+          sidecars: {{- include "common.tplvalues.render" ( dict "value" .Values.metering.sidecars "context" $) | nindent 12 }}
+          {{- end }}
+          env:
+            {{- if .Values.metering.extraEnvVars }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.metering.extraEnvVars "context" $) | nindent 12 }}
+            {{- end }}
+          envFrom:
+            {{- if .Values.metering.extraEnvVarsCM }}
+            - configMapRef:
+                name: {{ include "common.tplvalues.render" (dict "value" .Values.metering.extraEnvVarsCM "context" $) }}
+            {{- end }}
+            {{- if .Values.metering.extraEnvVarsSecret }}
+            - secretRef:
+                name: {{ include "common.tplvalues.render" (dict "value" .Values.metering.extraEnvVarsSecret "context" $) }}
+            {{- end }}
+          volumeMounts:
+            - name: data
+              mountPath: {{ .Values.metering.persistence.mountPath }}
+              {{- if .Values.metering.persistence.subPath }}
+              subPath: {{ .Values.metering.persistence.subPath }}
+              {{- end }}
+            - name: empty-dir
+              mountPath: /tmp
+              subPath: tmp-dir
+          {{- if .Values.metering.extraVolumeMounts }}
+          {{- include "common.tplvalues.render" (dict "value" .Values.metering.extraVolumeMounts "context" $) | nindent 12 }}
+          {{- end }}
+      volumes:
+        - name: empty-dir
+          emptyDir: {}
+        - name: data
+        {{- if .Values.metering.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ default (include "metering.names.fullname" .) .Values.metering.persistence.existingClaim }}
+        {{- else }}
+          emptyDir: {}
+        {{- end }}
+        {{- if .Values.metering.extraVolumes }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.metering.extraVolumes "context" $) | nindent 8 }}
+        {{- end }}
+{{- end }}
