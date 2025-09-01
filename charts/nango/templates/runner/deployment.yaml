@@ -115,14 +115,22 @@ spec:
             {{- include "common.tplvalues.render" (dict "value" .Values.runner.extraEnvVars "context" $) | nindent 12 }}
             {{- end }}
           envFrom:
-            {{- if .Values.runner.extraEnvVarsCM }}
+          {{- if .Values.runner.extraEnvVarsCM }}
             - configMapRef:
                 name: {{ include "common.tplvalues.render" (dict "value" .Values.runner.extraEnvVarsCM "context" $) }}
-            {{- end }}
-            {{- if .Values.runner.extraEnvVarsSecret }}
+          {{- end }}
+          {{- range .Values.runner.extraEnvVarsCMs }}
+            - configMapRef:
+                name: {{ include "common.tplvalues.render" (dict "value" . "context" $) }}
+          {{- end }}
+          {{- if .Values.runner.extraEnvVarsSecret }}
             - secretRef:
                 name: {{ include "common.tplvalues.render" (dict "value" .Values.runner.extraEnvVarsSecret "context" $) }}
-            {{- end }}
+          {{- end }}
+          {{- range .Values.runner.extraEnvVarsSecrets }}
+            - secretRef:
+                name: {{ include "common.tplvalues.render" (dict "value" . "context" $) }}
+          {{- end }}
           volumeMounts:
             - name: data
               mountPath: {{ .Values.runner.persistence.mountPath }}

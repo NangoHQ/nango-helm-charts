@@ -7,3 +7,4 @@ nango-data/*
 nango-integrations/*
 charts/nango/charts
 template.generated.yaml
+temp-values.yaml
