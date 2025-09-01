@@ -414,9 +414,15 @@ server:
   ## @param server.extraEnvVarsCM Name of existing ConfigMap containing extra env vars for server containers
   ##
   extraEnvVarsCM: ""
+  ## @param server.extraEnvVarsCMs Name of existing ConfigMaps containing extra env vars for server containers
+  ##
+  extraEnvVarsCMs: []
   ## @param server.extraEnvVarsSecret Name of existing Secret containing extra env vars for server containers
   ##
   extraEnvVarsSecret: ""
+  ## @param server.extraEnvVarsSecrets Name of existing Secrets containing extra env vars for server containers
+  ##
+  extraEnvVarsSecrets: []
   ## Configure extra options for server containers' liveness and readiness probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
   ## @param server.livenessProbe.enabled Enable livenessProbe on server containers
@@ -920,9 +926,15 @@ persist:
   ## @param persist.extraEnvVarsCM Name of existing ConfigMap containing extra env vars for persist containers
   ##
   extraEnvVarsCM: ""
+  ## @param persist.extraEnvVarsCMs Name of existing ConfigMaps containing extra env vars for persist containers
+  ##
+  extraEnvVarsCMs: []
   ## @param persist.extraEnvVarsSecret Name of existing Secret containing extra env vars for persist containers
   ##
   extraEnvVarsSecret: ""
+  ## @param persist.extraEnvVarsSecrets Name of existing Secrets containing extra env vars for persist containers
+  ##
+  extraEnvVarsSecrets: []
   ## Configure extra options for persist containers' liveness and readiness probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
 
@@ -1426,9 +1438,15 @@ orchestrator:
   ## @param orchestrator.extraEnvVarsCM Name of existing ConfigMap containing extra env vars for orchestrator containers
   ##
   extraEnvVarsCM: ""
+  ## @param orchestrator.extraEnvVarsCMs Name of existing ConfigMaps containing extra env vars for orchestrator containers
+  ##
+  extraEnvVarsCMs: []
   ## @param orchestrator.extraEnvVarsSecret Name of existing Secret containing extra env vars for orchestrator containers
   ##
   extraEnvVarsSecret: ""
+  ## @param orchestrator.extraEnvVarsSecrets Name of existing Secrets containing extra env vars for orchestrator containers
+  ##
+  extraEnvVarsSecrets: []
   ## Configure extra options for orchestrator containers' liveness and readiness probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
   ## @param orchestrator.livenessProbe.enabled Enable livenessProbe on orchestrator containers
@@ -1932,9 +1950,15 @@ jobs:
   ## @param jobs.extraEnvVarsCM Name of existing ConfigMap containing extra env vars for jobs containers
   ##
   extraEnvVarsCM: ""
+  ## @param jobs.extraEnvVarsCMs Name of existing ConfigMaps containing extra env vars for jobs containers
+  ##
+  extraEnvVarsCMs: []
   ## @param jobs.extraEnvVarsSecret Name of existing Secret containing extra env vars for jobs containers
   ##
   extraEnvVarsSecret: ""
+  ## @param jobs.extraEnvVarsSecrets Name of existing Secrets containing extra env vars for jobs containers
+  ##
+  extraEnvVarsSecrets: []
   ## Configure extra options for jobs containers' liveness and readiness probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
   ## @param jobs.livenessProbe.enabled Enable livenessProbe on jobs containers
@@ -2481,9 +2505,15 @@ runner:
   ## @param runner.extraEnvVarsCM Name of existing ConfigMap containing extra env vars for runner containers
   ##
   extraEnvVarsCM: ""
+  ## @param runner.extraEnvVarsCMs Name of existing ConfigMaps containing extra env vars for runner containers
+  ##
+  extraEnvVarsCMs: []
   ## @param runner.extraEnvVarsSecret Name of existing Secret containing extra env vars for runner containers
   ##
   extraEnvVarsSecret: ""
+  ## @param runner.extraEnvVarsSecrets Name of existing Secrets containing extra env vars for runner containers
+  ##
+  extraEnvVarsSecrets: []
   ## Configure extra options for runner containers' liveness and readiness probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
   ## @param runner.livenessProbe.enabled Enable livenessProbe on runner containers
@@ -2992,9 +3022,15 @@ metering:
   ## @param metering.extraEnvVarsCM Name of existing ConfigMap containing extra env vars for metering containers
   ##
   extraEnvVarsCM: ""
+  ## @param metering.extraEnvVarsCMs Name of existing ConfigMaps containing extra env vars for metering containers
+  ##
+  extraEnvVarsCMs: []
   ## @param metering.extraEnvVarsSecret Name of existing Secret containing extra env vars for metering containers
   ##
   extraEnvVarsSecret: ""
+  ## @param metering.extraEnvVarsSecrets Name of existing Secrets containing extra env vars for metering containers
+  ##
+  extraEnvVarsSecrets: []
   ## Configure extra options for metering containers' liveness and readiness probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
   ## @param metering.livenessProbe.enabled Enable livenessProbe on metering containers
