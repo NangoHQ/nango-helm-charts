@@ -1,6 +1,6 @@
 {{ if .Values.jobs.rbac.create }}
 apiVersion: {{ include "common.capabilities.rbac.apiVersion" . }}
-kind: Role
+kind: ClusterRole
 metadata:
   name: {{ include "jobs.names.fullname" . }}
   namespace: {{ include "jobs.names.namespace" . | quote }}
@@ -10,13 +10,6 @@ metadata:
   annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
   {{- end }}
 rules:
-  # TODO: Update resources and verbs to the proper values for the application cases
-  - apiGroups: [""]
-    resources: ["*"]
-    verbs: ["*"]
-  - apiGroups: [""]
-    resources: ["*"]
-    verbs: ["*"]
   {{- if .Values.jobs.rbac.rules }}
   {{- include "common.tplvalues.render" ( dict "value" .Values.jobs.rbac.rules "context" $ ) | nindent 2 }}
   {{- end }}

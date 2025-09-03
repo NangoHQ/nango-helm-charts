@@ -530,24 +530,6 @@ server:
     ##     app: my-app
     ##
     selector: {}
-  ## RBAC configuration
-  ##
-  rbac:
-    ## @param server.rbac.create Specifies whether RBAC resources should be created
-    ##
-    create: false
-    ## @param server.rbac.rules Custom RBAC rules to set
-    ## e.g:
-    ## rules:
-    ##   - apiGroups:
-    ##       - ""
-    ##     resources:
-    ##       - pods
-    ##     verbs:
-    ##       - get
-    ##       - list
-    ##
-    rules: []
 
 ## @section Persist Parameters
 ##
@@ -1043,24 +1025,6 @@ persist:
     ##     app: my-app
     ##
     selector: {}
-  ## RBAC configuration
-  ##
-  rbac:
-    ## @param persist.rbac.create Specifies whether RBAC resources should be created
-    ##
-    create: false
-    ## @param persist.rbac.rules Custom RBAC rules to set
-    ## e.g:
-    ## rules:
-    ##   - apiGroups:
-    ##       - ""
-    ##     resources:
-    ##       - pods
-    ##     verbs:
-    ##       - get
-    ##       - list
-    ##
-    rules: []
 
 ## @section Orchestrator Parameters
 ##
@@ -1554,24 +1518,6 @@ orchestrator:
     ##     app: my-app
     ##
     selector: {}
-  ## RBAC configuration
-  ##
-  rbac:
-    ## @param orchestrator.rbac.create Specifies whether RBAC resources should be created
-    ##
-    create: false
-    ## @param orchestrator.rbac.rules Custom RBAC rules to set
-    ## e.g:
-    ## rules:
-    ##   - apiGroups:
-    ##       - ""
-    ##     resources:
-    ##       - pods
-    ##     verbs:
-    ##       - get
-    ##       - list
-    ##
-    rules: []
 
 ## @section Jobs Parameters
 ##
@@ -2621,24 +2567,6 @@ runner:
     ##     app: my-app
     ##
     selector: {}
-  ## RBAC configuration
-  ##
-  rbac:
-    ## @param runner.rbac.create Specifies whether RBAC resources should be created
-    ##
-    create: false
-    ## @param runner.rbac.rules Custom RBAC rules to set
-    ## e.g:
-    ## rules:
-    ##   - apiGroups:
-    ##       - ""
-    ##     resources:
-    ##       - pods
-    ##     verbs:
-    ##       - get
-    ##       - list
-    ##
-    rules: []
 
 ## @section Metering Parameters
 ##
@@ -3138,25 +3066,6 @@ metering:
     ##     app: my-app
     ##
     selector: {}
-  ## RBAC configuration
-  ##
-  rbac:
-    ## @param metering.rbac.create Specifies whether RBAC resources should be created
-    ##
-    create: false
-    ## @param metering.rbac.rules Custom RBAC rules to set
-    ## e.g:
-    ## rules:
-    ##   - apiGroups:
-    ##       - ""
-    ##     resources:
-    ##       - pods
-    ##     verbs:
-    ##       - get
-    ##       - list
-    ##
-    rules: []
-
 
 ## @skip redis
 redis:  
