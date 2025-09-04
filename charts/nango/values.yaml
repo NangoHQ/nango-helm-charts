@@ -2042,6 +2042,8 @@ jobs:
         - "watch"
         - "create"
         - "update"
+        - "patch"
+        - "delete"
       - apiGroups: 
         - ""
         resources: 
