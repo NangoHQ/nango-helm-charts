@@ -25,7 +25,7 @@ spec:
       {{- if .Values.orchestrator.podAnnotations }}
       annotations: {{- include "common.tplvalues.render" (dict "value" .Values.orchestrator.podAnnotations "context" $) | nindent 8 }}
       {{- end }}
-      labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 8 }}
+      labels: {{- include "common.labels.standard" ( dict "customLabels" $podLabels "context" $ ) | nindent 8 }}
         app.kubernetes.io/component: {{ include "orchestrator.names.component" . }}
     spec:
       {{- if .Values.orchestrator.imagePullSecrets }}

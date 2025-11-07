@@ -25,7 +25,7 @@ spec:
       {{- if .Values.jobs.podAnnotations }}
       annotations: {{- include "common.tplvalues.render" (dict "value" .Values.jobs.podAnnotations "context" $) | nindent 8 }}
       {{- end }}
-      labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 8 }}
+      labels: {{- include "common.labels.standard" ( dict "customLabels" $podLabels "context" $ ) | nindent 8 }}
         app.kubernetes.io/component: {{ include "jobs.names.component" . }}
     spec:
       {{- if .Values.jobs.imagePullSecrets }}

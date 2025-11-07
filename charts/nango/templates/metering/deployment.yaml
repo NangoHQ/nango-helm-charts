@@ -26,7 +26,7 @@ spec:
       {{- if .Values.metering.podAnnotations }}
       annotations: {{- include "common.tplvalues.render" (dict "value" .Values.metering.podAnnotations "context" $) | nindent 8 }}
       {{- end }}
-      labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 8 }}
+      labels: {{- include "common.labels.standard" ( dict "customLabels" $podLabels "context" $ ) | nindent 8 }}
         app.kubernetes.io/component: {{ include "metering.names.component" . }}
     spec:
       {{- if .Values.metering.imagePullSecrets }}
