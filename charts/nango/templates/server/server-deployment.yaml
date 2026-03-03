@@ -78,6 +78,7 @@ spec:
                 secretKeyRef:
                   name: nango-secrets
                   key: mailgun-api-key
+                  optional: true
             - name: SERVER_PORT
               value: "{{ .Values.server.SERVER_PORT }}"
             {{- if .Values.server.env }}
