@@ -10,7 +10,7 @@ Nango is a single API for all your integrations. It provides OAuth handling, web
 
 | Chart | Description | Version |
 |-------|-------------|---------|
-| [nango](./charts/nango) | Complete Nango deployment with all components | ![Version](https://img.shields.io/badge/version-2.0.0-blue.svg?style=flat-square) |
+| [nango](./charts/nango) | Complete Nango deployment with all components | ![Version](https://img.shields.io/badge/version-2.3.4-blue.svg?style=flat-square) |
 
 ## Quick Start
 
