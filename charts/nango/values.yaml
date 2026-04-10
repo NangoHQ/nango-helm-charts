@@ -3072,11 +3072,20 @@ metering:
 ## @skip redis
 redis:  
   enabled: false
+  image:
+    repository: bitnamilegacy/redis
+    tag: 8.2.1-debian-12-r0
   
 ## @skip postgresql
 postgresql:
   enabled: false
+  image:
+    repository: bitnamilegacy/postgresql
+    tag: 17.6.0-debian-12-r4
   
 ## @skip elasticsearch 
 elasticsearch:
   enabled: false
+  image:
+    repository: bitnamilegacy/elasticsearch
+    tag: 9.1.2-debian-12-r0
