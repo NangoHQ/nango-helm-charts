@@ -3083,9 +3083,16 @@ postgresql:
     repository: bitnamilegacy/postgresql
     tag: 17.6.0-debian-12-r4
   
-## @skip elasticsearch 
+## @skip elasticsearch
 elasticsearch:
   enabled: false
   image:
     repository: bitnamilegacy/elasticsearch
     tag: 9.1.2-debian-12-r0
+
+## @skip unleash
+## Optional bundled Unleash feature flag service.
+## When enabled, Nango services can be configured to use it by setting
+## NANGO_FLAG_PROVIDER=unleash, NANGO_UNLEASH_URL, NANGO_UNLEASH_API_TOKEN.
+unleash:
+  enabled: false

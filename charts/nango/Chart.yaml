@@ -1,7 +1,7 @@
 apiVersion: v2
 name: nango
 type: application
-version: 2.2.4
+version: 2.3.0
 dependencies:
   - condition: postgresql.enabled
     name: postgresql
@@ -15,6 +15,10 @@ dependencies:
     name: redis
     repository: https://charts.bitnami.com/bitnami
     version: ~21.0.0
+  - condition: unleash.enabled
+    name: unleash
+    repository: https://docs.getunleash.io/helm-charts
+    version: ~5.6.0
 description: Nango - A single API for all your integrations
 home: https://nango.dev
 icon: https://app.nango.dev/logo-dark-background-vertical.svg
