@@ -1,0 +1,54 @@
+{{- if and .Values.unleash.enabled .Values.unleash.bootstrapDatabase }}
+{{- if not .Values.postgresql.enabled -}}
+{{- fail "unleash.bootstrapDatabase=true requires postgresql.enabled=true; the bootstrap Job targets the bundled bitnami postgres Service and its `<release>-postgresql` secret. For external/managed databases, create the Unleash database out-of-band and leave `unleash.bootstrapDatabase` false." -}}
+{{- end }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ printf "%s-unleash-bootstrap-db" .Release.Name | trunc 63 | trimSuffix "-" }}
+  namespace: {{ .Values.namespaceOverride | default .Release.Namespace | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: unleash-bootstrap-db
+spec:
+  backoffLimit: 20
+  ttlSecondsAfterFinished: 300
+  template:
+    metadata:
+      labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 8 }}
+        app.kubernetes.io/component: unleash-bootstrap-db
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: bootstrap
+          {{- $pgImage := .Values.postgresql.image }}
+          {{- $pgRegistry := $pgImage.registry | default "docker.io" }}
+          image: {{ printf "%s/%s:%s" $pgRegistry $pgImage.repository $pgImage.tag | quote }}
+          env:
+            - name: PGHOST
+              value: {{ printf "%s-postgresql.%s.svc.cluster.local" .Release.Name (.Values.namespaceOverride | default .Release.Namespace) }}
+            - name: PGPORT
+              value: "5432"
+            - name: PGUSER
+              value: postgres
+            - name: PGDATABASE
+              value: postgres
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ printf "%s-postgresql" .Release.Name }}
+                  key: postgres-password
+            - name: UNLEASH_DB
+              value: {{ .Values.unleash.dbConfig.database | default "unleash" | quote }}
+          command:
+            - /bin/bash
+            - -ec
+            - |
+              echo "Waiting for postgres at $PGHOST:$PGPORT..."
+              until pg_isready -q; do sleep 2; done
+              echo "Ensuring database \"$UNLEASH_DB\" exists..."
+              psql -v ON_ERROR_STOP=1 -v db="$UNLEASH_DB" <<'SQL'
+              SELECT format('CREATE DATABASE %I', :'db')
+                WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = :'db')
+              \gexec
+              SQL
+{{- end }}
