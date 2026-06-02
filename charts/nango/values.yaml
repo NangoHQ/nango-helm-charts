@@ -3091,28 +3091,26 @@ elasticsearch:
     tag: 9.1.2-debian-12-r0
 
 ## @skip unleash
-## Optional bundled Unleash feature flag service.
-## When enabled, Nango services can be configured to use it by setting
-## NANGO_FLAG_PROVIDER=unleash, NANGO_UNLEASH_URL, NANGO_UNLEASH_API_TOKEN.
+## Optional bundled Unleash feature-flag service — the "engine" behind Nango's
+## feature flags. The flags themselves are provisioned declaratively from the
+## nango-flags repo via Unleash's IMPORT_FILE startup option; this chart only
+## runs Unleash + its database. This is optional and off by default.
 ##
-## Important: the Unleash subchart bundles its own bitnami-postgres, which
-## inherits `app.kubernetes.io/instance=<release>` from this same Helm release.
-## That label collides with the top-level `postgresql` subchart's Service
-## selector (both Services then back both pods), so kube-proxy round-robins
-## Nango's DB traffic to the wrong Postgres and auth fails. We therefore
-## default the nested postgres off and expect `dbConfig` + `env` (or
-## `databaseSecrets`) to point Unleash at an external DB. Enable it only if
-## the top-level `postgresql` subchart is disabled or you have accepted the
-## selector conflict.
+## Database: Unleash runs its own bundled Postgres on the Unleash node
+## (`unleash.postgresql` below) so it never touches Nango's primary database.
+## Caveat: the bundled Postgres and the top-level `postgresql` subchart share
+## the same `app.kubernetes.io/{instance,name}` selector labels, so do NOT
+## enable both at once — to point Unleash at an external DB instead, set
+## `unleash.postgresql.enabled: false` and configure `unleash.dbConfig` / `unleash.databaseSecrets`.
 unleash:
   enabled: false
-  ## When true AND `unleash.enabled` is true, a post-install/upgrade Helm hook
-  ## Job creates the Unleash database (defaults to `unleash`) inside the
-  ## top-level `postgresql` subchart if it doesn't already exist. Intended for
-  ## local / bundled-DB setups; prod installs that use an external DB (e.g.
-  ## RDS) should leave this off and bootstrap the DB out-of-band.
-  bootstrapDatabase: false
+  ## Pin the Unleash server image explicitly.
+  image:
+    tag: "7.6.3"
+  ## Run Unleash's database on the Unleash node itself (bundled bitnami Postgres).
+  ## fullnameOverride keeps the Service name stable and distinct from Nango's DB.
   postgresql:
-    enabled: false
+    enabled: true
+    fullnameOverride: unleash-postgresql
   dbConfig:
     database: unleash
