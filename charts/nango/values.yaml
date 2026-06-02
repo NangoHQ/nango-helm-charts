@@ -3083,9 +3083,34 @@ postgresql:
     repository: bitnamilegacy/postgresql
     tag: 17.6.0-debian-12-r4
   
-## @skip elasticsearch 
+## @skip elasticsearch
 elasticsearch:
   enabled: false
   image:
     repository: bitnamilegacy/elasticsearch
     tag: 9.1.2-debian-12-r0
+
+## @skip unleash
+## Optional bundled Unleash feature-flag service — the "engine" behind Nango's
+## feature flags. The flags themselves are provisioned declaratively from the
+## nango-flags repo via Unleash's IMPORT_FILE startup option; this chart only
+## runs Unleash + its database. This is optional and off by default.
+##
+## Database: Unleash runs its own bundled Postgres on the Unleash node
+## (`unleash.postgresql` below) so it never touches Nango's primary database.
+## Caveat: the bundled Postgres and the top-level `postgresql` subchart share
+## the same `app.kubernetes.io/{instance,name}` selector labels, so do NOT
+## enable both at once — to point Unleash at an external DB instead, set
+## `unleash.postgresql.enabled: false` and configure `unleash.dbConfig` / `unleash.databaseSecrets`.
+unleash:
+  enabled: false
+  ## Pin the Unleash server image explicitly.
+  image:
+    tag: "7.6.3"
+  ## Run Unleash's database on the Unleash node itself (bundled bitnami Postgres).
+  ## fullnameOverride keeps the Service name stable and distinct from Nango's DB.
+  postgresql:
+    enabled: true
+    fullnameOverride: unleash-postgresql
+  dbConfig:
+    database: unleash

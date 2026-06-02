@@ -1,12 +1,15 @@
 dependencies:
 - name: postgresql
   repository: https://charts.bitnami.com/bitnami
-  version: 16.7.26
+  version: 16.7.27
 - name: elasticsearch
   repository: https://charts.bitnami.com/bitnami
   version: 22.0.15
 - name: redis
   repository: https://charts.bitnami.com/bitnami
   version: 21.0.3
-digest: sha256:a9b9f4a9bba7cab3ff632cbfeb3f281a3188fb8607bad41ecd24b4fba40b0b81
-generated: "2025-08-18T08:47:31.904356+02:00"
+- name: unleash
+  repository: https://docs.getunleash.io/helm-charts
+  version: 5.6.7
+digest: sha256:ac640780b609528b9c8a99e200e76d427be74f84cc13ef6ac5c8ec9086008bef
+generated: "2026-04-16T17:43:07.748086-03:00"
