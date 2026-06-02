@@ -27,8 +27,9 @@ jobs:
 
       - name: Add Helm Dependency Repos
         run: |
-          helm repo add bitnami https://charts.bitnami.com/bitnami 
+          helm repo add bitnami https://charts.bitnami.com/bitnami
           helm repo add airbyte https://airbytehq.github.io/helm-charts
+          helm repo add unleash https://docs.getunleash.io/helm-charts
 
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.6.0
