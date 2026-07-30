@@ -72,6 +72,17 @@ server:
   args:
     - "node"
     - "packages/server/dist/server.js"
+  ## Connect UI is the embeddable auth flow. The image can serve it alongside the API, but only via
+  ## the image's own entrypoint script, which reads FLAG_SERVE_CONNECT_UI — and the `args` above
+  ## replace the image CMD, so that script never runs. Enabling this replaces `args` with the
+  ## entrypoint, sets the flag, and exposes the Connect UI port on the container and the Service.
+  ## Requires an image that bundles Connect UI (Enterprise/managed).
+  ## @param server.connectUI.enabled Serve Connect UI from the server pod
+  ## @param server.connectUI.port Port Connect UI listens on (NANGO_CONNECT_UI_PORT)
+  ##
+  connectUI:
+    enabled: false
+    port: 3009
   ## ServiceAccount configuration
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
   ##

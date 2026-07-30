@@ -18,13 +18,6 @@ Expand the name of the chart.
 {{- end -}}
 
 {{/*
-Component URL helpers
-*/}}
-{{- define "nango.metering.url" -}}
-http://{{ include "metering.names.name" . }}.{{ .Release.Namespace }}
-{{- end }}
-
-{{/*
 Allow the release namespace to be overridden for multi-namespace deployments in combined charts.
 */}}
 {{- define "metering.names.namespace" -}}

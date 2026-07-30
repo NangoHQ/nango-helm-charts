@@ -106,10 +106,15 @@ spec:
               port: http
               scheme: HTTP
           {{- end }}
-          {{- if .Values.jobs.sidecars }}
-          sidecars: {{- include "common.tplvalues.render" ( dict "value" .Values.jobs.sidecars "context" $) | nindent 12 }}
-          {{- end }}
           env:
+            {{- include "nango.serviceUrlEnv" . | nindent 12 }}
+            {{- if .Values.runner.enabled }}
+            # jobs is the only component that reads this. Its default (LOCAL) makes jobs spawn a
+            # runner subprocess from a path that does not exist in the published image, so with a
+            # runner Deployment present REMOTE is the only mode that can work.
+            - name: RUNNER_TYPE
+              value: "REMOTE"
+            {{- end }}
             {{- if .Values.jobs.extraEnvVars }}
             {{- include "common.tplvalues.render" (dict "value" .Values.jobs.extraEnvVars "context" $) | nindent 12 }}
             {{- end }}
@@ -142,6 +147,9 @@ spec:
           {{- if .Values.jobs.extraVolumeMounts }}
           {{- include "common.tplvalues.render" (dict "value" .Values.jobs.extraVolumeMounts "context" $) | nindent 12 }}
           {{- end }}
+        {{- if .Values.jobs.sidecars }}
+        {{- include "common.tplvalues.render" ( dict "value" .Values.jobs.sidecars "context" $) | nindent 8 }}
+        {{- end }}
       volumes:
         - name: empty-dir
           emptyDir: {}

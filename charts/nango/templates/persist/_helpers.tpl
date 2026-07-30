@@ -18,13 +18,6 @@ Expand the name of the chart.
 {{- end -}}
 
 {{/*
-Component URL helpers
-*/}}
-{{- define "nango.persist.url" -}}
-http://{{ include "persist.names.name" . }}.{{ .Release.Namespace }}
-{{- end }}
-
-{{/*
 Allow the release namespace to be overridden for multi-namespace deployments in combined charts.
 */}}
 {{- define "persist.names.namespace" -}}

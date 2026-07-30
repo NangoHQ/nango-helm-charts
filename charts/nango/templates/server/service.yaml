@@ -41,6 +41,15 @@ spec:
       {{- else if eq .Values.server.service.type "ClusterIP" }}
       nodePort: null
       {{- end }}
+    {{- if .Values.server.connectUI.enabled }}
+    - name: connect-ui
+      port: {{ .Values.server.connectUI.port }}
+      targetPort: connect-ui
+      protocol: TCP
+      {{- if eq .Values.server.service.type "ClusterIP" }}
+      nodePort: null
+      {{- end }}
+    {{- end }}
     {{- if .Values.server.service.extraPorts }}
     {{- include "common.tplvalues.render" (dict "value" .Values.server.service.extraPorts "context" $) | nindent 4 }}
     {{- end }}

@@ -106,10 +106,8 @@ spec:
               port: http
               scheme: HTTP
           {{- end }}
-          {{- if .Values.orchestrator.sidecars }}
-          sidecars: {{- include "common.tplvalues.render" ( dict "value" .Values.orchestrator.sidecars "context" $) | nindent 12 }}
-          {{- end }}
           env:
+            {{- include "nango.serviceUrlEnv" . | nindent 12 }}
             {{- if .Values.orchestrator.extraEnvVars }}
             {{- include "common.tplvalues.render" (dict "value" .Values.orchestrator.extraEnvVars "context" $) | nindent 12 }}
             {{- end }}
@@ -142,6 +140,9 @@ spec:
           {{- if .Values.orchestrator.extraVolumeMounts }}
           {{- include "common.tplvalues.render" (dict "value" .Values.orchestrator.extraVolumeMounts "context" $) | nindent 12 }}
           {{- end }}
+        {{- if .Values.orchestrator.sidecars }}
+        {{- include "common.tplvalues.render" ( dict "value" .Values.orchestrator.sidecars "context" $) | nindent 8 }}
+        {{- end }}
       volumes:
         - name: empty-dir
           emptyDir: {}
