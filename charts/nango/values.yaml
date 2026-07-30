@@ -2,13 +2,13 @@
 
 ## @param nameOverride String to partially override common.names.name
 ##
-nameOverride: ''
+nameOverride: ""
 ## @param fullnameOverride String to fully override common.names.fullname
 ##
-fullnameOverride: ''
+fullnameOverride: ""
 ## @param namespaceOverride String to fully override common.names.namespace
 ##
-namespaceOverride: 'nango'
+namespaceOverride: "nango"
 ## @param commonLabels Labels to add to all deployed objects
 ##
 commonLabels: {}
@@ -29,19 +29,19 @@ global:
   ## @param global.image.pullSecrets global image pull secrets
   ##
   image:
-    registry: 'nangohq'
-    repository: 'nango'
-    tag: 'latest'
-    digest: ''
-    pullPolicy: 'IfNotPresent'
+    registry: "nangohq"
+    repository: "nango"
+    tag: "latest"
+    digest: ""
+    pullPolicy: "IfNotPresent"
     pullSecrets: []
   ## @param global.defaultStorageClass Global default StorageClass for Persistent Volume(s)
   ##
-  defaultStorageClass: ''
+  defaultStorageClass: ""
 
 ## @section Server Parameters
 ##
-
+  
 server:
   ## @param server.name server name
   ##
@@ -55,11 +55,11 @@ server:
   ## @param server.image.pullSecrets server image pull secrets
   ##
   image:
-    registry: ''
-    repository: ''
-    tag: ''
-    digest: ''
-    pullPolicy: ''
+    registry: ""
+    repository: ""
+    tag: ""
+    digest: ""
+    pullPolicy: ""
     pullSecrets: []
   ## @param server.replicaCount Number of server replicas to deploy
   ##
@@ -70,8 +70,8 @@ server:
   ## @param server.args Override default server container args (useful when using custom images)
   ##
   args:
-    - 'node'
-    - 'packages/server/dist/server.js'
+    - "node"
+    - "packages/server/dist/server.js"
   ## Connect UI is the embeddable auth flow. The image can serve it alongside the API, but only via
   ## the image's own entrypoint script, which reads FLAG_SERVE_CONNECT_UI — and the `args` above
   ## replace the image CMD, so that script never runs. Enabling this replaces `args` with the
@@ -93,7 +93,7 @@ server:
     ## @param server.serviceAccount.name The name of the ServiceAccount to use.
     ## If not set and create is true, a name is generated using the server.names.fullname template
     ##
-    name: ''
+    name: ""
     ## @param server.serviceAccount.annotations Additional Service Account annotations (evaluated as a template)
     ##
     annotations: {}
@@ -177,7 +177,7 @@ server:
     pathType: Prefix
     ## @param server.ingress.apiVersion Force Ingress API version (automatically detected if not set)
     ##
-    apiVersion: ''
+    apiVersion: ""
     ## @param server.ingress.hostname Default host for the ingress record
     ##
     hostname: example-app.nango.dev
@@ -185,7 +185,7 @@ server:
     ## This is supported in Kubernetes 1.18+ and required if you have more than one IngressClass marked as the default for your cluster .
     ## ref: https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/
     ##
-    ingressClassName: ''
+    ingressClassName: ""
     ## @param server.ingress.path Default path for the ingress record
     ## NOTE: You may need to set this to '/*' in order to use this with ALB ingress controllers
     ##
@@ -285,17 +285,17 @@ server:
     ## NOTE: choose port between <30000-32767>
     ##
     nodePorts:
-      http: ''
-      https: ''
+      http: ""
+      https: ""
     ## @param server.service.clusterIP server service Cluster IP
     ## e.g.:
     ## clusterIP: None
     ##
-    clusterIP: ''
+    clusterIP: ""
     ## @param server.service.loadBalancerIP server service Load Balancer IP
     ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-loadbalancer
     ##
-    loadBalancerIP: ''
+    loadBalancerIP: ""
     ## @param server.service.loadBalancerSourceRanges server service Load Balancer sources
     ## ref: https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service
     ## e.g:
@@ -343,7 +343,7 @@ server:
   ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
   ##
   updateStrategy:
-    type: 'RollingUpdate'
+    type: "RollingUpdate"
   ## Pod Disruption Budget configuration
   ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb
   ## @param server.pdb.create Enable/disable a Pod Disruption Budget creation
@@ -353,7 +353,7 @@ server:
   pdb:
     create: true
     minAvailable: 1
-    maxUnavailable: ''
+    maxUnavailable: ""
   ## Autoscaling configuration
   ## ref: https://kubernetes.io/docs/concepts/workloads/autoscaling/
   ##
@@ -403,7 +403,7 @@ server:
   ## ref: http://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/
   ## @param server.resourcesPreset Set server container resources according to one common preset (allowed values: none, nano, micro, small, medium, large, xlarge, 2xlarge). This is ignored if server.resources is set (server.resources is recommended for production).
   ##
-  resourcesPreset: '2xlarge'
+  resourcesPreset: "2xlarge"
   ## @param server.resources Set server container requests and limits for different resources like CPU or memory (essential for production workloads)
   ## Example:
   ## resources:
@@ -424,13 +424,13 @@ server:
   extraEnvVars: []
   ## @param server.extraEnvVarsCM Name of existing ConfigMap containing extra env vars for server containers
   ##
-  extraEnvVarsCM: ''
+  extraEnvVarsCM: ""
   ## @param server.extraEnvVarsCMs Name of existing ConfigMaps containing extra env vars for server containers
   ##
   extraEnvVarsCMs: []
   ## @param server.extraEnvVarsSecret Name of existing Secret containing extra env vars for server containers
   ##
-  extraEnvVarsSecret: ''
+  extraEnvVarsSecret: ""
   ## @param server.extraEnvVarsSecrets Name of existing Secrets containing extra env vars for server containers
   ##
   extraEnvVarsSecrets: []
@@ -508,7 +508,7 @@ server:
     mountPath: /nango/server/data
     ## @param server.persistence.subPath The subdirectory of the volume to mount to, useful in dev environments and one PV for multiple services
     ##
-    subPath: ''
+    subPath: ""
     ## @param server.persistence.storageClass Storage class of backing PVC
     ## If defined, storageClassName: <storageClass>
     ## If set to "-", storageClassName: "", which disables dynamic provisioning
@@ -516,7 +516,7 @@ server:
     ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
     ##   GKE, AWS & OpenStack)
     ##
-    storageClass: ''
+    storageClass: ""
     ## @param server.persistence.annotations Persistent Volume Claim annotations
     ##
     annotations: {}
@@ -532,8 +532,8 @@ server:
     dataSource: {}
     ## @param server.persistence.existingClaim The name of an existing PVC to use for persistence
     ##
-    existingClaim: 'nango-jobs'
-    ## @param server.persistence.selector Selector to match an existing Persistent Volume
+    existingClaim: "nango-jobs"
+    ## @param server.persistence.selector Selector to match an existing Persistent Volume 
     ## If set, the PVC can't have a PV dynamically provisioned for it
     ## E.g.
     ## selector:
@@ -558,13 +558,13 @@ persist:
   ## @param persist.image.pullSecrets persist image pull secrets
   ##
   image:
-    registry: ''
-    repository: ''
-    tag: ''
-    digest: ''
-    pullPolicy: ''
+    registry: ""
+    repository: ""
+    tag: ""
+    digest: ""
+    pullPolicy: ""
     pullSecrets: []
-
+  
   ## @param persist.replicaCount Number of persist replicas to deploy
   ##
   replicaCount: 1
@@ -575,7 +575,7 @@ persist:
   ##
   args:
     - node
-    - 'packages/persist/dist/app.js'
+    - "packages/persist/dist/app.js"
   ## ServiceAccount configuration
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
   ##
@@ -586,7 +586,7 @@ persist:
     ## @param persist.serviceAccount.name The name of the ServiceAccount to use.
     ## If not set and create is true, a name is generated using the common.names.fullname template
     ##
-    name: ''
+    name: ""
     ## @param persist.serviceAccount.annotations Additional Service Account annotations (evaluated as a template)
     ##
     annotations: {}
@@ -671,7 +671,7 @@ persist:
     pathType: ImplementationSpecific
     ## @param persist.ingress.apiVersion Force Ingress API version (automatically detected if not set)
     ##
-    apiVersion: ''
+    apiVersion: ""
     ## @param persist.ingress.hostname Default host for the ingress record
     ##
     hostname: nango-server-default.dev
@@ -679,7 +679,7 @@ persist:
     ## This is supported in Kubernetes 1.18+ and required if you have more than one IngressClass marked as the default for your cluster .
     ## ref: https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/
     ##
-    ingressClassName: ''
+    ingressClassName: ""
     ## @param persist.ingress.path Default path for the ingress record
     ## NOTE: You may need to set this to '/*' in order to use this with ALB ingress controllers
     ##
@@ -779,17 +779,17 @@ persist:
     ## NOTE: choose port between <30000-32767>
     ##
     nodePorts:
-      http: ''
-      https: ''
+      http: ""
+      https: ""
     ## @param persist.service.clusterIP persist service Cluster IP
     ## e.g.:
     ## clusterIP: None
     ##
-    clusterIP: ''
+    clusterIP: ""
     ## @param persist.service.loadBalancerIP persist service Load Balancer IP
     ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-loadbalancer
     ##
-    loadBalancerIP: ''
+    loadBalancerIP: ""
     ## @param persist.service.loadBalancerSourceRanges persist service Load Balancer sources
     ## ref: https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service
     ## e.g:
@@ -837,7 +837,7 @@ persist:
   ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
   ##
   updateStrategy:
-    type: 'RollingUpdate'
+    type: "RollingUpdate"
   ## Pod Disruption Budget configuration
   ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb
   ## @param persist.pdb.create Enable/disable a Pod Disruption Budget creation
@@ -847,7 +847,7 @@ persist:
   pdb:
     create: true
     minAvailable: 1
-    maxUnavailable: ''
+    maxUnavailable: ""
   ## Autoscaling configuration
   ## ref: https://kubernetes.io/docs/concepts/workloads/autoscaling/
   ##
@@ -897,7 +897,7 @@ persist:
   ## ref: http://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/
   ## @param persist.resourcesPreset Set persist container resources according to one common preset (allowed values: none, nano, micro, small, medium, large, xlarge, 2xlarge). This is ignored if persist.resources is set (persist.resources is recommended for production).
   ##
-  resourcesPreset: 'xlarge'
+  resourcesPreset: "xlarge"
   ## @param persist.resources Set persist container requests and limits for different resources like CPU or memory (essential for production workloads)
   ## Example:
   ## resources:
@@ -918,13 +918,13 @@ persist:
   extraEnvVars: []
   ## @param persist.extraEnvVarsCM Name of existing ConfigMap containing extra env vars for persist containers
   ##
-  extraEnvVarsCM: ''
+  extraEnvVarsCM: ""
   ## @param persist.extraEnvVarsCMs Name of existing ConfigMaps containing extra env vars for persist containers
   ##
   extraEnvVarsCMs: []
   ## @param persist.extraEnvVarsSecret Name of existing Secret containing extra env vars for persist containers
   ##
-  extraEnvVarsSecret: ''
+  extraEnvVarsSecret: ""
   ## @param persist.extraEnvVarsSecrets Name of existing Secrets containing extra env vars for persist containers
   ##
   extraEnvVarsSecrets: []
@@ -1003,7 +1003,7 @@ persist:
     mountPath: /nango/server/data
     ## @param persist.persistence.subPath The subdirectory of the volume to mount to, useful in dev environments and one PV for multiple services
     ##
-    subPath: ''
+    subPath: ""
     ## @param persist.persistence.storageClass Storage class of backing PVC
     ## If defined, storageClassName: <storageClass>
     ## If set to "-", storageClassName: "", which disables dynamic provisioning
@@ -1011,7 +1011,7 @@ persist:
     ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
     ##   GKE, AWS & OpenStack)
     ##
-    storageClass: ''
+    storageClass: ""
     ## @param persist.persistence.annotations Persistent Volume Claim annotations
     ##
     annotations: {}
@@ -1027,8 +1027,8 @@ persist:
     dataSource: {}
     ## @param persist.persistence.existingClaim The name of an existing PVC to use for persistence
     ##
-    existingClaim: ''
-    ## @param persist.persistence.selector Selector to match an existing Persistent Volume
+    existingClaim: ""
+    ## @param persist.persistence.selector Selector to match an existing Persistent Volume 
     ## If set, the PVC can't have a PV dynamically provisioned for it
     ## E.g.
     ## selector:
@@ -1053,13 +1053,13 @@ orchestrator:
   ## @param orchestrator.image.pullSecrets orchestrator image pull secrets
   ##
   image:
-    registry: ''
-    repository: ''
-    tag: ''
-    digest: ''
-    pullPolicy: ''
+    registry: ""
+    repository: ""
+    tag: ""
+    digest: ""
+    pullPolicy: ""
     pullSecrets: []
-
+  
   ## @param orchestrator.replicaCount Number of orchestrator replicas to deploy
   ##
   replicaCount: 1
@@ -1068,9 +1068,9 @@ orchestrator:
   command: []
   ## @param orchestrator.args Override default orchestrator container args (useful when using custom images)
   ##
-  args:
+  args: 
     - node
-    - 'packages/orchestrator/dist/app.js'
+    - "packages/orchestrator/dist/app.js"
   ## ServiceAccount configuration
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
   ##
@@ -1081,7 +1081,7 @@ orchestrator:
     ## @param orchestrator.serviceAccount.name The name of the ServiceAccount to use.
     ## If not set and create is true, a name is generated using the common.names.fullname template
     ##
-    name: ''
+    name: ""
     ## @param orchestrator.serviceAccount.annotations Additional Service Account annotations (evaluated as a template)
     ##
     annotations: {}
@@ -1165,7 +1165,7 @@ orchestrator:
     pathType: ImplementationSpecific
     ## @param orchestrator.ingress.apiVersion Force Ingress API version (automatically detected if not set)
     ##
-    apiVersion: ''
+    apiVersion: ""
     ## @param orchestrator.ingress.hostname Default host for the ingress record
     ##
     hostname: nango-orchestrator-default.dev
@@ -1173,7 +1173,7 @@ orchestrator:
     ## This is supported in Kubernetes 1.18+ and required if you have more than one IngressClass marked as the default for your cluster .
     ## ref: https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/
     ##
-    ingressClassName: ''
+    ingressClassName: ""
     ## @param orchestrator.ingress.path Default path for the ingress record
     ## NOTE: You may need to set this to '/*' in order to use this with ALB ingress controllers
     ##
@@ -1273,17 +1273,17 @@ orchestrator:
     ## NOTE: choose port between <30000-32767>
     ##
     nodePorts:
-      http: ''
-      https: ''
+      http: ""
+      https: ""
     ## @param orchestrator.service.clusterIP orchestrator service Cluster IP
     ## e.g.:
     ## clusterIP: None
     ##
-    clusterIP: ''
+    clusterIP: ""
     ## @param orchestrator.service.loadBalancerIP orchestrator service Load Balancer IP
     ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-loadbalancer
     ##
-    loadBalancerIP: ''
+    loadBalancerIP: ""
     ## @param orchestrator.service.loadBalancerSourceRanges orchestrator service Load Balancer sources
     ## ref: https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service
     ## e.g:
@@ -1331,7 +1331,7 @@ orchestrator:
   ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
   ##
   updateStrategy:
-    type: 'RollingUpdate'
+    type: "RollingUpdate"
   ## Pod Disruption Budget configuration
   ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb
   ## @param orchestrator.pdb.create Enable/disable a Pod Disruption Budget creation
@@ -1341,7 +1341,7 @@ orchestrator:
   pdb:
     create: true
     minAvailable: 1
-    maxUnavailable: ''
+    maxUnavailable: ""
   ## Autoscaling configuration
   ## ref: https://kubernetes.io/docs/concepts/workloads/autoscaling/
   ##
@@ -1391,7 +1391,7 @@ orchestrator:
   ## ref: http://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/
   ## @param orchestrator.resourcesPreset Set orchestrator container resources according to one common preset (allowed values: none, nano, micro, small, medium, large, xlarge, 2xlarge). This is ignored if orchestrator.resources is set (orchestrator.resources is recommended for production).
   ##
-  resourcesPreset: 'nano'
+  resourcesPreset: "nano"
   ## @param orchestrator.resources Set orchestrator container requests and limits for different resources like CPU or memory (essential for production workloads)
   ## Example:
   ## resources:
@@ -1412,13 +1412,13 @@ orchestrator:
   extraEnvVars: []
   ## @param orchestrator.extraEnvVarsCM Name of existing ConfigMap containing extra env vars for orchestrator containers
   ##
-  extraEnvVarsCM: ''
+  extraEnvVarsCM: ""
   ## @param orchestrator.extraEnvVarsCMs Name of existing ConfigMaps containing extra env vars for orchestrator containers
   ##
   extraEnvVarsCMs: []
   ## @param orchestrator.extraEnvVarsSecret Name of existing Secret containing extra env vars for orchestrator containers
   ##
-  extraEnvVarsSecret: ''
+  extraEnvVarsSecret: ""
   ## @param orchestrator.extraEnvVarsSecrets Name of existing Secrets containing extra env vars for orchestrator containers
   ##
   extraEnvVarsSecrets: []
@@ -1496,7 +1496,7 @@ orchestrator:
     mountPath: /nango/orchestrator/data
     ## @param orchestrator.persistence.subPath The subdirectory of the volume to mount to, useful in dev environments and one PV for multiple services
     ##
-    subPath: ''
+    subPath: ""
     ## @param orchestrator.persistence.storageClass Storage class of backing PVC
     ## If defined, storageClassName: <storageClass>
     ## If set to "-", storageClassName: "", which disables dynamic provisioning
@@ -1504,7 +1504,7 @@ orchestrator:
     ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
     ##   GKE, AWS & OpenStack)
     ##
-    storageClass: ''
+    storageClass: ""
     ## @param orchestrator.persistence.annotations Persistent Volume Claim annotations
     ##
     annotations: {}
@@ -1520,8 +1520,8 @@ orchestrator:
     dataSource: {}
     ## @param orchestrator.persistence.existingClaim The name of an existing PVC to use for persistence
     ##
-    existingClaim: ''
-    ## @param orchestrator.persistence.selector Selector to match an existing Persistent Volume
+    existingClaim: ""
+    ## @param orchestrator.persistence.selector Selector to match an existing Persistent Volume 
     ## If set, the PVC can't have a PV dynamically provisioned for it
     ## E.g.
     ## selector:
@@ -1545,14 +1545,14 @@ jobs:
   ## @param jobs.image.pullPolicy jobs image pull policy
   ## @param jobs.image.pullSecrets jobs image pull secrets
   ##
-  image:
-    registry: ''
-    repository: ''
-    tag: ''
-    digest: ''
-    pullPolicy: ''
+  image: 
+    registry: ""
+    repository: ""
+    tag: ""
+    digest: ""
+    pullPolicy: ""
     pullSecrets: []
-
+  
   ## @param jobs.replicaCount Number of jobs replicas to deploy
   ##
   replicaCount: 1
@@ -1561,9 +1561,9 @@ jobs:
   command: []
   ## @param jobs.args Override default jobs container args (useful when using custom images)
   ##
-  args:
+  args: 
     - node
-    - 'packages/jobs/dist/app.js'
+    - "packages/jobs/dist/app.js"
   ## ServiceAccount configuration
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
   ##
@@ -1574,7 +1574,7 @@ jobs:
     ## @param jobs.serviceAccount.name The name of the ServiceAccount to use.
     ## If not set and create is true, a name is generated using the jobs.names.fullname template
     ##
-    name: ''
+    name: ""
     ## @param jobs.serviceAccount.annotations Additional Service Account annotations (evaluated as a template)
     ##
     annotations: {}
@@ -1659,15 +1659,15 @@ jobs:
     pathType: ImplementationSpecific
     ## @param jobs.ingress.apiVersion Force Ingress API version (automatically detected if not set)
     ##
-    apiVersion: ''
+    apiVersion: ""
     ## @param jobs.ingress.hostname Default host for the ingress record
     ##
-    hostname: ''
+    hostname: ""
     ## @param jobs.ingress.ingressClassName IngressClass that will be be used to implement the Ingress (Kubernetes 1.18+)
     ## This is supported in Kubernetes 1.18+ and required if you have more than one IngressClass marked as the default for your cluster .
     ## ref: https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/
     ##
-    ingressClassName: ''
+    ingressClassName: ""
     ## @param jobs.ingress.path Default path for the ingress record
     ## NOTE: You may need to set this to '/*' in order to use this with ALB ingress controllers
     ##
@@ -1767,17 +1767,17 @@ jobs:
     ## NOTE: choose port between <30000-32767>
     ##
     nodePorts:
-      http: ''
-      https: ''
+      http: ""
+      https: ""
     ## @param jobs.service.clusterIP jobs service Cluster IP
     ## e.g.:
     ## clusterIP: None
     ##
-    clusterIP: ''
+    clusterIP: ""
     ## @param jobs.service.loadBalancerIP jobs service Load Balancer IP
     ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-loadbalancer
     ##
-    loadBalancerIP: ''
+    loadBalancerIP: ""
     ## @param jobs.service.loadBalancerSourceRanges jobs service Load Balancer sources
     ## ref: https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service
     ## e.g:
@@ -1825,7 +1825,7 @@ jobs:
   ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
   ##
   updateStrategy:
-    type: 'RollingUpdate'
+    type: "RollingUpdate"
   ## Pod Disruption Budget configuration
   ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb
   ## @param jobs.pdb.create Enable/disable a Pod Disruption Budget creation
@@ -1835,7 +1835,7 @@ jobs:
   pdb:
     create: true
     minAvailable: 1
-    maxUnavailable: ''
+    maxUnavailable: ""
   ## Autoscaling configuration
   ## ref: https://kubernetes.io/docs/concepts/workloads/autoscaling/
   ##
@@ -1885,7 +1885,7 @@ jobs:
   ## ref: http://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/
   ## @param jobs.resourcesPreset Set jobs container resources according to one common preset (allowed values: none, nano, micro, small, medium, large, xlarge, 2xlarge). This is ignored if jobs.resources is set (jobs.resources is recommended for production).
   ##
-  resourcesPreset: '2xlarge'
+  resourcesPreset: "2xlarge"
   ## @param jobs.resources Set jobs container requests and limits for different resources like CPU or memory (essential for production workloads)
   ## Example:
   ## resources:
@@ -1906,13 +1906,13 @@ jobs:
   extraEnvVars: []
   ## @param jobs.extraEnvVarsCM Name of existing ConfigMap containing extra env vars for jobs containers
   ##
-  extraEnvVarsCM: ''
+  extraEnvVarsCM: ""
   ## @param jobs.extraEnvVarsCMs Name of existing ConfigMaps containing extra env vars for jobs containers
   ##
   extraEnvVarsCMs: []
   ## @param jobs.extraEnvVarsSecret Name of existing Secret containing extra env vars for jobs containers
   ##
-  extraEnvVarsSecret: ''
+  extraEnvVarsSecret: ""
   ## @param jobs.extraEnvVarsSecrets Name of existing Secrets containing extra env vars for jobs containers
   ##
   extraEnvVarsSecrets: []
@@ -1990,7 +1990,7 @@ jobs:
     mountPath: /nango/jobs/data
     ## @param jobs.persistence.subPath The subdirectory of the volume to mount to, useful in dev environments and one PV for multiple services
     ##
-    subPath: ''
+    subPath: ""
     ## @param jobs.persistence.storageClass Storage class of backing PVC
     ## If defined, storageClassName: <storageClass>
     ## If set to "-", storageClassName: "", which disables dynamic provisioning
@@ -1998,7 +1998,7 @@ jobs:
     ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
     ##   GKE, AWS & OpenStack)
     ##
-    storageClass: ''
+    storageClass: ""
     ## @param jobs.persistence.annotations Persistent Volume Claim annotations
     ##
     annotations: {}
@@ -2014,8 +2014,8 @@ jobs:
     dataSource: {}
     ## @param jobs.persistence.existingClaim The name of an existing PVC to use for persistence
     ##
-    existingClaim: ''
-    ## @param jobs.persistence.selector Selector to match an existing Persistent Volume
+    existingClaim: ""
+    ## @param jobs.persistence.selector Selector to match an existing Persistent Volume 
     ## If set, the PVC can't have a PV dynamically provisioned for it
     ## E.g.
     ## selector:
@@ -2043,48 +2043,48 @@ jobs:
     ##       - list
     ##
     rules:
-      - apiGroups:
-          - 'apps'
-        resources:
-          - 'deployments'
-        verbs:
-          - 'get'
-          - 'list'
-          - 'watch'
-          - 'create'
-          - 'update'
-          - 'patch'
-          - 'delete'
-      - apiGroups:
-          - ''
-        resources:
-          - 'services'
-          - 'pods'
-          - 'configmaps'
-          - 'secrets'
-          - 'persistentvolumeclaims'
-          - 'namespaces'
-        verbs:
-          - 'get'
-          - 'list'
-          - 'watch'
-          - 'create'
-          - 'update'
-          - 'patch'
-          - 'delete'
-      - apiGroups:
-          - 'networking.k8s.io'
-        resources:
-          - 'networkpolicies'
-        verbs:
-          - 'get'
-          - 'list'
-          - 'watch'
-          - 'create'
-          - 'update'
-          - 'patch'
-          - 'delete'
-
+      - apiGroups: 
+        - "apps"
+        resources: 
+        - "deployments"
+        verbs: 
+        - "get"
+        - "list"
+        - "watch"
+        - "create"
+        - "update"
+        - "patch"
+        - "delete"
+      - apiGroups: 
+        - ""
+        resources: 
+        - "services"
+        - "pods"
+        - "configmaps"
+        - "secrets"
+        - "persistentvolumeclaims"
+        - "namespaces"
+        verbs: 
+        - "get"
+        - "list"
+        - "watch"
+        - "create"
+        - "update"
+        - "patch"
+        - "delete"
+      - apiGroups: 
+        - "networking.k8s.io"
+        resources: 
+        - "networkpolicies"
+        verbs: 
+        - "get"
+        - "list"
+        - "watch"
+        - "create"
+        - "update"
+        - "patch"
+        - "delete"
+  
 ## @section Runner Parameters
 ##
 
@@ -2103,14 +2103,14 @@ runner:
   ## @param runner.image.pullPolicy runner image pull policy
   ## @param runner.image.pullSecrets runner image pull secrets
   ##
-  image:
-    registry: ''
-    repository: ''
-    tag: ''
-    digest: ''
-    pullPolicy: ''
+  image: 
+    registry: ""
+    repository: ""
+    tag: ""
+    digest: ""
+    pullPolicy: ""
     pullSecrets: []
-
+  
   ## @param runner.replicaCount Number of runner replicas to deploy
   ##
   replicaCount: 1
@@ -2121,7 +2121,7 @@ runner:
   ##
   args:
     - node
-    - 'packages/runner/dist/app.js'
+    - "packages/runner/dist/app.js"
   ## ServiceAccount configuration
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
   ##
@@ -2132,7 +2132,7 @@ runner:
     ## @param runner.serviceAccount.name The name of the ServiceAccount to use.
     ## If not set and create is true, a name is generated using the common.names.fullname template
     ##
-    name: ''
+    name: ""
     ## @param runner.serviceAccount.annotations Additional Service Account annotations (evaluated as a template)
     ##
     annotations: {}
@@ -2216,7 +2216,7 @@ runner:
     pathType: ImplementationSpecific
     ## @param runner.ingress.apiVersion Force Ingress API version (automatically detected if not set)
     ##
-    apiVersion: ''
+    apiVersion: ""
     ## @param runner.ingress.hostname Default host for the ingress record
     ##
     hostname: nango-server-default.dev
@@ -2224,7 +2224,7 @@ runner:
     ## This is supported in Kubernetes 1.18+ and required if you have more than one IngressClass marked as the default for your cluster .
     ## ref: https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/
     ##
-    ingressClassName: ''
+    ingressClassName: ""
     ## @param runner.ingress.path Default path for the ingress record
     ## NOTE: You may need to set this to '/*' in order to use this with ALB ingress controllers
     ##
@@ -2324,17 +2324,17 @@ runner:
     ## NOTE: choose port between <30000-32767>
     ##
     nodePorts:
-      http: ''
-      https: ''
+      http: ""
+      https: ""
     ## @param runner.service.clusterIP runner service Cluster IP
     ## e.g.:
     ## clusterIP: None
     ##
-    clusterIP: ''
+    clusterIP: ""
     ## @param runner.service.loadBalancerIP runner service Load Balancer IP
     ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-loadbalancer
     ##
-    loadBalancerIP: ''
+    loadBalancerIP: ""
     ## @param runner.service.loadBalancerSourceRanges runner service Load Balancer sources
     ## ref: https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service
     ## e.g:
@@ -2382,7 +2382,7 @@ runner:
   ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
   ##
   updateStrategy:
-    type: 'RollingUpdate'
+    type: "RollingUpdate"
   ## Pod Disruption Budget configuration
   ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb
   ## @param runner.pdb.create Enable/disable a Pod Disruption Budget creation
@@ -2391,8 +2391,8 @@ runner:
   ##
   pdb:
     create: false
-    minAvailable: ''
-    maxUnavailable: ''
+    minAvailable: ""
+    maxUnavailable: ""
   ## Autoscaling configuration
   ## ref: https://kubernetes.io/docs/concepts/workloads/autoscaling/
   ##
@@ -2442,7 +2442,7 @@ runner:
   ## ref: http://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/
   ## @param runner.resourcesPreset Set runner container resources according to one common preset (allowed values: none, nano, micro, small, medium, large, xlarge, 2xlarge). This is ignored if runner.resources is set (runner.resources is recommended for production).
   ##
-  resourcesPreset: 'small'
+  resourcesPreset: "small"
   ## @param runner.resources Set runner container requests and limits for different resources like CPU or memory (essential for production workloads)
   ## Example:
   ## resources:
@@ -2463,13 +2463,13 @@ runner:
   extraEnvVars: []
   ## @param runner.extraEnvVarsCM Name of existing ConfigMap containing extra env vars for runner containers
   ##
-  extraEnvVarsCM: ''
+  extraEnvVarsCM: ""
   ## @param runner.extraEnvVarsCMs Name of existing ConfigMaps containing extra env vars for runner containers
   ##
   extraEnvVarsCMs: []
   ## @param runner.extraEnvVarsSecret Name of existing Secret containing extra env vars for runner containers
   ##
-  extraEnvVarsSecret: ''
+  extraEnvVarsSecret: ""
   ## @param runner.extraEnvVarsSecrets Name of existing Secrets containing extra env vars for runner containers
   ##
   extraEnvVarsSecrets: []
@@ -2547,7 +2547,7 @@ runner:
     mountPath: /nango/runner/data
     ## @param runner.persistence.subPath The subdirectory of the volume to mount to, useful in dev environments and one PV for multiple services
     ##
-    subPath: ''
+    subPath: ""
     ## @param runner.persistence.storageClass Storage class of backing PVC
     ## If defined, storageClassName: <storageClass>
     ## If set to "-", storageClassName: "", which disables dynamic provisioning
@@ -2555,7 +2555,7 @@ runner:
     ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
     ##   GKE, AWS & OpenStack)
     ##
-    storageClass: ''
+    storageClass: ""
     ## @param runner.persistence.annotations Persistent Volume Claim annotations
     ##
     annotations: {}
@@ -2571,8 +2571,8 @@ runner:
     dataSource: {}
     ## @param runner.persistence.existingClaim The name of an existing PVC to use for persistence
     ##
-    existingClaim: ''
-    ## @param runner.persistence.selector Selector to match an existing Persistent Volume
+    existingClaim: ""
+    ## @param runner.persistence.selector Selector to match an existing Persistent Volume 
     ## If set, the PVC can't have a PV dynamically provisioned for it
     ## E.g.
     ## selector:
@@ -2599,11 +2599,11 @@ metering:
   ## @param metering.image.pullSecrets metering image pull secrets
   ##
   image:
-    registry: ''
-    repository: ''
-    tag: ''
-    digest: ''
-    pullPolicy: ''
+    registry: ""
+    repository: ""
+    tag: ""
+    digest: ""
+    pullPolicy: ""
     pullSecrets: []
   ## @param metering.replicaCount Number of metering replicas to deploy
   ##
@@ -2614,8 +2614,8 @@ metering:
   ## @param metering.args Override default metering container args (useful when using custom images)
   ##
   args:
-    - 'node'
-    - 'packages/metering/dist/app.js'
+    - "node"
+    - "packages/metering/dist/app.js"
   ## ServiceAccount configuration
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
   ##
@@ -2626,7 +2626,7 @@ metering:
     ## @param metering.serviceAccount.name The name of the ServiceAccount to use.
     ## If not set and create is true, a name is generated using the metering.names.fullname template
     ##
-    name: ''
+    name: ""
     ## @param metering.serviceAccount.annotations Additional Service Account annotations (evaluated as a template)
     ##
     annotations: {}
@@ -2710,7 +2710,7 @@ metering:
     pathType: Prefix
     ## @param metering.ingress.apiVersion Force Ingress API version (automatically detected if not set)
     ##
-    apiVersion: ''
+    apiVersion: ""
     ## @param metering.ingress.hostname Default host for the ingress record
     ##
     hostname: example-app.nango.dev
@@ -2718,7 +2718,7 @@ metering:
     ## This is supported in Kubernetes 1.18+ and required if you have more than one IngressClass marked as the default for your cluster .
     ## ref: https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/
     ##
-    ingressClassName: ''
+    ingressClassName: ""
     ## @param metering.ingress.path Default path for the ingress record
     ## NOTE: You may need to set this to '/*' in order to use this with ALB ingress controllers
     ##
@@ -2821,17 +2821,17 @@ metering:
     ## NOTE: choose port between <30000-32767>
     ##
     nodePorts:
-      http: ''
-      https: ''
+      http: ""
+      https: ""
     ## @param metering.service.clusterIP metering service Cluster IP
     ## e.g.:
     ## clusterIP: None
     ##
-    clusterIP: ''
+    clusterIP: ""
     ## @param metering.service.loadBalancerIP metering service Load Balancer IP
     ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-loadbalancer
     ##
-    loadBalancerIP: ''
+    loadBalancerIP: ""
     ## @param metering.service.loadBalancerSourceRanges metering service Load Balancer sources
     ## ref: https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service
     ## e.g:
@@ -2866,8 +2866,8 @@ metering:
   ##
   containerPorts:
     enabled: false
-    http: ''
-    https: ''
+    http: ""
+    https: ""
   ## @param metering.extraContainerPorts Optionally specify extra list of additional ports for metering containers
   ## e.g:
   ## extraContainerPorts:
@@ -2881,7 +2881,7 @@ metering:
   ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
   ##
   updateStrategy:
-    type: 'RollingUpdate'
+    type: "RollingUpdate"
   ## Pod Disruption Budget configuration
   ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb
   ## @param metering.pdb.create Enable/disable a Pod Disruption Budget creation
@@ -2891,7 +2891,7 @@ metering:
   pdb:
     create: true
     minAvailable: 1
-    maxUnavailable: ''
+    maxUnavailable: ""
   ## Autoscaling configuration
   ## ref: https://kubernetes.io/docs/concepts/workloads/autoscaling/
   ##
@@ -2906,8 +2906,8 @@ metering:
       enabled: false
       minReplicas: 1
       maxReplicas: 1
-      targetCPU: ''
-      targetMemory: ''
+      targetCPU: ""
+      targetMemory: ""
     ## @param metering.autoscaling.vpa.enabled Enable VPA for metering pods
     ## @param metering.autoscaling.vpa.annotations Annotations for VPA resource
     ## @param metering.autoscaling.vpa.controlledResources VPA List of resources that the vertical pod autoscaler can control. Defaults to cpu and memory
@@ -2941,7 +2941,7 @@ metering:
   ## ref: http://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/
   ## @param metering.resourcesPreset Set metering container resources according to one common preset (allowed values: none, nano, micro, small, medium, large, xlarge, 2xlarge). This is ignored if metering.resources is set (metering.resources is recommended for production).
   ##
-  resourcesPreset: 'small'
+  resourcesPreset: "small"
   ## @param metering.resources Set metering container requests and limits for different resources like CPU or memory (essential for production workloads)
   ## Example:
   ## resources:
@@ -2962,13 +2962,13 @@ metering:
   extraEnvVars: []
   ## @param metering.extraEnvVarsCM Name of existing ConfigMap containing extra env vars for metering containers
   ##
-  extraEnvVarsCM: ''
+  extraEnvVarsCM: ""
   ## @param metering.extraEnvVarsCMs Name of existing ConfigMaps containing extra env vars for metering containers
   ##
   extraEnvVarsCMs: []
   ## @param metering.extraEnvVarsSecret Name of existing Secret containing extra env vars for metering containers
   ##
-  extraEnvVarsSecret: ''
+  extraEnvVarsSecret: ""
   ## @param metering.extraEnvVarsSecrets Name of existing Secrets containing extra env vars for metering containers
   ##
   extraEnvVarsSecrets: []
@@ -3046,7 +3046,7 @@ metering:
     mountPath: /nango/metering/data
     ## @param metering.persistence.subPath The subdirectory of the volume to mount to, useful in dev environments and one PV for multiple services
     ##
-    subPath: ''
+    subPath: ""
     ## @param metering.persistence.storageClass Storage class of backing PVC
     ## If defined, storageClassName: <storageClass>
     ## If set to "-", storageClassName: "", which disables dynamic provisioning
@@ -3054,7 +3054,7 @@ metering:
     ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
     ##   GKE, AWS & OpenStack)
     ##
-    storageClass: ''
+    storageClass: ""
     ## @param metering.persistence.annotations Persistent Volume Claim annotations
     ##
     annotations: {}
@@ -3070,8 +3070,8 @@ metering:
     dataSource: {}
     ## @param metering.persistence.existingClaim The name of an existing PVC to use for persistence
     ##
-    existingClaim: 'nango-jobs'
-    ## @param metering.persistence.selector Selector to match an existing Persistent Volume
+    existingClaim: "nango-jobs"
+    ## @param metering.persistence.selector Selector to match an existing Persistent Volume 
     ## If set, the PVC can't have a PV dynamically provisioned for it
     ## E.g.
     ## selector:
@@ -3081,19 +3081,19 @@ metering:
     selector: {}
 
 ## @skip redis
-redis:
+redis:  
   enabled: false
   image:
     repository: bitnamilegacy/redis
     tag: 8.2.1-debian-12-r0
-
+  
 ## @skip postgresql
 postgresql:
   enabled: false
   image:
     repository: bitnamilegacy/postgresql
     tag: 17.6.0-debian-12-r4
-
+  
 ## @skip elasticsearch
 elasticsearch:
   enabled: false
@@ -3117,7 +3117,7 @@ unleash:
   enabled: false
   ## Pin the Unleash server image explicitly.
   image:
-    tag: '7.6.3'
+    tag: "7.6.3"
   ## Run Unleash's database on the Unleash node itself (bundled bitnami Postgres).
   ## fullnameOverride keeps the Service name stable and distinct from Nango's DB.
   postgresql:
