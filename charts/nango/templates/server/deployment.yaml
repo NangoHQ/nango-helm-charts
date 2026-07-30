@@ -63,7 +63,11 @@ spec:
           {{- if .Values.server.command }}
           command: {{- include "common.tplvalues.render" (dict "value" .Values.server.command "context" $) | nindent 12 }}
           {{- end }}
-          {{- if .Values.server.args }}
+          {{- if .Values.server.connectUI.enabled }}
+          # Replaces `server.args`: only the image entrypoint starts both the API and Connect UI.
+          args:
+            - packages/server/entrypoint.sh
+          {{- else if .Values.server.args }}
           args: {{- include "common.tplvalues.render" (dict "value" .Values.server.args "context" $) | nindent 12 }}
           {{- end }}
           {{- if .Values.server.resources }}
@@ -76,6 +80,10 @@ spec:
               containerPort: {{ .Values.server.containerPorts.http }}
             - name: https
               containerPort: {{ .Values.server.containerPorts.https }}
+            {{- if .Values.server.connectUI.enabled }}
+            - name: connect-ui
+              containerPort: {{ .Values.server.connectUI.port }}
+            {{- end }}
             {{- if .Values.server.extraContainerPorts }}
             {{- include "common.tplvalues.render" (dict "value" .Values.server.extraContainerPorts "context" $) | nindent 12 }}
             {{- end }}
@@ -106,10 +114,14 @@ spec:
               port: http
               scheme: HTTP
           {{- end }}
-          {{- if .Values.server.sidecars }}
-          sidecars: {{- include "common.tplvalues.render" ( dict "value" .Values.server.sidecars "context" $) | nindent 12 }}
-          {{- end }}
           env:
+            {{- include "nango.serviceUrlEnv" . | nindent 12 }}
+            {{- if .Values.server.connectUI.enabled }}
+            - name: FLAG_SERVE_CONNECT_UI
+              value: "true"
+            - name: NANGO_CONNECT_UI_PORT
+              value: {{ .Values.server.connectUI.port | quote }}
+            {{- end }}
             {{- if .Values.server.extraEnvVars }}
             {{- include "common.tplvalues.render" (dict "value" .Values.server.extraEnvVars "context" $) | nindent 12 }}
             {{- end }}
@@ -142,6 +154,9 @@ spec:
           {{- if .Values.server.extraVolumeMounts }}
           {{- include "common.tplvalues.render" (dict "value" .Values.server.extraVolumeMounts "context" $) | nindent 12 }}
           {{- end }}
+        {{- if .Values.server.sidecars }}
+        {{- include "common.tplvalues.render" ( dict "value" .Values.server.sidecars "context" $) | nindent 8 }}
+        {{- end }}
       volumes:
         - name: empty-dir
           emptyDir: {}
