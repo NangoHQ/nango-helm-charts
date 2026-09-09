@@ -106,6 +106,9 @@ spec:
               port: http
               scheme: HTTP
           {{- end }}
+          {{- if .Values.jobs.lifecycleHooks }}
+          lifecycle: {{- include "common.tplvalues.render" (dict "value" .Values.jobs.lifecycleHooks "context" $) | nindent 12 }}
+          {{- end }}
           {{- if .Values.jobs.sidecars }}
           sidecars: {{- include "common.tplvalues.render" ( dict "value" .Values.jobs.sidecars "context" $) | nindent 12 }}
           {{- end }}
