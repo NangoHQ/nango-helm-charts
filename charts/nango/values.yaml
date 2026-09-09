@@ -1859,6 +1859,14 @@ jobs:
       ##
       updatePolicy:
         updateMode: Auto
+  ## @param jobs.lifecycleHooks Add lifecycle hooks to the jobs container
+  ## e.g:
+  ## lifecycleHooks:
+  ##   preStop:
+  ##     sleep:
+  ##       seconds: 15
+  ##
+  lifecycleHooks: {}
   ## @param jobs.sidecars Add additional sidecar containers to the jobs pods
   ## e.g:
   ## sidecars:
