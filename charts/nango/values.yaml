@@ -377,6 +377,14 @@ server:
       ##
       updatePolicy:
         updateMode: Auto
+  ## @param server.lifecycleHooks Add lifecycle hooks to the server container
+  ## e.g:
+  ## lifecycleHooks:
+  ##   preStop:
+  ##     sleep:
+  ##       seconds: 15
+  ##
+  lifecycleHooks: {}
   ## @param server.sidecars Add additional sidecar containers to the server pods
   ## e.g:
   ## sidecars:
@@ -871,6 +879,14 @@ persist:
       ##
       updatePolicy:
         updateMode: Auto
+  ## @param persist.lifecycleHooks Add lifecycle hooks to the persist container
+  ## e.g:
+  ## lifecycleHooks:
+  ##   preStop:
+  ##     sleep:
+  ##       seconds: 15
+  ##
+  lifecycleHooks: {}
   ## @param persist.sidecars Add additional sidecar containers to the persist pods
   ## e.g:
   ## sidecars:
@@ -1365,6 +1381,14 @@ orchestrator:
       ##
       updatePolicy:
         updateMode: Auto
+  ## @param orchestrator.lifecycleHooks Add lifecycle hooks to the orchestrator container
+  ## e.g:
+  ## lifecycleHooks:
+  ##   preStop:
+  ##     sleep:
+  ##       seconds: 15
+  ##
+  lifecycleHooks: {}
   ## @param orchestrator.sidecars Add additional sidecar containers to the orchestrator pods
   ## e.g:
   ## sidecars:
