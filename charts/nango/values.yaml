@@ -2448,6 +2448,14 @@ runner:
       ##
       updatePolicy:
         updateMode: Auto
+  ## @param runner.lifecycleHooks Add lifecycle hooks to the runner container
+  ## e.g:
+  ## lifecycleHooks:
+  ##   preStop:
+  ##     sleep:
+  ##       seconds: 15
+  ##
+  lifecycleHooks: {}
   ## @param runner.sidecars Add additional sidecar containers to the runner pods
   ## e.g:
   ## sidecars:
