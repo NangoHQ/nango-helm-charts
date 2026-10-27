@@ -1,0 +1,53 @@
+{{- if .Values.selfHosting.enabled }}
+{{- if .Values.selfHosting.service.create }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "selfHosting.names.service" . }}
+  namespace: {{ include "selfHosting.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: {{ include "selfHosting.names.component" . }}
+  {{- if or .Values.selfHosting.service.annotations .Values.commonAnnotations }}
+  {{- $annotations := include "common.tplvalues.merge" (dict "values" (list .Values.selfHosting.service.annotations .Values.commonAnnotations) "context" .) }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" $annotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.selfHosting.service.type }}
+  {{- if and .Values.selfHosting.service.clusterIP (eq .Values.selfHosting.service.type "ClusterIP") }}
+  clusterIP: {{ .Values.selfHosting.service.clusterIP }}
+  {{- end }}
+  {{- if .Values.selfHosting.service.sessionAffinity }}
+  sessionAffinity: {{ .Values.selfHosting.service.sessionAffinity }}
+  {{- end }}
+  {{- if .Values.selfHosting.service.sessionAffinityConfig }}
+  sessionAffinityConfig: {{- include "common.tplvalues.render" (dict "value" .Values.selfHosting.service.sessionAffinityConfig "context" $) | nindent 4 }}
+  {{- end }}
+  {{- if or (eq .Values.selfHosting.service.type "LoadBalancer") (eq .Values.selfHosting.service.type "NodePort") }}
+  externalTrafficPolicy: {{ .Values.selfHosting.service.externalTrafficPolicy | quote }}
+  {{- end }}
+  {{- if and (eq .Values.selfHosting.service.type "LoadBalancer") (not (empty .Values.selfHosting.service.loadBalancerSourceRanges)) }}
+  loadBalancerSourceRanges: {{ .Values.selfHosting.service.loadBalancerSourceRanges }}
+  {{- end }}
+  {{- if and (eq .Values.selfHosting.service.type "LoadBalancer") (not (empty .Values.selfHosting.service.loadBalancerIP)) }}
+  loadBalancerIP: {{ .Values.selfHosting.service.loadBalancerIP }}
+  {{- end }}
+  ports:
+    - name: http
+      port: {{ .Values.selfHosting.service.ports.http }}
+      {{- if not (eq .Values.selfHosting.service.ports.http .Values.selfHosting.containerPorts.http) }}
+      targetPort: {{ .Values.selfHosting.containerPorts.http }}
+      {{- end }}
+      protocol: TCP
+      {{- if and (or (eq .Values.selfHosting.service.type "NodePort") (eq .Values.selfHosting.service.type "LoadBalancer")) (not (empty .Values.selfHosting.service.nodePorts.http)) }}
+      nodePort: {{ .Values.selfHosting.service.nodePorts.http }}
+      {{- else if eq .Values.selfHosting.service.type "ClusterIP" }}
+      nodePort: null
+      {{- end }}
+    {{- if .Values.selfHosting.service.extraPorts }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.selfHosting.service.extraPorts "context" $) | nindent 4 }}
+    {{- end }}
+  {{- $podLabels := include "common.tplvalues.merge" (dict "values" (list .Values.selfHosting.podLabels .Values.commonLabels) "context" .) | fromYaml }}
+  selector: {{- include "common.labels.matchLabels" ( dict "customLabels" $podLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: {{ include "selfHosting.names.component" . }}
+{{- end }}
+{{- end }}

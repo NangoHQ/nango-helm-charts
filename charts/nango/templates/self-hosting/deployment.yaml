@@ -1,0 +1,161 @@
+{{- if .Values.selfHosting.enabled }}
+apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
+kind: Deployment
+metadata:
+  name: {{ include "selfHosting.names.fullname" . }}
+  namespace: {{ include "selfHosting.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: {{ include "selfHosting.names.component" . }}
+  {{- if or .Values.selfHosting.deploymentAnnotations .Values.commonAnnotations }}
+  {{- $annotations := include "common.tplvalues.merge" (dict "values" (list .Values.selfHosting.deploymentAnnotations .Values.commonAnnotations) "context" .) }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" $annotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if not .Values.selfHosting.autoscaling.hpa.enabled }}
+  replicas: {{ .Values.selfHosting.replicaCount }}
+  {{- end -}}
+  {{- if .Values.selfHosting.updateStrategy }}
+  strategy: {{- toYaml .Values.selfHosting.updateStrategy | nindent 4 }}
+  {{- end }}
+  {{- $podLabels := include "common.tplvalues.merge" (dict "values" (list .Values.selfHosting.podLabels .Values.commonLabels) "context" .) }}
+  selector: 
+    matchLabels: {{- include "common.labels.matchLabels" ( dict "customLabels" $podLabels "context" $ ) | nindent 6 }}
+      app.kubernetes.io/component: {{ include "selfHosting.names.component" . }}
+  template:
+    metadata:
+      {{- if .Values.selfHosting.podAnnotations }}
+      annotations: {{- include "common.tplvalues.render" (dict "value" .Values.selfHosting.podAnnotations "context" $) | nindent 8 }}
+      {{- end }}
+      labels: {{- include "common.labels.standard" ( dict "customLabels" $podLabels "context" $ ) | nindent 8 }}
+        app.kubernetes.io/component: {{ include "selfHosting.names.component" . }}
+    spec:
+      {{- if .Values.selfHosting.imagePullSecrets }}
+      imagePullSecrets: {{- include "common.tplvalues.render" ( dict "value" .Values.selfHosting.imagePullSecrets "context" $) | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ template "selfHosting.names.serviceAccountName" . }}
+      {{- if .Values.selfHosting.hostAliases }}
+      hostAliases: {{- include "common.tplvalues.render" (dict "value" .Values.selfHosting.hostAliases "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.selfHosting.nodeSelector }}
+      nodeSelector: {{- include "common.tplvalues.render" ( dict "value" .Values.selfHosting.nodeSelector "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.selfHosting.tolerations }}
+      tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.selfHosting.tolerations "context" .) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.selfHosting.priorityClassName }}
+      priorityClassName: {{ .Values.selfHosting.priorityClassName | quote }}
+      {{- end }}
+      {{- if .Values.selfHosting.schedulerName }}
+      schedulerName: {{ .Values.selfHosting.schedulerName | quote }}
+      {{- end }}
+      {{- if .Values.selfHosting.topologySpreadConstraints }}
+      topologySpreadConstraints: {{- include "common.tplvalues.render" (dict "value" .Values.selfHosting.topologySpreadConstraints "context" .) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.selfHosting.podSecurityContext.enabled }}
+      securityContext: {{- omit .Values.selfHosting.podSecurityContext "enabled" | toYaml | nindent 8 }}
+      {{- end }}
+      {{- if .Values.selfHosting.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ .Values.selfHosting.terminationGracePeriodSeconds }}
+      {{- end }}
+      containers:
+        - name: {{ include "selfHosting.names.component" . }}
+          image: {{ template "selfHosting.image" . }}
+          imagePullPolicy: {{ include "selfHosting.images.pullPolicy" . }}
+          {{- if .Values.selfHosting.command }}
+          command: {{- include "common.tplvalues.render" (dict "value" .Values.selfHosting.command "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.selfHosting.args }}
+          args: {{- include "common.tplvalues.render" (dict "value" .Values.selfHosting.args "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.selfHosting.resources }}
+          resources: {{- toYaml .Values.selfHosting.resources | nindent 12 }}
+          {{- else if ne .Values.selfHosting.resourcesPreset "none" }}
+          resources: {{- include "common.resources.preset" (dict "type" .Values.selfHosting.resourcesPreset) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.selfHosting.containerPorts.enabled }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.selfHosting.containerPorts.http }}
+            - name: https
+              containerPort: {{ .Values.selfHosting.containerPorts.https }}
+            {{- if .Values.selfHosting.extraContainerPorts }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.selfHosting.extraContainerPorts "context" $) | nindent 12 }}
+            {{- end }}
+          {{- end }}
+          {{- if .Values.selfHosting.customLivenessProbe }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.selfHosting.customLivenessProbe "context" $) | nindent 12 }}
+          {{- else if .Values.selfHosting.livenessProbe.enabled }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.selfHosting.livenessProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+          {{- end }}
+          {{- if .Values.selfHosting.customReadinessProbe }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.selfHosting.customReadinessProbe "context" $) | nindent 12 }}
+          {{- else if .Values.selfHosting.readinessProbe.enabled }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.selfHosting.readinessProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+          {{- end }}
+          {{- if .Values.selfHosting.customStartupProbe }}
+          startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.selfHosting.customStartupProbe "context" $) | nindent 12 }}
+          {{- else if .Values.selfHosting.startupProbe.enabled }}
+          startupProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.selfHosting.startupProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+          {{- end }}
+          {{- if .Values.selfHosting.sidecars }}
+          sidecars: {{- include "common.tplvalues.render" ( dict "value" .Values.selfHosting.sidecars "context" $) | nindent 12 }}
+          {{- end }}
+          env:
+            {{- if .Values.selfHosting.extraEnvVars }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.selfHosting.extraEnvVars "context" $) | nindent 12 }}
+            {{- end }}
+          envFrom:
+          {{- if .Values.selfHosting.extraEnvVarsCM }}
+            - configMapRef:
+                name: {{ include "common.tplvalues.render" (dict "value" .Values.selfHosting.extraEnvVarsCM "context" $) }}
+          {{- end }}
+          {{- range .Values.selfHosting.extraEnvVarsCMs }}
+            - configMapRef:
+                name: {{ include "common.tplvalues.render" (dict "value" . "context" $) }}
+          {{- end }}
+          {{- if .Values.selfHosting.extraEnvVarsSecret }}
+            - secretRef:
+                name: {{ include "common.tplvalues.render" (dict "value" .Values.selfHosting.extraEnvVarsSecret "context" $) }}
+          {{- end }}
+          {{- range .Values.selfHosting.extraEnvVarsSecrets }}
+            - secretRef:
+                name: {{ include "common.tplvalues.render" (dict "value" . "context" $) }}
+          {{- end }}
+          volumeMounts:
+            - name: data
+              mountPath: {{ .Values.selfHosting.persistence.mountPath }}
+              {{- if .Values.selfHosting.persistence.subPath }}
+              subPath: {{ .Values.selfHosting.persistence.subPath }}
+              {{- end }}
+            - name: empty-dir
+              mountPath: /tmp
+              subPath: tmp-dir
+          {{- if .Values.selfHosting.extraVolumeMounts }}
+          {{- include "common.tplvalues.render" (dict "value" .Values.selfHosting.extraVolumeMounts "context" $) | nindent 12 }}
+          {{- end }}
+      volumes:
+        - name: empty-dir
+          emptyDir: {}
+        - name: data
+        {{- if .Values.selfHosting.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ default (include "selfHosting.names.fullname" .) .Values.selfHosting.persistence.existingClaim }}
+        {{- else }}
+          emptyDir: {}
+        {{- end }}
+        {{- if .Values.selfHosting.extraVolumes }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.selfHosting.extraVolumes "context" $) | nindent 8 }}
+        {{- end }}
+{{- end }}
