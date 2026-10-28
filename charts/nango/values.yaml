@@ -3111,7 +3111,7 @@ metering:
 
 ## @skip redis
 selfHosting:
-  ## @param selfHosting.enabled Enable/disable the self-hosting service: the control plane for installations at Nango, the installation side elsewhere
+  ## @param selfHosting.enabled Enable/disable self-hosting
   enabled: false
   ## @param selfHosting.name self-hosting name
   ##
@@ -3386,7 +3386,7 @@ selfHosting:
     ##     timeoutSeconds: 300
     ##
     sessionAffinityConfig: {}
-  ## @param selfHosting.containerPorts.enabled Enable/disable the self-hosting service: the control plane for installations at Nango, the installation side elsewhere container ports
+  ## @param selfHosting.containerPorts.enabled Enable/disable self-hosting container ports
   ## @param selfHosting.containerPorts.http self-hosting HTTP container port
   ## @param selfHosting.containerPorts.https self-hosting HTTPS container port
   ##
