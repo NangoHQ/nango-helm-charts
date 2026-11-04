@@ -1,0 +1,25 @@
+{{- if .Values.selfHosting.enabled }}
+{{- if .Values.selfHosting.pdb.create }}
+apiVersion: {{ include "common.capabilities.policy.apiVersion" . }}
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "selfHosting.names.fullname" . }}
+  namespace: {{ include "selfHosting.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: {{ include "selfHosting.names.component" . }}
+  {{- if .Values.commonAnnotations }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if .Values.selfHosting.pdb.minAvailable }}
+  minAvailable: {{ .Values.selfHosting.pdb.minAvailable }}
+  {{- end  }}
+  {{- if or .Values.selfHosting.pdb.maxUnavailable ( not .Values.selfHosting.pdb.minAvailable ) }}
+  maxUnavailable: {{ .Values.selfHosting.pdb.maxUnavailable | default 1 }}
+  {{- end  }}
+  {{- $podLabels := include "common.tplvalues.merge" ( dict "values" ( list .Values.selfHosting.podLabels .Values.commonLabels ) "context" . ) }}
+  selector:
+    matchLabels: {{- include "common.labels.matchLabels" ( dict "customLabels" $podLabels "context" $ ) | nindent 6 }}
+      app.kubernetes.io/component: {{ include "selfHosting.names.component" . }}
+{{- end }}
+{{- end }}

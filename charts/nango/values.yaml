@@ -3110,6 +3110,503 @@ metering:
     selector: {}
 
 ## @skip redis
+selfHosting:
+  ## @param selfHosting.enabled Enable/disable self-hosting
+  enabled: false
+  ## @param selfHosting.name self-hosting name
+  ##
+  name: self-hosting
+  ## self-hosting image
+  ## @param selfHosting.image.registry [default: nangohq] self-hosting image registry
+  ## @param selfHosting.image.repository [default: nango] self-hosting image repository
+  ## @skip selfHosting.image.tag self-hosting image tag (immutable tags are recommended)
+  ## @param selfHosting.image.digest self-hosting image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended)
+  ## @param selfHosting.image.pullPolicy self-hosting image pull policy
+  ## @param selfHosting.image.pullSecrets self-hosting image pull secrets
+  ##
+  image:
+    registry: ""
+    repository: ""
+    tag: ""
+    digest: ""
+    pullPolicy: ""
+    pullSecrets: []
+  ## @param selfHosting.replicaCount Number of self-hosting replicas to deploy
+  ##
+  replicaCount: 1
+  ## @param selfHosting.command Override default self-hosting container command (useful when using custom images)
+  ##
+  command: []
+  ## @param selfHosting.args Override default self-hosting container args (useful when using custom images)
+  ##
+  args:
+    - "node"
+    - "packages/self-hosting/dist/app.js"
+  ## ServiceAccount configuration
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+  ##
+  serviceAccount:
+    ## @param selfHosting.serviceAccount.create Specifies whether a ServiceAccount should be created
+    ##
+    create: true
+    ## @param selfHosting.serviceAccount.name The name of the ServiceAccount to use.
+    ## If not set and create is true, a name is generated using the selfHosting.names.fullname template
+    ##
+    name: ""
+    ## @param selfHosting.serviceAccount.annotations Additional Service Account annotations (evaluated as a template)
+    ##
+    annotations: {}
+    ## @param selfHosting.serviceAccount.automountServiceAccountToken Automount service account token for the self-hosting service account
+    ##
+    automountServiceAccountToken: true
+  ## Network Policies
+  ## Ref: https://kubernetes.io/docs/concepts/services-networking/network-policies/
+  ##
+  networkPolicy:
+    ## @param selfHosting.networkPolicy.enabled Specifies whether a NetworkPolicy should be created
+    ##
+    enabled: true
+    ## @param selfHosting.networkPolicy.allowExternal Don't require self-hosting label for connections
+    ## The Policy model to apply. When set to false, only pods with the correct
+    ## self-hosting label will have network access to the ports self-hosting is listening
+    ## on. When true, self-hosting will accept connections from any source
+    ## (with the correct destination port).
+    ##
+    allowExternal: true
+    ## @param selfHosting.networkPolicy.allowExternalEgress Allow the pod to access any range of port and all destinations.
+    ##
+    allowExternalEgress: true
+    ## @param selfHosting.networkPolicy.addExternalClientAccess Allow access from pods with client label set to "true". Ignored if `selfHosting.networkPolicy.allowExternal` is true.
+    ##
+    addExternalClientAccess: true
+    ## @param selfHosting.networkPolicy.extraIngress [array] Add extra ingress rules to the NetworkPolicy
+    ## e.g:
+    ## extraIngress:
+    ##   - ports:
+    ##       - port: 1234
+    ##     from:
+    ##       - podSelector:
+    ##           - matchLabels:
+    ##               - role: frontend
+    ##       - podSelector:
+    ##           - matchExpressions:
+    ##               - key: role
+    ##                 operator: In
+    ##                 values:
+    ##                   - frontend
+    extraIngress: []
+    ## @param selfHosting.networkPolicy.extraEgress [array] Add extra ingress rules to the NetworkPolicy (ignored if allowExternalEgress=true)
+    ## e.g:
+    ## extraEgress:
+    ##   - ports:
+    ##       - port: 1234
+    ##     to:
+    ##       - podSelector:
+    ##           - matchLabels:
+    ##               - role: frontend
+    ##       - podSelector:
+    ##           - matchExpressions:
+    ##               - key: role
+    ##                 operator: In
+    ##                 values:
+    ##                   - frontend
+    ##
+    extraEgress: []
+    ## @param selfHosting.networkPolicy.ingressPodMatchLabels [object] Labels to match to allow traffic from other pods. Ignored if `selfHosting.networkPolicy.allowExternal` is true.
+    ## e.g:
+    ## ingressPodMatchLabels:
+    ##   my-client: "true"
+    #
+    ingressPodMatchLabels: {}
+    ## @param selfHosting.networkPolicy.ingressNSMatchLabels [object] Labels to match to allow traffic from other namespaces. Ignored if `selfHosting.networkPolicy.allowExternal` is true.
+    ##
+    ingressNSMatchLabels: {}
+    ## @param selfHosting.networkPolicy.ingressNSPodMatchLabels [object] Pod labels to match to allow traffic from other namespaces. Ignored if `selfHosting.networkPolicy.allowExternal` is true.
+    ##
+    ingressNSPodMatchLabels: {}
+  ## self-hosting ingress parameters
+  ## ref: http://kubernetes.io/docs/concepts/services-networking/ingress/
+  ##
+  ingress:
+    ## @param selfHosting.ingress.enabled Enable ingress record generation for self-hosting
+    ##
+    enabled: false
+    ## @param selfHosting.ingress.pathType Ingress path type
+    ##
+    pathType: Prefix
+    ## @param selfHosting.ingress.apiVersion Force Ingress API version (automatically detected if not set)
+    ##
+    apiVersion: ""
+    ## @param selfHosting.ingress.hostname Default host for the ingress record
+    ##
+    hostname: example-app.nango.dev
+    ## @param selfHosting.ingress.ingressClassName IngressClass that will be be used to implement the Ingress (Kubernetes 1.18+)
+    ## This is supported in Kubernetes 1.18+ and required if you have more than one IngressClass marked as the default for your cluster .
+    ## ref: https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/
+    ##
+    ingressClassName: ""
+    ## @param selfHosting.ingress.path Default path for the ingress record
+    ## NOTE: You may need to set this to '/*' in order to use this with ALB ingress controllers
+    ##
+    path: /
+    ## @param selfHosting.ingress.annotations Additional annotations for the Ingress resource. To enable certificate autogeneration, place here your cert-manager annotations.
+    ## Use this parameter to set the required annotations for cert-manager, see
+    ## ref: https://cert-manager.io/docs/usage/ingress/#supported-annotations
+    ## e.g:
+    ## annotations:
+    ##   kubernetes.io/ingress.class: nginx
+    ##   cert-manager.io/cluster-issuer: cluster-issuer-name
+    ##
+    annotations: {}
+    ## @param selfHosting.ingress.tls Enable TLS configuration for the host defined at `selfHosting.ingress.hostname` parameter
+    ## TLS certificates will be retrieved from a TLS secret with name: `{{- printf "%s-tls" .Values.selfHosting.ingress.hostname }}`
+    ## You can:
+    ##   - Use the `selfHosting.ingress.secrets` parameter to create this TLS secret
+    ##   - Rely on cert-manager to create it by setting the corresponding annotations
+    ##   - Rely on Helm to create self-signed certificates by setting `selfHosting.ingress.selfSigned=true`
+    ##
+    tls: false
+    ## @param selfHosting.ingress.selfSigned Create a TLS secret for this ingress record using self-signed certificates generated by Helm
+    ##
+    selfSigned: false
+    ## @param selfHosting.ingress.extraHosts An array with additional hostname(s) to be covered with the ingress record
+    ## e.g:
+    ## extraHosts:
+    ##   - name: selfHosting.local
+    ##     path: /
+    ##
+    extraHosts: []
+    ## @param selfHosting.ingress.extraPaths An array with additional arbitrary paths that may need to be added to the ingress under the main host
+    ## e.g:
+    ## extraPaths:
+    ## - path: /*
+    ##   backend:
+    ##     serviceName: ssl-redirect
+    ##     servicePort: use-annotation
+    ##
+    extraPaths: []
+    ## @param selfHosting.ingress.extraTls TLS configuration for additional hostname(s) to be covered with this ingress record
+    ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/#tls
+    ## e.g:
+    ## extraTls:
+    ## - hosts:
+    ##     - selfHosting.local
+    ##   secretName: selfHosting.local-tls
+    ##
+    extraTls: []
+    ## @param selfHosting.ingress.secrets Custom TLS certificates as secrets
+    ## NOTE: 'key' and 'certificate' are expected in PEM format
+    ## NOTE: 'name' should line up with a 'secretName' set further up
+    ## If it is not set and you're using cert-manager, this is unneeded, as it will create a secret for you with valid certificates
+    ## If it is not set and you're NOT using cert-manager either, self-signed certificates will be created valid for 365 days
+    ## It is also possible to create and manage the certificates outside of this helm chart
+    ## Please see README.md for more information
+    ## e.g:
+    ## secrets:
+    ##   - name: selfHosting.local-tls
+    ##     key: |-
+    ##       -----BEGIN RSA PRIVATE KEY-----
+    ##       ...
+    ##       -----END RSA PRIVATE KEY-----
+    ##     certificate: |-
+    ##       -----BEGIN CERTIFICATE-----
+    ##       ...
+    ##       -----END CERTIFICATE-----
+    ##
+    secrets: []
+    ## @param selfHosting.ingress.extraRules Additional rules to be covered with this ingress record
+    ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-rules
+    ## e.g:
+    ## extraRules:
+    ## - host: example.local
+    ##     http:
+    ##       path: /
+    ##       backend:
+    ##         service:
+    ##           name: example-svc
+    ##           port:
+    ##             name: http
+    ##
+    extraRules: []
+  service:
+    ## @param selfHosting.service.create Create self-hosting service
+    ##
+    create: false
+    ## @param selfHosting.service.type self-hosting service type
+    ##
+    type: LoadBalancer
+    ## @param selfHosting.service.ports.http self-hosting service HTTP port
+    ## @param selfHosting.service.ports.https self-hosting service HTTPS port
+    ##
+    ports:
+      http: 80
+      https: 443
+    ## Node ports to expose
+    ## @param selfHosting.service.nodePorts.http Node port for HTTP
+    ## @param selfHosting.service.nodePorts.https Node port for HTTPS
+    ## NOTE: choose port between <30000-32767>
+    ##
+    nodePorts:
+      http: ""
+      https: ""
+    ## @param selfHosting.service.clusterIP self-hosting service Cluster IP
+    ## e.g.:
+    ## clusterIP: None
+    ##
+    clusterIP: ""
+    ## @param selfHosting.service.loadBalancerIP self-hosting service Load Balancer IP
+    ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-loadbalancer
+    ##
+    loadBalancerIP: ""
+    ## @param selfHosting.service.loadBalancerSourceRanges self-hosting service Load Balancer sources
+    ## ref: https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service
+    ## e.g:
+    ## loadBalancerSourceRanges:
+    ##   - 10.10.10.0/24
+    ##
+    loadBalancerSourceRanges: []
+    ## @param selfHosting.service.externalTrafficPolicy self-hosting service external traffic policy
+    ## ref http://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
+    ##
+    externalTrafficPolicy: Cluster
+    ## @param selfHosting.service.annotations Additional custom annotations for self-hosting service
+    ##
+    annotations: {}
+    ## @param selfHosting.service.extraPorts Extra ports to expose in self-hosting service (normally used with the `sidecars` value)
+    ##
+    extraPorts: []
+    ## @param selfHosting.service.sessionAffinity Control where client requests go, to the same pod or round-robin
+    ## Values: ClientIP or None
+    ## ref: https://kubernetes.io/docs/concepts/services-networking/service/
+    ##
+    sessionAffinity: None
+    ## @param selfHosting.service.sessionAffinityConfig Additional settings for the sessionAffinity
+    ## sessionAffinityConfig:
+    ##   clientIP:
+    ##     timeoutSeconds: 300
+    ##
+    sessionAffinityConfig: {}
+  ## @param selfHosting.containerPorts.enabled Enable/disable self-hosting container ports
+  ## @param selfHosting.containerPorts.http self-hosting HTTP container port
+  ## @param selfHosting.containerPorts.https self-hosting HTTPS container port
+  ##
+  containerPorts:
+    enabled: true
+    http: 3010
+    https: 3010
+  ## @param selfHosting.extraContainerPorts Optionally specify extra list of additional ports for self-hosting containers
+  ## e.g:
+  ## extraContainerPorts:
+  ##   - name: myservice
+  ##     containerPort: 9090
+  ##
+  extraContainerPorts: []
+  ## @param selfHosting.updateStrategy.type self-hosting deployment strategy type
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
+  ## @param selfHosting.updateStrategy.type self-hosting statefulset strategy type
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
+  ##
+  updateStrategy:
+    type: "RollingUpdate"
+  ## Pod Disruption Budget configuration
+  ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb
+  ## @param selfHosting.pdb.create Enable/disable a Pod Disruption Budget creation
+  ## @param selfHosting.pdb.minAvailable Minimum number/percentage of pods that should remain scheduled
+  ## @param selfHosting.pdb.maxUnavailable Maximum number/percentage of pods that may be made unavailable. Defaults to `1` if both `selfHosting.pdb.minAvailable` and `selfHosting.pdb.maxUnavailable` are empty.
+  ##
+  pdb:
+    create: true
+    minAvailable: 1
+    maxUnavailable: ""
+  ## Autoscaling configuration
+  ## ref: https://kubernetes.io/docs/concepts/workloads/autoscaling/
+  ##
+  autoscaling:
+    ## @param selfHosting.autoscaling.hpa.enabled Enable HPA for self-hosting pods
+    ## @param selfHosting.autoscaling.hpa.minReplicas Minimum number of replicas
+    ## @param selfHosting.autoscaling.hpa.maxReplicas Maximum number of replicas
+    ## @param selfHosting.autoscaling.hpa.targetCPU Target CPU utilization percentage
+    ## @param selfHosting.autoscaling.hpa.targetMemory Target Memory utilization percentage
+    ##
+    hpa:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 1
+      targetCPU: ""
+      targetMemory: ""
+    ## @param selfHosting.autoscaling.vpa.enabled Enable VPA for self-hosting pods
+    ## @param selfHosting.autoscaling.vpa.annotations Annotations for VPA resource
+    ## @param selfHosting.autoscaling.vpa.controlledResources VPA List of resources that the vertical pod autoscaler can control. Defaults to cpu and memory
+    ## @param selfHosting.autoscaling.vpa.maxAllowed VPA Max allowed resources for the pod
+    ## @param selfHosting.autoscaling.vpa.minAllowed VPA Min allowed resources for the pod
+    ##
+    vpa:
+      enabled: false
+      annotations: {}
+      controlledResources: []
+      maxAllowed: {}
+      minAllowed: {}
+      ## @param selfHosting.autoscaling.vpa.updatePolicy.updateMode Autoscaling update policy
+      ## Specifies whether recommended updates are applied when a Pod is started and whether recommended updates are applied during the life of a Pod
+      ## Possible values are "Off", "Initial", "Recreate", and "Auto".
+      ##
+      updatePolicy:
+        updateMode: Auto
+  ## @param selfHosting.sidecars Add additional sidecar containers to the self-hosting pods
+  ## e.g:
+  ## sidecars:
+  ##   - name: your-image-name
+  ##     image: your-image
+  ##     imagePullPolicy: Always
+  ##     ports:
+  ##       - name: portname
+  ##         containerPort: 1234
+  ##
+  sidecars: []
+  ## self-hosting resource requests and limits
+  ## ref: http://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/
+  ## @param selfHosting.resourcesPreset Set self-hosting container resources according to one common preset (allowed values: none, nano, micro, small, medium, large, xlarge, 2xlarge). This is ignored if selfHosting.resources is set (selfHosting.resources is recommended for production).
+  ##
+  resourcesPreset: "small"
+  ## @param selfHosting.resources Set self-hosting container requests and limits for different resources like CPU or memory (essential for production workloads)
+  ## Example:
+  ## resources:
+  ##   requests:
+  ##     cpu: 2
+  ##     memory: 512Mi
+  ##   limits:
+  ##     cpu: 3
+  ##     memory: 1024Mi
+  ##
+  resources: {}
+  ## @param selfHosting.extraEnvVars Array with extra environment variables to add to self-hosting containers
+  ## e.g:
+  ## extraEnvVars:
+  ##   - name: FOO
+  ##     value: "bar"
+  ##
+  extraEnvVars: []
+  ## @param selfHosting.extraEnvVarsCM Name of existing ConfigMap containing extra env vars for self-hosting containers
+  ##
+  extraEnvVarsCM: ""
+  ## @param selfHosting.extraEnvVarsCMs Name of existing ConfigMaps containing extra env vars for self-hosting containers
+  ##
+  extraEnvVarsCMs: []
+  ## @param selfHosting.extraEnvVarsSecret Name of existing Secret containing extra env vars for self-hosting containers
+  ##
+  extraEnvVarsSecret: ""
+  ## @param selfHosting.extraEnvVarsSecrets Name of existing Secrets containing extra env vars for self-hosting containers
+  ##
+  extraEnvVarsSecrets: []
+  ## Configure extra options for self-hosting containers' liveness and readiness probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
+  ## @param selfHosting.livenessProbe.enabled Enable livenessProbe on self-hosting containers
+  ## @param selfHosting.livenessProbe.initialDelaySeconds Initial delay seconds for livenessProbe
+  ## @param selfHosting.livenessProbe.periodSeconds Period seconds for livenessProbe
+  ## @param selfHosting.livenessProbe.timeoutSeconds Timeout seconds for livenessProbe
+  ## @param selfHosting.livenessProbe.failureThreshold Failure threshold for livenessProbe
+  ## @param selfHosting.livenessProbe.successThreshold Success threshold for livenessProbe
+  ##
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 20
+    periodSeconds: 10
+    timeoutSeconds: 3
+    failureThreshold: 6
+    successThreshold: 1
+  ## @param selfHosting.readinessProbe.enabled Enable readinessProbe on self-hosting containers
+  ## @param selfHosting.readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
+  ## @param selfHosting.readinessProbe.periodSeconds Period seconds for readinessProbe
+  ## @param selfHosting.readinessProbe.timeoutSeconds Timeout seconds for readinessProbe
+  ## @param selfHosting.readinessProbe.failureThreshold Failure threshold for readinessProbe
+  ## @param selfHosting.readinessProbe.successThreshold Success threshold for readinessProbe
+  ##
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 2
+    periodSeconds: 5
+    timeoutSeconds: 2
+    failureThreshold: 3
+    successThreshold: 1
+  ## @param selfHosting.startupProbe.enabled Enable startupProbe on self-hosting containers
+  ## @param selfHosting.startupProbe.initialDelaySeconds Initial delay seconds for startupProbe
+  ## @param selfHosting.startupProbe.periodSeconds Period seconds for startupProbe
+  ## @param selfHosting.startupProbe.timeoutSeconds Timeout seconds for startupProbe
+  ## @param selfHosting.startupProbe.failureThreshold Failure threshold for startupProbe
+  ## @param selfHosting.startupProbe.successThreshold Success threshold for startupProbe
+  ##
+  startupProbe:
+    enabled: false
+    initialDelaySeconds: 0
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 24
+    successThreshold: 1
+  ## Configure Pods Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
+  ## @param selfHosting.podSecurityContext.enabled Enable self-hosting pods' Security Context
+  ## @param selfHosting.podSecurityContext.fsGroupChangePolicy Set filesystem group change policy for self-hosting pods
+  ## @param selfHosting.podSecurityContext.sysctls Set kernel settings using the sysctl interface for self-hosting pods
+  ## @param selfHosting.podSecurityContext.supplementalGroups Set filesystem extra groups for self-hosting pods
+  ## @param selfHosting.podSecurityContext.fsGroup Set fsGroup in self-hosting pods' Security Context
+  ##
+  podSecurityContext:
+    enabled: false
+    fsGroupChangePolicy: Always
+    sysctls: []
+    supplementalGroups: []
+    fsGroup: 1001
+  ## @param selfHosting.deploymentAnnotations Annotations for self-hosting deployment
+  ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  ##
+  deploymentAnnotations: {}
+  ## Enable persistence using Persistent Volume Claims
+  ## ref: https://kubernetes.io/docs/concepts/storage/persistent-volumes/
+  ##
+  persistence:
+    ## @param selfHosting.persistence.enabled Enable persistence using Persistent Volume Claims
+    ##
+    enabled: false
+    ## @param selfHosting.persistence.mountPath Path to mount the volume at.
+    ##
+    mountPath: /nango/self-hosting/data
+    ## @param selfHosting.persistence.subPath The subdirectory of the volume to mount to, useful in dev environments and one PV for multiple services
+    ##
+    subPath: ""
+    ## @param selfHosting.persistence.storageClass Storage class of backing PVC
+    ## If defined, storageClassName: <storageClass>
+    ## If set to "-", storageClassName: "", which disables dynamic provisioning
+    ## If undefined (the default) or set to null, no storageClassName spec is
+    ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+    ##   GKE, AWS & OpenStack)
+    ##
+    storageClass: ""
+    ## @param selfHosting.persistence.annotations Persistent Volume Claim annotations
+    ##
+    annotations: {}
+    ## @param selfHosting.persistence.accessModes Persistent Volume Access Modes
+    ##
+    accessModes:
+      - ReadWriteOnce
+    ## @param selfHosting.persistence.size Size of data volume
+    ##
+    size: 8Gi
+    ## @param selfHosting.persistence.dataSource Custom PVC data source
+    ##
+    dataSource: {}
+    ## @param selfHosting.persistence.existingClaim The name of an existing PVC to use for persistence
+    ##
+    existingClaim: "nango-jobs"
+    ## @param selfHosting.persistence.selector Selector to match an existing Persistent Volume 
+    ## If set, the PVC can't have a PV dynamically provisioned for it
+    ## E.g.
+    ## selector:
+    ##   matchLabels:
+    ##     app: my-app
+    ##
+    selector: {}
+
+## @skip redis
 redis:  
   enabled: false
   image:

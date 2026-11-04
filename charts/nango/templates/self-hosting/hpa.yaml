@@ -1,0 +1,38 @@
+{{- if .Values.selfHosting.enabled }}
+{{- if .Values.selfHosting.autoscaling.hpa.enabled }}
+apiVersion: {{ include "common.capabilities.hpa.apiVersion" ( dict "context" $ ) }}
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "selfHosting.names.fullname" . }}
+  namespace: {{ include "selfHosting.names.namespace" . | quote}}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: {{ include "selfHosting.names.component" . }}
+  {{- if .Values.commonAnnotations }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  scaleTargetRef:
+    apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
+    kind: Deployment
+    name: {{ include "selfHosting.names.fullname" . }}
+  minReplicas: {{ .Values.selfHosting.autoscaling.hpa.minReplicas }}
+  maxReplicas: {{ .Values.selfHosting.autoscaling.hpa.maxReplicas }}
+  metrics:
+    {{- if .Values.selfHosting.autoscaling.hpa.targetMemory }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.selfHosting.autoscaling.hpa.targetMemory }}
+    {{- end }}
+    {{- if .Values.selfHosting.autoscaling.hpa.targetCPU }}
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.selfHosting.autoscaling.hpa.targetCPU }}
+    {{- end }}
+{{- end }}
+{{- end }}

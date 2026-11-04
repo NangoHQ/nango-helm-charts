@@ -1,0 +1,30 @@
+{{- if .Values.selfHosting.enabled }}
+{{- if and .Values.selfHosting.persistence.enabled (not .Values.selfHosting.persistence.existingClaim) -}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "selfHosting.names.fullname" . }}
+  namespace: {{ include "selfHosting.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: {{ include "selfHosting.names.component" . }}
+  {{- if or .Values.selfHosting.persistence.annotations .Values.commonAnnotations }}
+  {{- $annotations := include "common.tplvalues.merge" (dict "values" (list .Values.selfHosting.persistence.annotations .Values.commonAnnotations) "context" .) }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" $annotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  accessModes:
+  {{- range .Values.selfHosting.persistence.accessModes }}
+    - {{ . | quote }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.selfHosting.persistence.size | quote }}
+  {{- if .Values.selfHosting.persistence.selector }}
+  selector: {{- include "common.tplvalues.render" (dict "value" .Values.selfHosting.persistence.selector "context" $) | nindent 4 }}
+  {{- end }}
+  {{- if .Values.selfHosting.persistence.dataSource }}
+  dataSource: {{- include "common.tplvalues.render" (dict "value" .Values.selfHosting.persistence.dataSource "context" $) | nindent 4 }}
+  {{- end }}
+  {{- include "common.storage.class" (dict "persistence" .Values.selfHosting.persistence "global" .Values.global) | nindent 2 }}
+{{- end -}}
+{{- end }}

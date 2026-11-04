@@ -1,0 +1,53 @@
+{{- if .Values.selfHosting.enabled }}
+{{- if .Values.selfHosting.ingress.enabled }}
+apiVersion: {{ include "common.capabilities.ingress.apiVersion" . }}
+kind: Ingress
+metadata:
+  name: {{ include "selfHosting.names.fullname" . }}
+  namespace: {{ include "selfHosting.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/component: {{ include "selfHosting.names.component" . }}
+  {{- if or .Values.selfHosting.ingress.annotations .Values.commonAnnotations }}
+  {{- $annotations := include "common.tplvalues.merge" (dict "values" (list .Values.selfHosting.ingress.annotations .Values.commonAnnotations) "context" .) }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" $annotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if .Values.selfHosting.ingress.ingressClassName }}
+  ingressClassName: {{ .Values.selfHosting.ingress.ingressClassName | quote }}
+  {{- end }}
+  rules:
+    {{- if .Values.selfHosting.ingress.hostname }}
+    - host: {{ .Values.selfHosting.ingress.hostname }}
+      http:
+        paths:
+          {{- if .Values.selfHosting.ingress.extraPaths }}
+          {{- toYaml .Values.selfHosting.ingress.extraPaths | nindent 10 }}
+          {{- end }}
+          - path: {{ .Values.selfHosting.ingress.path }}
+            pathType: {{ .Values.selfHosting.ingress.pathType }}
+            backend: {{- include "common.ingress.backend" (dict "serviceName" (include "selfHosting.names.service" .) "servicePort" "http" "context" $)  | nindent 14 }}
+    {{- end }}
+    {{- range .Values.selfHosting.ingress.extraHosts }}
+    - host: {{ .name | quote }}
+      http:
+        paths:
+          - path: {{ default "/" .path }}
+            pathType: {{ default "ImplementationSpecific" .pathType }}
+            backend: {{- include "common.ingress.backend" (dict "serviceName" (include "selfHosting.names.service" $) "servicePort" "http" "context" $) | nindent 14 }}
+    {{- end }}
+    {{- if .Values.selfHosting.ingress.extraRules }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.selfHosting.ingress.extraRules "context" $) | nindent 4 }}
+    {{- end }}
+  {{- if or (and .Values.selfHosting.ingress.tls (or (include "common.ingress.certManagerRequest" ( dict "annotations" .Values.selfHosting.ingress.annotations )) .Values.selfHosting.ingress.selfSigned)) .Values.selfHosting.ingress.extraTls }}
+  tls:
+    {{- if and .Values.selfHosting.ingress.tls (or (include "common.ingress.certManagerRequest" ( dict "annotations" .Values.selfHosting.ingress.annotations )) .Values.selfHosting.ingress.selfSigned) }}
+    - hosts:
+        - {{ .Values.selfHosting.ingress.hostname | quote }}
+      secretName: {{ printf "%s-tls" .Values.selfHosting.ingress.hostname }}
+    {{- end }}
+    {{- if .Values.selfHosting.ingress.extraTls }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.selfHosting.ingress.extraTls "context" $) | nindent 4 }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+{{- end }}
