@@ -341,7 +341,7 @@ server:
   ##
   pdb:
     create: true
-    minAvailable: 1
+    minAvailable: ""
     maxUnavailable: ""
   ## Autoscaling configuration
   ## ref: https://kubernetes.io/docs/concepts/workloads/autoscaling/
@@ -843,7 +843,7 @@ persist:
   ##
   pdb:
     create: true
-    minAvailable: 1
+    minAvailable: ""
     maxUnavailable: ""
   ## Autoscaling configuration
   ## ref: https://kubernetes.io/docs/concepts/workloads/autoscaling/
@@ -1345,7 +1345,7 @@ orchestrator:
   ##
   pdb:
     create: true
-    minAvailable: 1
+    minAvailable: ""
     maxUnavailable: ""
   ## Autoscaling configuration
   ## ref: https://kubernetes.io/docs/concepts/workloads/autoscaling/
@@ -1847,7 +1847,7 @@ jobs:
   ##
   pdb:
     create: true
-    minAvailable: 1
+    minAvailable: ""
     maxUnavailable: ""
   ## Autoscaling configuration
   ## ref: https://kubernetes.io/docs/concepts/workloads/autoscaling/
@@ -2919,7 +2919,7 @@ metering:
   ##
   pdb:
     create: true
-    minAvailable: 1
+    minAvailable: ""
     maxUnavailable: ""
   ## Autoscaling configuration
   ## ref: https://kubernetes.io/docs/concepts/workloads/autoscaling/
@@ -3416,7 +3416,7 @@ selfHosting:
   ##
   pdb:
     create: true
-    minAvailable: 1
+    minAvailable: ""
     maxUnavailable: ""
   ## Autoscaling configuration
   ## ref: https://kubernetes.io/docs/concepts/workloads/autoscaling/
